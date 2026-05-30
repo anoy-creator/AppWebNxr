@@ -19,3 +19,4 @@ On boss sur deux branche
 - et on met a jour sur sa branche perso
 - git commit -a -m "nomDuCommit"
 - puis git push
+- deblox s'occupe des merges
