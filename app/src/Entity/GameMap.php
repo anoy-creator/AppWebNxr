@@ -33,7 +33,7 @@ class GameMap
 
     public function __construct()
     {
-        $this->matches = new ArrayCollection();
+        $this->games = new ArrayCollection();
     }
 
     public function getId(): ?int

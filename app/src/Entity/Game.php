@@ -187,7 +187,7 @@ class Game
     {
         if (!$this->matchPlayers->contains($matchPlayer)) {
             $this->matchPlayers->add($matchPlayer);
-            $matchPlayer->setMatch($this);
+            $matchPlayer->setGame($this);
         }
 
         return $this;
@@ -196,8 +196,8 @@ class Game
     public function removeMatchPlayer(MatchPlayer $matchPlayer): static
     {
         if ($this->matchPlayers->removeElement($matchPlayer)) {
-            if ($matchPlayer->getMatch() === $this) {
-                $matchPlayer->setMatch(null);
+            if ($matchPlayer->getGame() === $this) {
+                $matchPlayer->setGame(null);
             }
         }
 
