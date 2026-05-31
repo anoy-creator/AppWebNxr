@@ -27,3 +27,15 @@ exit
 git add .
 git commit -m "<message>"
 git push
+
+# Symfony CLI (optionnel — exécution locale sans Docker)
+# Depuis le dossier de l'application
+cd app
+
+# Démarrer le serveur local
+symfony server:start
+
+# Arrêter le serveur
+symfony server:stop
+
+# Remarque: utiliser Symfony CLI uniquement pour développement local rapide. Docker reste la méthode recommandée pour un environnement identique aux autres contributeurs.
