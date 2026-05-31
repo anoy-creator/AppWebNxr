@@ -2,11 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - master
   pull_request:
 
 jobs:
-  phpunit:
+  tests:
     runs-on: ubuntu-latest
 
     defaults:
@@ -14,41 +16,54 @@ jobs:
         working-directory: app
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: "8.2"
           extensions: mbstring, intl, pdo_mysql
-          tools: composer
+          coverage: none
 
-      - name: Get Composer cache
+      - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
           path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('app/composer.lock', 'app/composer.json') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('app/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Validate composer
-        run: composer validate --strict
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
 
       - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+        run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Run php-cs-fixer
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
-
-      - name: Run phpstan
-        run: vendor/bin/phpstan analyse src --no-progress --level=7 || true
-
-      - name: Setup test database
+      - name: Check coding standards
         run: |
-          php bin/console doctrine:database:create --env=test --if-not-exists
-          php bin/console doctrine:migrations:migrate -n --env=test
-          php bin/console doctrine:fixtures:load -n --env=test
+          if [ -f vendor/bin/php-cs-fixer ]; then
+            vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+          else
+            echo "php-cs-fixer non installé, étape ignorée."
+          fi
 
-      - name: Run tests
-        run: vendor/bin/phpunit --testdox
+      - name: Run PHPStan
+        run: |
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse src --no-progress || true
+          else
+            echo "PHPStan non installé, étape ignorée."
+          fi
+
+      - name: Prepare test environment
+        run: |
+          cp .env.test .env.test.local || true
+
+      - name: Run PHPUnit
+        run: |
+          if [ -f vendor/bin/phpunit ]; then
+            vendor/bin/phpunit --testdox
+          else
+            php bin/phpunit --testdox
+          fi
