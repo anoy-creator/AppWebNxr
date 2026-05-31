@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title|default('Matchs - Naxera') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/pages/matches/matches.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'pages/matches/_matches.html.twig' %}
+{% endblock %}

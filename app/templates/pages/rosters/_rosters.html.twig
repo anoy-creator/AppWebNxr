@@ -1,0 +1,65 @@
+<section class="page container">
+    <div class="page-heading">
+        <span>CUP</span>
+        <h1>Nos Rosters</h1>
+    </div>
+
+    <div class="stack">
+        {% for roster in rosters %}
+            <article class="roster-card">
+
+                <div class="roster-hero">
+                    <img
+                        src="{{ roster.banner ?: '/images/roster-default.jpg' }}"
+                        alt="{{ roster.name }}"
+                    >
+
+                    <div class="roster-title">
+                        <div class="logo-mark big">NxR</div>
+
+                        <div>
+                            <h2>{{ roster.name }}</h2>
+                            <p>{{ roster.game }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="roster-content">
+
+                    <div class="mini-stats big-stats">
+                        <span>
+                            <strong>{{ roster.wins }}</strong>
+                            Victoires
+                        </span>
+
+                        <span>
+                            <strong>{{ roster.losses }}</strong>
+                            Défaites
+                        </span>
+
+                        <span>
+                            <strong>{{ roster.winrate }}</strong>
+                            Winrate
+                        </span>
+                    </div>
+
+                    <h3>Composition</h3>
+
+                    <div class="composition-grid">
+                        {% for player in roster.players %}
+                            <span>
+                                {{ player.pseudo }}
+                                <em>{{ player.grade }}</em>
+                            </span>
+                        {% else %}
+                            <span>Aucun joueur</span>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </article>
+        {% else %}
+            <p>Aucun roster disponible.</p>
+        {% endfor %}
+    </div>
+</section>

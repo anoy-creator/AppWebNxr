@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title|default('Admin - Naxera') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/pages/admin/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'pages/admin/_admin.html.twig' %}
+{% endblock %}

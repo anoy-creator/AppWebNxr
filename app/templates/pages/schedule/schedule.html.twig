@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title|default('Planning - Naxera') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/pages/schedule/schedule.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'pages/schedule/_schedule.html.twig' %}
+{% endblock %}

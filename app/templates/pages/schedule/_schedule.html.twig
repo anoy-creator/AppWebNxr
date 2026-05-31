@@ -1,0 +1,69 @@
+<section class="page container">
+    <div class="page-heading">
+        <span>CAL</span>
+        <h1>Planning</h1>
+    </div>
+
+    {% if events|length == 0 and matches|length == 0 %}
+        <p>Aucun evenement programme.</p>
+    {% else %}
+
+        <div class="legend">
+            <span><i class="blue"></i>Entrainement</span>
+            <span><i class="yellow"></i>Reunion</span>
+            <span><i class="purple"></i>Tournoi</span>
+            <span><i class="red"></i>Match officiel</span>
+        </div>
+
+        <div class="stack">
+
+            {# EVENTS #}
+            {% for event in events %}
+                <article class="event-card {{ event.type }}">
+                    <div>
+                        <span>{{ event.title }}</span>
+                        <span>
+                            {{ event.date ? event.date|date('d/m/Y') : 'TBD' }}
+                            {% if event.time %}
+                                - {{ event.time }}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <h3>{{ event.title }}</h3>
+
+                    <p>{{ event.description }}</p>
+                </article>
+            {% endfor %}
+
+            {# MATCHES #}
+            {% for match in matches %}
+                <article class="event-card match">
+
+                    <div>
+                        <span>Match officiel</span>
+                        <span>
+                            {{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}
+                        </span>
+                    </div>
+
+                    <h3>
+                        {{ match.teamA ? match.teamA.name : 'TBA' }}
+                        vs
+                        {{ match.teamB ? match.teamB.name : 'TBA' }}
+                    </h3>
+
+                    <p>
+                        {{ match.game }}
+                        {% if match.mode %}
+                            - {{ match.mode }}
+                        {% endif %}
+                    </p>
+
+                </article>
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+</section>

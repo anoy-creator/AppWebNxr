@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title|default('Joueurs - Naxera') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/pages/players/players.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'pages/players/_players.html.twig' %}
+{% endblock %}

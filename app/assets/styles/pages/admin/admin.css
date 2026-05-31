@@ -1,0 +1,50 @@
+@import '../../_variables.css';
+@import '../../common.css';
+
+.admin-locked {
+    position: relative;
+    display: grid;
+    min-height: calc(100vh - 80px);
+    place-items: center;
+    overflow: hidden;
+    padding: 48px 16px;
+    text-align: center;
+}
+
+.admin-locked::before,
+.admin-locked::after {
+    content: "";
+    position: absolute;
+    width: 560px;
+    height: 560px;
+    border-radius: 999px;
+    background: var(--purple);
+    filter: blur(150px);
+    opacity: .2;
+}
+
+.admin-locked::before {
+    top: 25%;
+    left: 20%;
+}
+
+.admin-locked::after {
+    right: 18%;
+    bottom: 16%;
+}
+
+.admin-locked h1 {
+    margin-bottom: 8px;
+    font-size: 2.4rem;
+    font-weight: 900;
+}
+
+.admin-locked p {
+    color: var(--muted);
+}
+
+.admin-locked div {
+    position: relative;
+    z-index: 1;
+    max-width: 620px;
+}

@@ -1,0 +1,16 @@
+:root {
+    --bg: #0b0b0b;
+    --black: #000;
+    --panel: rgba(255, 255, 255, .055);
+    --panel-soft: rgba(255, 255, 255, .035);
+    --line: rgba(255, 255, 255, .1);
+    --line-purple: rgba(123, 46, 255, .28);
+    --text: #fff;
+    --muted: #9ca3af;
+    --purple: #7b2eff;
+    --purple-dark: #6b21d9;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #facc15;
+    --blue: #60a5fa;
+}

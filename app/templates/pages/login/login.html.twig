@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title|default('Connexion - Naxera') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/pages/login/login.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'pages/login/_login.html.twig' %}
+{% endblock %}
