@@ -1,0 +1,83 @@
+@startuml
+
+title Diagramme BDD - Entités Doctrine
+
+skinparam classAttributeIconSize 0
+hide methods
+hide circle
+
+class Event {
+  id: integer
+  title: string
+  type: string
+  date: datetime_immutable
+  time: string
+  description: text
+}
+
+class GameMatch {
+  id: integer
+  playedAt: datetime_immutable
+  game: string
+  mode: string
+  result: string
+  score: string
+  teamA: Team
+  teamB: Team
+}
+
+class News {
+  id: integer
+  title: string
+  author: string
+  date: datetime_immutable
+  image: string
+  excerpt: string
+  content: text
+}
+
+class Player {
+  id: integer
+  pseudo: string
+  avatar: string
+  role: string
+  grade: string
+  game: string
+  socials: json
+  roster: Roster
+}
+
+class Roster {
+  id: integer
+  name: string
+  game: string
+  banner: string
+  wins: integer
+  losses: integer
+  winrate: string
+  players: Player
+}
+
+class Team {
+  id: integer
+  name: string
+}
+
+class User {
+  id: integer
+  discordId: string
+  username: string
+  discriminator: string
+  avatar: string
+  email: string
+  roles: json
+  createdAt: datetime_immutable
+  lastLoginAt: datetime_immutable
+}
+
+GameMatch "*" -- "1" Team : teamA
+GameMatch "*" -- "1" Team : teamB
+Player "*" -- "1" Roster : roster
+Roster "1" -- "*" Player : players
+
+@enduml
