@@ -1,0 +1,18 @@
+<section class="page container">
+    <div class="page-heading">
+        <span>NEWS</span>
+        <h1>Actualites</h1>
+    </div>
+    <div class="card-grid two">
+        {% for item in news %}
+            <article class="image-card large">
+                <img src="{{ item.image|default('/images/news-default.jpg') }}" alt="">
+                <div class="card-body">
+                    <h2>{{ item.title }}</h2>
+                    <p>{{ item.content }}</p>
+                    <small>{{ item.author|default('N/A') }} - {{ item.date ? item.date|date('d/m/Y') : '' }}</small>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>

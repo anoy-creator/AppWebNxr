@@ -1,0 +1,56 @@
+<section class="page container">
+    <div class="page-heading">
+        <span>TEAM</span>
+        <h1>Nos Joueurs</h1>
+    </div>
+
+    <div class="filter-row">
+        {% for filter in ['Tous', 'Staff', 'Joueur', 'Streamer', 'Createur'] %}
+            <span>{{ filter }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="card-grid three">
+        {% for player in players %}
+            <article class="player-card">
+
+                <div class="player-photo">
+                    <img
+                        src="{{ player.avatar ?: '/images/default-avatar.png' }}"
+                        alt="{{ player.pseudo }}"
+                    >
+
+                    <span>
+                        {{ player.roster ? player.roster.name : 'Sans roster' }}
+                    </span>
+
+                    <div>
+                        <h2>{{ player.pseudo }}</h2>
+                        <p>{{ player.grade }}</p>
+                    </div>
+                </div>
+
+                <div class="player-meta">
+                    <span>Rôle</span>
+                    <strong>{{ player.role }}</strong>
+                </div>
+
+                <div class="player-meta">
+                    <span>Jeu principal</span>
+                    <strong>{{ player.game }}</strong>
+                </div>
+
+                {% if player.socials is not empty %}
+                    <div class="social-links">
+                        {% for network, account in player.socials %}
+                            <span>{{ network }} : {{ account }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+            </article>
+        {% else %}
+            <p>Aucun joueur trouvé.</p>
+        {% endfor %}
+    </div>
+</section>

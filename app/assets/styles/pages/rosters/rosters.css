@@ -1,0 +1,230 @@
+@import '../../_variables.css';
+@import '../../common.css';
+
+.roster-card {
+    overflow: hidden;
+    border-radius: 18px;
+}
+
+.roster-banner {
+    position: relative;
+    overflow: hidden;
+    height: 170px;
+}
+
+.roster-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+
+.roster-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .22), transparent);
+}
+
+.roster-banner div {
+    position: absolute;
+    right: 24px;
+    bottom: 18px;
+    left: 24px;
+    z-index: 1;
+}
+
+.roster-banner h3 {
+    margin-bottom: 4px;
+    font-size: 1.7rem;
+    font-weight: 900;
+}
+
+.roster-banner p {
+    margin: 0;
+    color: #d1d5db;
+}
+
+.roster-banner:hover img {
+    transform: scale(1.06);
+}
+
+.mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 20px;
+}
+
+.mini-stats span {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .055);
+    padding: 14px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.mini-stats strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--purple);
+    font-size: 1.55rem;
+}
+
+.player-list {
+    display: grid;
+    gap: 8px;
+    padding: 0 20px 22px;
+}
+
+.player-list span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .045);
+    padding: 11px 14px;
+    font-weight: 700;
+}
+
+.player-list em {
+    color: var(--muted);
+    font-size: .78rem;
+    font-style: normal;
+}
+
+.composition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.composition-grid span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .045);
+    padding: 11px 14px;
+    font-weight: 700;
+}
+
+.composition-grid em {
+    color: var(--muted);
+    font-size: .78rem;
+    font-style: normal;
+}
+
+.composition-grid .captain {
+    border-color: rgba(123, 46, 255, .36);
+    background: rgba(123, 46, 255, .12);
+}
+
+.composition-grid .sub {
+    opacity: .65;
+}
+
+.roster-hero {
+    position: relative;
+    overflow: hidden;
+    height: 260px;
+}
+
+.roster-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+
+.roster-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .22), transparent);
+}
+
+.roster-hero:hover img {
+    transform: scale(1.06);
+}
+
+.roster-title {
+    position: absolute;
+    bottom: 26px;
+    left: 26px;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+}
+
+.roster-title h2 {
+    margin-bottom: 4px;
+    font-size: 2.5rem;
+    font-weight: 900;
+}
+
+.roster-title p {
+    margin: 0;
+    color: #d1d5db;
+}
+
+.roster-content {
+    padding: 32px;
+}
+
+.big-stats {
+    padding: 0 0 30px;
+}
+
+.stack {
+    display: grid;
+    gap: 32px;
+}
+
+.card-grid.two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 1020px) {
+    .composition-grid,
+    .card-grid.two {
+        grid-template-columns: 1fr;
+    }
+
+    .mini-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    .composition-grid,
+    .card-grid.two,
+    .mini-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title,
+    .roster-title {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .button {
+        width: 100%;
+    }
+
+    .roster-hero {
+        height: 330px;
+    }
+
+    .roster-content {
+        padding: 24px;
+    }
+}

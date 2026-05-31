@@ -1,0 +1,145 @@
+@import '../../_variables.css';
+@import '../../common.css';
+
+.card-grid.three {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.player-card {
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+.player-photo {
+    position: relative;
+    height: 288px;
+    overflow: hidden;
+}
+
+.player-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease;
+}
+
+.player-photo > span,
+.player-photo > div {
+    position: absolute;
+    z-index: 1;
+}
+
+.player-photo > span {
+    top: 16px;
+    right: 16px;
+    border-radius: 999px;
+    background: rgba(123, 46, 255, .9);
+    padding: 6px 12px;
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.player-photo > div {
+    right: 24px;
+    bottom: 22px;
+    left: 24px;
+}
+
+.player-photo h2 {
+    margin-bottom: 4px;
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.player-photo p {
+    margin: 0;
+    color: var(--purple);
+    font-weight: 700;
+}
+
+.player-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .22), transparent);
+}
+
+.player-photo:hover img {
+    transform: scale(1.06);
+}
+
+.player-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 24px 16px;
+}
+
+.player-meta span {
+    color: var(--muted);
+}
+
+.card-socials {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px 24px;
+}
+
+.card-socials a {
+    flex: 1;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .055);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.filter-row span {
+    background: rgba(255, 255, 255, .055);
+    color: var(--muted);
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: .25s ease;
+}
+
+.filter-row span:first-child {
+    background: var(--purple);
+    color: #fff;
+    box-shadow: 0 10px 26px rgba(123, 46, 255, .3);
+}
+
+@media (max-width: 1020px) {
+    .card-grid.three {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    .card-grid.three {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-actions,
+    .section-title {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .button {
+        width: 100%;
+    }
+}

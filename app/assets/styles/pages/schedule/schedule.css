@@ -1,0 +1,63 @@
+@import '../../_variables.css';
+@import '../../common.css';
+
+.day-block h2 {
+    margin-bottom: 18px;
+    font-size: 1.8rem;
+}
+
+.event-card {
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    transition: .25s ease;
+}
+
+.event-card:hover {
+    transform: translateX(4px);
+}
+
+.event-card div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.event-card div span {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .09);
+    padding: 6px 12px;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.event-card h3 {
+    margin-bottom: 8px;
+}
+
+.event-card p {
+    margin: 0;
+    color: #d1d5db;
+}
+
+.event-card.training { 
+    border-color: rgba(96, 165, 250, .3); 
+    background: rgba(96, 165, 250, .09); 
+}
+
+.event-card.meeting { 
+    border-color: rgba(250, 204, 21, .3); 
+    background: rgba(250, 204, 21, .08); 
+}
+
+.event-card.tournament { 
+    border-color: rgba(123, 46, 255, .36); 
+    background: rgba(123, 46, 255, .11); 
+}
+
+.event-card.match { 
+    border-color: rgba(248, 113, 113, .3); 
+    background: rgba(248, 113, 113, .09); 
+}
