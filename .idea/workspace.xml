@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Doc/technique/runEnv.md" beforeDir="false" afterPath="$PROJECT_DIR$/Doc/technique/runEnv.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,6 +134,20 @@
       <path value="$PROJECT_DIR$/app/vendor/symfony/polyfill-php84" />
       <path value="$PROJECT_DIR$/app/vendor/symfony/doctrine-bridge" />
       <path value="$PROJECT_DIR$/app/vendor/symfony/stopwatch" />
+      <path value="$PROJECT_DIR$/app/vendor/friendsofphp/php-cs-fixer" />
+      <path value="$PROJECT_DIR$/app/vendor/clue/ndjson-react" />
+      <path value="$PROJECT_DIR$/app/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/app/vendor/fidry/cpu-core-counter" />
+      <path value="$PROJECT_DIR$/app/vendor/ergebnis/agent-detector" />
+      <path value="$PROJECT_DIR$/app/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/app/vendor/react/child-process" />
+      <path value="$PROJECT_DIR$/app/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/app/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/app/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/app/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/app/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/app/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/app/vendor/react/stream" />
     </include_path>
   </component>
   <component name="ProjectColorInfo">{
@@ -188,7 +202,7 @@
       <updated>1780065131255</updated>
       <workItem from="1780065132575" duration="6000" />
       <workItem from="1780219489313" duration="13000" />
-      <workItem from="1780219512094" duration="6570000" />
+      <workItem from="1780219512094" duration="7612000" />
     </task>
     <servers />
   </component>
