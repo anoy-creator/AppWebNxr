@@ -18,6 +18,7 @@ php bin/console do:sc:update --force
 php bin/console doctrine:fixtures:load
 
 # Vérifier et afficher les corrections de style (dry-run)
+docker exec -it symfony_php bash
 vendor/bin/php-cs-fixer fix --dry-run --diff (en gros cette commande avant de commit)
 # (Optionnel) Appliquer automatiquement : vendor/bin/php-cs-fixer fix
 
