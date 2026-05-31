@@ -6,17 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/reference.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/IndexController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/index/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/index/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/Selli/IdeaProjects/AppWebNxr" value="3EP0vrZEcOonEGqBWm0YjxZXYPU" />
+    </persistenceIdMap>
   </component>
   <component name="Git.Settings">
     <option name="INCOMING_COMMITS_CHECK_STRATEGY" value="FETCH" />
@@ -39,6 +38,10 @@
     &quot;accountId&quot;: &quot;a4469737-0506-461f-8993-18d601347be9&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -53,9 +56,12 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "creation-front",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
     "git.auto.fetch.suggestion.counter": "1",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -81,6 +87,7 @@
       <option name="presentableId" value="Default" />
       <updated>1780065131255</updated>
       <workItem from="1780065132575" duration="6000" />
+      <workItem from="1780219489313" duration="13000" />
     </task>
     <servers />
   </component>
