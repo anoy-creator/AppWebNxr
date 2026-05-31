@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/app/src" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" packagePrefix="App\Tests\" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/clue/ndjson-react" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/collections" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/dbal" />
@@ -19,11 +20,23 @@
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/orm" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/persistence" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/sql-formatter" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/ergebnis/agent-detector" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/evenement/evenement" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/fidry/cpu-core-counter" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/friendsofphp/php-cs-fixer" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/nikic/php-parser" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/psr/cache" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/psr/container" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/psr/event-dispatcher" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/child-process" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/event-loop" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/react/stream" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/sebastian/diff" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/asset" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/cache" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/cache-contracts" />
@@ -43,6 +56,7 @@
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/http-foundation" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/http-kernel" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/maker-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/options-resolver" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/polyfill-intl-grapheme" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/polyfill-intl-normalizer" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/polyfill-mbstring" />

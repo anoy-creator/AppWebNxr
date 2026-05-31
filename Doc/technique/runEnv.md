@@ -32,7 +32,14 @@ git push
 # Depuis le dossier de l'application
 cd app
 
+# CsFixer depuis l'intérieur du conteneur PHP :
+docker exec -it symfony_php bash
+vendor/bin/php-cs-fixer fix --dry-run --diff
+# ou
+vendor/bin/php-cs-fixer fix
+
 # Démarrer le serveur local
+docker exec -it symfony_php bash
 symfony server:start
 
 # Arrêter le serveur

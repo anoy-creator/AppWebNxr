@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\TeamMember;
 use App\Entity\Team;
+use App\Entity\TeamMember;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
