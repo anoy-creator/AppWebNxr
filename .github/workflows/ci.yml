@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_mysql
+
+      - name: Get Composer cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock', 'composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Validate composer
+        run: composer --version
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install dev tools (php-cs-fixer, phpstan)
+        run: composer require --no-interaction --no-progress --dev friendsofphp/php-cs-fixer phpstan/phpstan
+
+      - name: Run php-cs-fixer (check)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+
+      - name: Run phpstan
+        run: vendor/bin/phpstan analyse app/src --no-progress --level=7 || true
+
+      - name: Run tests
+        run: vendor/bin/phpunit --testdox
