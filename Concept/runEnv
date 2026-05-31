@@ -1,5 +1,0 @@
-Run =>
-
-docker compose up -d --build
-docker exec -it symfony_php bash
-symfony serve:start

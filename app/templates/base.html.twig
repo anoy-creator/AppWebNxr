@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Mon site Symfony{% endblock %}</title>
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+    </head>
+
+    <body>
+        <header style="padding: 15px; background: #222; color: white;">
+            <h2>Mon Symfony App</h2>
+        </header>
+
+        <main style="padding: 20px;">
+            {% block body %}{% endblock %}
+        </main>
+
+        <footer style="padding: 15px; background: #eee; text-align: center;">
+            © {{ "now"|date("Y") }} - Mon site
+        </footer>
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </body>
+</html>

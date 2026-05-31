@@ -37,5 +37,13 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
+  node:
+    image: node:22
+    container_name: symfony_node
+    working_dir: /var/www/app
+    volumes:
+      - ./app:/var/www/app
+    tty: true
+
 volumes:
   db_data:
