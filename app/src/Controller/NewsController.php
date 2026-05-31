@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\SiteDataProvider;
+use App\Repository\NewsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,15 +12,11 @@ class NewsController extends AbstractController
 {
     use PageRenderTrait;
 
-    public function __construct(private readonly SiteDataProvider $siteDataProvider)
-    {
-    }
-
     #[Route('/news', name: 'app_news')]
-    public function index(Request $request): Response
+    public function index(Request $request, NewsRepository $newsRepository): Response
     {
         return $this->renderPage($request, 'news', 'Actualites - Naxera', [
-            'data' => $this->siteDataProvider->getData(),
+            'news' => $newsRepository->findBy([], ['date' => 'DESC']),
         ]);
     }
 }

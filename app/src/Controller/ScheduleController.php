@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Service\SiteDataProvider;
+use App\Repository\EventRepository;
+use App\Repository\GameMatchRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,15 +13,15 @@ class ScheduleController extends AbstractController
 {
     use PageRenderTrait;
 
-    public function __construct(private readonly SiteDataProvider $siteDataProvider)
-    {
-    }
-
     #[Route('/schedule', name: 'app_schedule')]
-    public function index(Request $request): Response
-    {
+    public function index(
+        Request $request,
+        EventRepository $eventRepository,
+        GameMatchRepository $gameMatchRepository,
+    ): Response {
         return $this->renderPage($request, 'schedule', 'Planning - Naxera', [
-            'data' => $this->siteDataProvider->getData(),
+            'events' => $eventRepository->findBy([], ['date' => 'ASC']),
+            'matches' => $gameMatchRepository->findBy([], ['playedAt' => 'ASC']),
         ]);
     }
 }

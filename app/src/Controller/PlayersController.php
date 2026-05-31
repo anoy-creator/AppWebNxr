@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\SiteDataProvider;
+use App\Repository\PlayerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,15 +12,11 @@ class PlayersController extends AbstractController
 {
     use PageRenderTrait;
 
-    public function __construct(private readonly SiteDataProvider $siteDataProvider)
-    {
-    }
-
     #[Route('/players', name: 'app_players')]
-    public function index(Request $request): Response
+    public function index(Request $request, PlayerRepository $playerRepository): Response
     {
         return $this->renderPage($request, 'players', 'Joueurs - Naxera', [
-            'data' => $this->siteDataProvider->getData(),
+            'players' => $playerRepository->findBy([], ['pseudo' => 'ASC']),
         ]);
     }
 }
