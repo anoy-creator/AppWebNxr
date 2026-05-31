@@ -1,4 +1,4 @@
-# 🚀 AppWebNxr
+﻿# 🚀 AppWebNxr
 
 Application web basée sur Symfony, conteneurisée avec Docker pour garantir un environnement de développement et de production identique.
 

@@ -1,4 +1,4 @@
-﻿# Commandes pour démarrer le projet localement et push Git
+﻿# Commandes
 
 git clone <repo-url>
 cd AppWebNxr
