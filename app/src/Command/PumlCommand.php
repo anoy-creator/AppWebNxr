@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class PumlCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
     }
@@ -69,15 +69,15 @@ final class PumlCommand extends Command
             mkdir($outputDir, 0777, true);
         }
 
-        file_put_contents($outputDir . '/index.puml', $puml);
+        file_put_contents($outputDir.'/index.puml', $puml);
 
         $encoded = $this->encodePlantUml($puml);
-        $url = 'https://www.plantuml.com/plantuml/png/' . $encoded;
+        $url = 'https://www.plantuml.com/plantuml/png/'.$encoded;
 
         $command = sprintf(
             'curl --silent %s --output %s',
             escapeshellarg($url),
-            escapeshellarg($outputDir . '/index.png')
+            escapeshellarg($outputDir.'/index.png')
         );
 
         system($command);
@@ -157,9 +157,9 @@ final class PumlCommand extends Command
         $c4 = $b3 & 0x3F;
 
         return
-            $this->encode6Bit($c1 & 0x3F) .
-            $this->encode6Bit($c2 & 0x3F) .
-            $this->encode6Bit($c3 & 0x3F) .
+            $this->encode6Bit($c1 & 0x3F).
+            $this->encode6Bit($c2 & 0x3F).
+            $this->encode6Bit($c3 & 0x3F).
             $this->encode6Bit($c4 & 0x3F);
     }
 
