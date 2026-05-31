@@ -1,26 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Mon site Symfony{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Naxera eSport{% endblock %}</title>
+        <meta name="description" content="Site officiel de Naxera eSport, rosters, actualites, planning et resultats NxR.">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
     </head>
 
-    <body>
-        <header style="padding: 15px; background: #222; color: white;">
-            <h2>Mon Symfony App</h2>
+    <body class="{{ hide_footer is defined and hide_footer ? 'hide-site-footer' : '' }}">
+        {% set nav = {
+            '/': 'Accueil',
+            '/news': 'Actualites',
+            '/players': 'Joueurs',
+            '/rosters': 'Rosters',
+            '/schedule': 'Planning',
+            '/matches': 'Matchs'
+        } %}
+
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" href="{{ path('app_index') }}">
+                    <span class="logo-mark">NxR</span>
+                    <span>NAXERA</span>
+                </a>
+                <nav class="desktop-nav" aria-label="Navigation principale">
+                    {% for href, label in nav %}
+                        <a class="nav-link{{ app.request.pathInfo == href ? ' is-active' : '' }}" href="{{ href }}">{{ label }}</a>
+                    {% endfor %}
+                </nav>
+                <a class="login-link" href="{{ path('app_login') }}">Connexion</a>
+            </div>
         </header>
 
-        <main style="padding: 20px;">
+        <div class="ajax-loader" aria-live="polite" aria-hidden="true">
+            <div class="ajax-loader-logo">NxR</div>
+        </div>
+
+        <main id="ajax-root" class="ajax-root">
             {% block body %}{% endblock %}
         </main>
 
-        <footer style="padding: 15px; background: #eee; text-align: center;">
-            © {{ "now"|date("Y") }} - Mon site
-        </footer>
+        {% if hide_footer is not defined or not hide_footer %}
+            <footer class="site-footer">
+                <div class="container footer-grid">
+                    <div class="footer-brand">
+                        <div class="brand">
+                            <span class="logo-mark">NxR</span>
+                            <span>NAXERA</span>
+                        </div>
+                        <p>"One Team. One Vision. NxR."</p>
+                        <div class="social-row">
+                            <a href="#" aria-label="Twitter">X</a>
+                            <a href="#" aria-label="Twitch">Tw</a>
+                            <a href="#" aria-label="Youtube">Yt</a>
+                            <a href="#" aria-label="Instagram">Ig</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Navigation</h3>
+                        <ul class="footer-list">
+                            <li><a href="{{ path('app_index') }}">Accueil</a></li>
+                            <li><a href="{{ path('app_news') }}">Actualites</a></li>
+                            <li><a href="{{ path('app_players') }}">Joueurs</a></li>
+                            <li><a href="{{ path('app_rosters') }}">Rosters</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Partenaires</h3>
+                        <ul class="footer-list">
+                            <li>HyperX</li>
+                            <li>Discord</li>
+                            <li>Twitch</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="copyright">&copy; {{ "now"|date("Y") }} Naxera eSport. All rights reserved.</p>
+            </footer>
+        {% endif %}
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
