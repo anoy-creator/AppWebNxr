@@ -1,1 +1,27 @@
+# IDE & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Figma exports
 .figma-export-*/
+
+# Environment
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Docker volumes (optional - uncomment if you want to ignore them)
+# db_data/
