@@ -1,0 +1,31 @@
+{% set labels = {
+    training: 'Entrainement',
+    meeting: 'Reunion',
+    tournament: 'Tournoi',
+    match: 'Match officiel'
+} %}
+
+<section class="page container">
+    <div class="page-heading">
+        <span>CAL</span>
+        <h1>Planning</h1>
+    </div>
+    <div class="legend">
+        <span><i class="blue"></i>Entrainement</span>
+        <span><i class="yellow"></i>Reunion</span>
+        <span><i class="purple"></i>Tournoi</span>
+        <span><i class="red"></i>Match officiel</span>
+    </div>
+    <div class="stack">
+        {% for event in data.events %}
+            <article class="event-card {{ event.type }}">
+                <div>
+                    <span>{{ labels[event.type] }}</span>
+                    <span>{{ event.date|date('d/m/Y') }} - {{ event.time }}</span>
+                </div>
+                <h3>{{ event.title }}</h3>
+                <p>{{ event.description }}</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>

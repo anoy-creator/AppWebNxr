@@ -1,0 +1,41 @@
+{% set total = data.matches|length %}
+{% set victories = data.matches|filter(match => match.result == 'Victory')|length %}
+{% set defeats = total - victories %}
+{% set winrate = ((victories / total) * 100)|number_format(1) %}
+
+<section class="page container">
+    <div class="page-heading">
+        <span>CUP</span>
+        <h1>Historique des Matchs</h1>
+    </div>
+    <div class="stat-grid match-stats">
+        <article class="stat-card"><strong>{{ total }}</strong><p>Total matchs</p></article>
+        <article class="stat-card green"><strong>{{ victories }}</strong><p>Victoires</p></article>
+        <article class="stat-card red"><strong>{{ defeats }}</strong><p>Defaites</p></article>
+        <article class="stat-card purple"><strong>{{ winrate }}%</strong><p>Winrate</p></article>
+    </div>
+    <div class="filter-row">
+        {% for filter in ['Tous', 'CDL', 'Warzone', 'Tournament'] %}
+            <span>{{ filter }}</span>
+        {% endfor %}
+    </div>
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Adversaire</th><th>Mode</th><th>Jeu</th><th>Score</th><th>Resultat</th></tr>
+            </thead>
+            <tbody>
+                {% for match in data.matches %}
+                    <tr>
+                        <td>{{ match.date|date('d/m/Y') }}</td>
+                        <td>{{ match.opponent }}</td>
+                        <td>{{ match.mode }}</td>
+                        <td><span class="pill">{{ match.game }}</span></td>
+                        <td>{{ match.score }}</td>
+                        <td><span class="result {{ match.result == 'Victory' ? 'win' : 'loss' }}">{{ match.result == 'Victory' ? 'Victoire' : 'Defaite' }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
