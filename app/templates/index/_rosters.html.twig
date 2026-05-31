@@ -1,0 +1,38 @@
+<section class="page container">
+    <div class="page-heading">
+        <span>CUP</span>
+        <h1>Nos Rosters</h1>
+    </div>
+    <div class="stack">
+        {% for roster in data.rosters %}
+            <article class="roster-card">
+                <div class="roster-hero">
+                    <img src="{{ roster.banner }}" alt="">
+                    <div class="roster-title">
+                        <div class="logo-mark big">NxR</div>
+                        <div>
+                            <h2>{{ roster.name }}</h2>
+                            <p>{{ roster.game }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="roster-content">
+                    <div class="mini-stats big-stats">
+                        <span><strong>{{ roster.stats.wins }}</strong> Victoires</span>
+                        <span><strong>{{ roster.stats.losses }}</strong> Defaites</span>
+                        <span><strong>{{ roster.stats.winrate }}</strong> Winrate</span>
+                    </div>
+                    <h3>Composition</h3>
+                    <div class="composition-grid">
+                        {% for player in roster.players %}
+                            <span class="{{ player.role|lower }}">
+                                {{ player.pseudo }}
+                                <em>{{ player.role }}</em>
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>

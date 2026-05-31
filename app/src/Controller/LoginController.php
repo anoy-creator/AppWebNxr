@@ -2,25 +2,20 @@
 
 namespace App\Controller;
 
-use App\Service\SiteDataProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class IndexController extends AbstractController
+class LoginController extends AbstractController
 {
     use PageRenderTrait;
 
-    public function __construct(private readonly SiteDataProvider $siteDataProvider)
-    {
-    }
-
-    #[Route('/', name: 'app_index')]
+    #[Route('/login', name: 'app_login')]
     public function index(Request $request): Response
     {
-        return $this->renderPage($request, 'index', 'Naxera eSport', [
-            'data' => $this->siteDataProvider->getData(),
+        return $this->renderPage($request, 'login', 'Connexion - Naxera', [
+            'hide_footer' => true,
         ]);
     }
 }

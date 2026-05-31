@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class IndexController extends AbstractController
+class RostersController extends AbstractController
 {
     use PageRenderTrait;
 
@@ -16,10 +16,10 @@ class IndexController extends AbstractController
     {
     }
 
-    #[Route('/', name: 'app_index')]
+    #[Route('/rosters', name: 'app_rosters')]
     public function index(Request $request): Response
     {
-        return $this->renderPage($request, 'index', 'Naxera eSport', [
+        return $this->renderPage($request, 'rosters', 'Rosters - Naxera', [
             'data' => $this->siteDataProvider->getData(),
         ]);
     }

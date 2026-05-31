@@ -5,17 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/templates/base.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/index/index.html.twig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Concept/runEnv" beforeDir="false" afterPath="$PROJECT_DIR$/Concept/runEnv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/app/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/bundles.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/assets/styles/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/reference.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/symfony.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Controller/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/index/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/index/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +53,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "creation-front",
     "git.auto.fetch.suggestion.counter": "1",
     "kotlin-language-version-configured": "true",
     "vue.rearranger.settings.migration": "true"
