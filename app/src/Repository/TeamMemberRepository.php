@@ -23,6 +23,15 @@ class TeamMemberRepository extends ServiceEntityRepository
         parent::__construct($registry, TeamMember::class);
     }
 
+    public function findNxrNbr(): int
+    {
+        return (int) $this->createQueryBuilder('tm')
+            ->select('COUNT(tm.id)')
+            ->where('tm.isMembre IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findActiveMembers(Team $team): array
     {
         return $this->createQueryBuilder('tm')
