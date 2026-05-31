@@ -13,10 +13,10 @@
 
 <section class="section container">
     <div class="stat-grid">
-        <article class="stat-card"><span>Team</span><strong>{{ data.stats.members }}</strong><p>Membres</p></article>
-        <article class="stat-card"><span>Aim</span><strong>{{ data.stats.matchesPlayed }}</strong><p>Matchs joues</p></article>
-        <article class="stat-card"><span>Cup</span><strong>{{ data.stats.tournamentsWon }}</strong><p>Tournois gagnes</p></article>
-        <article class="stat-card"><span>Rate</span><strong>{{ data.stats.winrate }}</strong><p>Winrate</p></article>
+        <article class="stat-card"><span>Team</span><strong>{{ nbMembre }}</strong><p>Membres</p></article>
+        <article class="stat-card"><span>Aim</span><strong>{{ matchesPlayed }}</strong><p>Matchs joues</p></article>
+        <article class="stat-card"><span>Cup</span><strong>{{ tournamentsWon }}</strong><p>Tournois gagnes</p></article>
+        <article class="stat-card"><span>Rate</span><strong>{{ winrate }}</strong><p>Winrate</p></article>
     </div>
 </section>
 
@@ -27,7 +27,7 @@
             <a href="{{ path('app_news') }}">Voir tout -></a>
         </div>
         <div class="card-grid three">
-            {% for item in data.news|slice(0, 3) %}
+            {% for item in news|slice(0, 3) %}
                 <article class="image-card">
                     <img src="{{ item.image }}" alt="">
                     <div class="card-body">
@@ -46,7 +46,7 @@
         <h2>Rosters actifs</h2>
     </div>
     <div class="card-grid two">
-        {% for roster in data.rosters %}
+        {% for roster in rosters %}
             <article class="roster-card compact">
                 <div class="roster-banner">
                     <img src="{{ roster.banner }}" alt="">

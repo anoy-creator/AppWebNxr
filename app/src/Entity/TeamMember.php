@@ -32,6 +32,9 @@ class TeamMember
     #[ORM\JoinColumn(name: 'team_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Team $team = null;
 
+    #[ORM\Column(type: 'string', nullable: true, name: 'is_member')]
+    private ?string $isMembre = null;
+
     public function getId(): ?int
     {
         return $this->id;
