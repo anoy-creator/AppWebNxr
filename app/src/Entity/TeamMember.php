@@ -63,7 +63,7 @@ class TeamMember
 
     public function isActive(): bool
     {
-        return $this->leftAt === null;
+        return null === $this->leftAt;
     }
 
     public function getUser(): ?User

@@ -9,7 +9,7 @@ trait PageRenderTrait
 {
     private function renderPage(Request $request, string $page, string $title, array $parameters = []): Response
     {
-        $template = $request->headers->get('X-Naxera-Ajax') === '1'
+        $template = '1' === $request->headers->get('X-Naxera-Ajax')
             ? sprintf('index/_%s.html.twig', $page)
             : sprintf('index/%s.html.twig', $page);
 

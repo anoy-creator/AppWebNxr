@@ -163,11 +163,11 @@ class MatchPlayer
     }
 
     /**
-     * Calculate KD ratio (Kills/Deaths)
+     * Calculate KD ratio (Kills/Deaths).
      */
     public function getKdRatio(): float
     {
-        if ($this->deaths === 0) {
+        if (0 === $this->deaths) {
             return $this->kills > 0 ? (float) $this->kills : 0.0;
         }
 
