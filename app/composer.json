@@ -10,17 +10,23 @@
         "doctrine/doctrine-bundle": "^2.18.2",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6.7",
+        "knpuniversity/oauth2-client-bundle": "^2.20",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.4.*",
         "symfony/runtime": "7.4.*",
+        "symfony/security-bundle": "7.4.*",
         "symfony/twig-bundle": "7.4.*",
         "symfony/webpack-encore-bundle": "^2.4",
-        "symfony/yaml": "7.4.*"
+        "symfony/yaml": "7.4.*",
+        "wohali/oauth2-discord-new": "^1.2"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^1.12.33",
+        "phpunit/phpunit": "^10.5.63",
         "symfony/maker-bundle": "^1.67"
     },
     "config": {

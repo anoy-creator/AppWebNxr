@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\SiteDataProvider;
+use App\Repository\GameMatchRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,15 +12,18 @@ class MatchesController extends AbstractController
 {
     use PageRenderTrait;
 
-    public function __construct(private readonly SiteDataProvider $siteDataProvider)
-    {
-    }
-
     #[Route('/matches', name: 'app_matches')]
-    public function index(Request $request): Response
-    {
+    public function index(
+        Request $request,
+        GameMatchRepository $gameMatchRepository,
+    ): Response {
+        $games = $gameMatchRepository->findBy(
+            [],
+            ['playedAt' => 'DESC']
+        );
+
         return $this->renderPage($request, 'matches', 'Matchs - Naxera', [
-            'data' => $this->siteDataProvider->getData(),
+            'games' => $games,
         ]);
     }
 }

@@ -10,8 +10,8 @@ trait PageRenderTrait
     private function renderPage(Request $request, string $page, string $title, array $parameters = []): Response
     {
         $template = '1' === $request->headers->get('X-Naxera-Ajax')
-            ? sprintf('index/_%s.html.twig', $page)
-            : sprintf('index/%s.html.twig', $page);
+            ? sprintf('pages/%s/_%s.html.twig', $page, $page)
+            : sprintf('pages/%s/%s.html.twig', $page, $page);
 
         $response = $this->render($template, $parameters + [
             'page_title' => $title,

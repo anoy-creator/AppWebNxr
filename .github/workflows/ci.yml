@@ -42,5 +42,14 @@ jobs:
       - name: Run phpstan
         run: vendor/bin/phpstan analyse app/src --no-progress --level=7 || true
 
+      - name: Setup test database
+        run: |
+          cd app
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:migrations:migrate -n --env=test
+          php bin/console doctrine:fixtures:load -n --env=test
+
       - name: Run tests
-        run: vendor/bin/phpunit --testdox
+        run: |
+          cd app
+          vendor/bin/phpunit --testdox
