@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,23 +65,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.8589075346387225" />
-      <entry key="MS500" value="3.9424408153281916" />
-      <entry key="S2" value="6.1092481337274265" />
-      <entry key="S5" value="10.895281026314874" />
-      <entry key="S10" value="18.645681317925717" />
-      <entry key="S30" value="32.85618114439637" />
-      <entry key="S60" value="39.048103877577105" />
-      <entry key="M2" value="42.80068512052624" />
-      <entry key="M5" value="47.78685201096976" />
-      <entry key="M10" value="57.65564756277311" />
-      <entry key="M15" value="65.56601984116307" />
-      <entry key="M30" value="78.54643596105502" />
-      <entry key="H1" value="88.20625853153555" />
-      <entry key="H2" value="100.92200657092555" />
-      <entry key="H4" value="134.36467549585717" />
-      <entry key="D1" value="247.0280607696783" />
-      <entry key="W1" value="286.48678472107093" />
+      <entry key="MS100" value="1.409640889178903" />
+      <entry key="MS500" value="2.6171111531409528" />
+      <entry key="S2" value="4.43951913435787" />
+      <entry key="S5" value="5.269907555219602" />
+      <entry key="S10" value="5.614242506454666" />
+      <entry key="S30" value="5.866482956588248" />
+      <entry key="S60" value="5.932603271292973" />
+      <entry key="M2" value="5.96614039869898" />
+      <entry key="M5" value="5.986417244766316" />
+      <entry key="M10" value="5.993202118353882" />
+      <entry key="M15" value="5.995466638537578" />
+      <entry key="M30" value="5.9985043331696115" />
+      <entry key="H1" value="6.275351306961591" />
+      <entry key="H2" value="11.649740911706365" />
+      <entry key="H4" value="37.79247610977379" />
+      <entry key="D1" value="200.27639521225882" />
+      <entry key="W1" value="282.8221564227951" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -92,36 +90,36 @@
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
       <entry key="S30" value="0.0" />
-      <entry key="S60" value="1.3338649811019362E-174" />
-      <entry key="M2" value="2.281226159292095E-87" />
-      <entry key="M5" value="5.048358571230961E-35" />
-      <entry key="M10" value="1.4311264887974167E-17" />
-      <entry key="M15" value="9.53834881389594E-12" />
-      <entry key="M30" value="6.581807058987335E-6" />
-      <entry key="H1" value="0.005633303272752741" />
-      <entry key="H2" value="0.1669001865231403" />
-      <entry key="H4" value="0.9121182791746086" />
-      <entry key="D1" value="3.7646069595973626" />
-      <entry key="W1" value="4.801316766899329" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="1.7512276011254814E-162" />
+      <entry key="M5" value="4.5417151696012485E-65" />
+      <entry key="M10" value="1.357415707151498E-32" />
+      <entry key="M15" value="9.207953139335403E-22" />
+      <entry key="M30" value="6.466809939263202E-11" />
+      <entry key="H1" value="1.7657759907448867E-5" />
+      <entry key="H2" value="0.009344220099822612" />
+      <entry key="H4" value="0.2158212869799797" />
+      <entry key="D1" value="2.960693797739386" />
+      <entry key="W1" value="4.639344515617994" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.8081319557699687" />
-      <entry key="MS500" value="3.8976565933729184" />
-      <entry key="S2" value="6.090172124285227" />
-      <entry key="S5" value="10.882679795095397" />
-      <entry key="S10" value="18.636020804501495" />
-      <entry key="S30" value="32.85092942133714" />
-      <entry key="S60" value="39.04502749029837" />
-      <entry key="M2" value="42.79900888666029" />
-      <entry key="M5" value="47.78609477521098" />
-      <entry key="M10" value="57.65517040027449" />
-      <entry key="M15" value="65.56564770396528" />
-      <entry key="M30" value="78.54621163216723" />
-      <entry key="H1" value="88.21175587609453" />
-      <entry key="H2" value="101.08877084265009" />
-      <entry key="H4" value="135.27657414715094" />
-      <entry key="D1" value="250.79253244351088" />
-      <entry key="W1" value="291.2880769788684" />
+      <entry key="MS100" value="1.3568979022954812" />
+      <entry key="MS500" value="2.567088265704977" />
+      <entry key="S2" value="4.41724291383324" />
+      <entry key="S5" value="5.259575511286907" />
+      <entry key="S10" value="5.608796096834152" />
+      <entry key="S30" value="5.864600369413319" />
+      <entry key="S60" value="5.931653264946507" />
+      <entry key="M2" value="5.965663192202992" />
+      <entry key="M5" value="5.986225830114458" />
+      <entry key="M10" value="5.993106322079403" />
+      <entry key="M15" value="5.995402754567929" />
+      <entry key="M30" value="5.998472379082324" />
+      <entry key="H1" value="6.27535256013764" />
+      <entry key="H2" value="11.659069532533593" />
+      <entry key="H4" value="38.00824143433295" />
+      <entry key="D1" value="203.2369819479719" />
+      <entry key="W1" value="287.4614771610007" />
     </decayedShown>
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
@@ -243,6 +241,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "copilot.sensitive.folder.allow.file_read.C:/Users/elli/IdeaProjects/AppWebNxr/bot": "true",
     "disable.download.node.interpreter.editor.notification": "true",
     "git-widget-placeholder": "main",
     "git.auto.fetch.suggestion.counter": "1",
@@ -291,7 +290,7 @@
       <workItem from="1780219489313" duration="13000" />
       <workItem from="1780219512094" duration="11772000" />
       <workItem from="1780256426820" duration="7539000" />
-      <workItem from="1780271365118" duration="4133000" />
+      <workItem from="1780271365118" duration="5015000" />
     </task>
     <servers />
   </component>
