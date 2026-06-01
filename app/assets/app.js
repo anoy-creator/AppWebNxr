@@ -88,3 +88,115 @@ document.addEventListener('click', (event) => {
 window.addEventListener('popstate', () => {
     loadPage(new URL(window.location.href), false);
 });
+
+// Load profile via AJAX
+const loadProfileAjax = async () => {
+    const content = document.getElementById('ajax-content') || document.getElementById('ajax-root');
+    if (!content) return;
+
+    try {
+        const response = await fetch('/ajax/profile', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+
+        if (response.ok) {
+            content.innerHTML = await response.text();
+        } else {
+            content.innerHTML = '<p>Erreur lors du chargement du profil</p>';
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        content.innerHTML = '<p>Erreur réseau</p>';
+    }
+};
+
+// Admin Dropdowns
+document.addEventListener('DOMContentLoaded', () => {
+    const adminMenuBtn = document.getElementById('adminMenuBtn');
+    const adminMenu = document.getElementById('adminMenu');
+    const profileMenuBtn = document.getElementById('profileMenuBtn');
+    const profileMenu = document.getElementById('profileMenu');
+
+    // Admin dropdown toggle
+    if (adminMenuBtn && adminMenu) {
+        adminMenuBtn.addEventListener('click', () => {
+            adminMenu.classList.toggle('show');
+            profileMenu?.classList.remove('show');
+        });
+
+        document.querySelectorAll('.admin-dropdown-menu .dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                adminMenu.classList.remove('show');
+            });
+        });
+    }
+
+    // Profile dropdown toggle
+    if (profileMenuBtn && profileMenu) {
+        profileMenuBtn.addEventListener('click', () => {
+            profileMenu.classList.toggle('show');
+            adminMenu?.classList.remove('show');
+        });
+
+        // Load profile on click - attach to the menu itself
+        const profileLink = profileMenu.querySelector('a[data-load-profile]');
+        if (profileLink) {
+            profileLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                profileMenu.classList.remove('show');
+                console.log('Loading profile...');
+                await loadProfileAjax();
+            });
+        }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.admin-dropdown') && !e.target.closest('.user-menu')) {
+            adminMenu?.classList.remove('show');
+            profileMenu?.classList.remove('show');
+        }
+    });
+
+    // Admin form submission
+    document.querySelectorAll('.admin-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const endpoint = form.dataset.endpoint;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('✅ Élément ajouté avec succès!');
+                    form.reset();
+                    // Close modal
+                    const modal = form.closest('.modal');
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    bsModal?.hide();
+                    // Reload page
+                    window.location.reload();
+                } else {
+                    alert('❌ Erreur: ' + (result.message || 'Une erreur est survenue'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Erreur réseau');
+            }
+        });
+    });
+});

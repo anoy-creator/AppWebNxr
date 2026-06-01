@@ -1,0 +1,88 @@
+<div class="profile-container">
+    <h1>Mon Profil</h1>
+    
+    <div class="profile-card">
+        {% if user.avatar %}
+            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="profile-avatar-large">
+        {% else %}
+            <div class="profile-avatar-large no-avatar">{{ user.username|first|upper }}</div>
+        {% endif %}
+        
+        <div class="profile-info">
+            <h2>{{ user.username }}</h2>
+            {% if user.email %}
+                <p><strong>Email:</strong> {{ user.email }}</p>
+            {% endif %}
+            <p><strong>Rôles:</strong> 
+                {% for role in user.roles %}
+                    <span class="badge">{{ role }}</span>
+                {% endfor %}
+            </p>
+            {% if user.lastLoginAt %}
+                <p><strong>Dernière connexion:</strong> {{ user.lastLoginAt|date('d/m/Y H:i') }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.profile-avatar-large.no-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+}
+
+.profile-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile-info h2 {
+    margin: 0 0 10px 0;
+    color: white;
+}
+
+.profile-info p {
+    margin: 8px 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+</style>

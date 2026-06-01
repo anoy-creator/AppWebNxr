@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Naxera eSport{% endblock %}</title>
-        <meta name="description" content="Site officiel de Naxera eSport, rosters, actualites, planning et resultats NxR.">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
-    </head>
+    <title>{% block title %}Naxera eSport{% endblock %}</title>
+
+    <meta name="description" content="Site officiel de Naxera eSport, rosters, actualites, planning et resultats NxR.">
+
+    <link rel="icon" type="image/png" href="{{ asset('build/images/NxrLogo.png') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+</head>
 
     <body class="{{ hide_footer is defined and hide_footer ? 'hide-site-footer' : '' }}">
         {% set nav = {
@@ -27,7 +35,7 @@
         <header class="site-header">
             <div class="container header-inner">
                 <a class="brand" href="{{ path('app_index') }}">
-                    <span class="logo-mark">NxR</span>
+                    <img src="{{ asset('build/images/NxrLogo.png') }}" alt="NxR" class="logo-img">
                     <span>NAXERA</span>
                 </a>
                 <nav class="desktop-nav" aria-label="Navigation principale">
@@ -35,12 +43,48 @@
                         <a class="nav-link{{ app.request.pathInfo == href ? ' is-active' : '' }}" href="{{ href }}">{{ label }}</a>
                     {% endfor %}
                 </nav>
-                <a class="login-link" href="{{ path('app_login') }}">Connexion</a>
+
+                <div class="header-actions">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="admin-dropdown">
+                            <button class="admin-add-btn" id="adminMenuBtn">
+                                ➕ Ajouter
+                            </button>
+                            <div class="admin-dropdown-menu" id="adminMenu">
+                                <button class="dropdown-item" data-modal="add-news">📰 Actualité</button>
+                                <button class="dropdown-item" data-modal="add-player">👤 Joueur</button>
+                                <button class="dropdown-item" data-modal="add-roster">👥 Roster</button>
+                                <button class="dropdown-item" data-modal="add-event">📅 Event</button>
+                                <button class="dropdown-item" data-modal="add-match">⚽ Match</button>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="user-menu">
+                            <button class="profile-btn" id="profileMenuBtn">
+                                {% if app.user.avatar %}
+                                    <img src="{{ app.user.avatar }}" alt="Profil" class="user-avatar">
+                                {% else %}
+                                    <span class="user-avatar-fallback">{{ app.user.username|first|upper }}</span>
+                                {% endif %}
+                                <span>{{ app.user.username }}</span>
+                            </button>
+                            <div class="user-dropdown-menu" id="profileMenu">
+                                <a href="#" class="dropdown-item" data-load-profile="true">👤 Profil</a>
+                                <hr>
+                                <a href="{{ path('app_logout') }}" class="dropdown-item logout-item">🚪 Déconnexion</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="login-link" href="{{ path('app_login') }}">Connexion</a>
+                    {% endif %}
+                </div>
             </div>
         </header>
 
         <div class="ajax-loader" aria-live="polite" aria-hidden="true">
-            <div class="ajax-loader-logo">NxR</div>
+            <img src="{{ asset('build/images/NxrLogo.png') }}" alt="NxR" class="ajax-loader-logo">
         </div>
 
         <main id="ajax-root" class="ajax-root">
@@ -52,8 +96,8 @@
                 <div class="container footer-grid">
                     <div class="footer-brand">
                         <div class="brand">
-                            <span class="logo-mark">NxR</span>
-                            <span>NAXERA</span>
+                            <img src="{{ asset('build/images/NxrLogo.png') }}" alt="NxR" class="logo-img">
+
                         </div>
                         <p>"One Team. One Vision. NxR."</p>
                         <div class="social-row">
@@ -85,8 +129,12 @@
             </footer>
         {% endif %}
 
+        {% include 'pages/admin/modals.html.twig' %}
+
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         {% endblock %}
     </body>
 </html>

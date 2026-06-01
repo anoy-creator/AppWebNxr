@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\TeamRepository;
+use App\Repository\UserRepository;
 use App\Traits\UserTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: TeamRepository::class)]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use UserTrait;
 
@@ -20,6 +21,9 @@ class User implements UserInterface
 
     #[ORM\Column(length: 100)]
     private string $username;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $password = null;
 
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $discriminator = null;
@@ -55,6 +59,18 @@ class User implements UserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(?string $password): self
+    {
+        $this->password = $password;
 
         return $this;
     }

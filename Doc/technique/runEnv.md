@@ -14,7 +14,7 @@ docker compose up -d --build
 docker exec -it symfony_php bash
 # Installer dépendances PHP (une seule fois ou après  , mettre a jour la bdd , load les données de test)
 composer install
-php bin/console do:sc:update --force
+php bin/console do:sc:up --force
 php bin/console doctrine:fixtures:load
 
 # Vérifier et afficher les corrections de style (dry-run)
