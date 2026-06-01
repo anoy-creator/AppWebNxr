@@ -1,6 +1,6 @@
 <section class="login-page">
     <div class="login-card">
-        <div class="hero-logo small">NxR</div>
+        <img src="{{ asset('build/images/NxrLogo.png') }}" alt="NxR" class="hero-logo small">
         <h1>Connexion</h1>
         <p>Connectez-vous pour acceder a l'espace membre</p>
         <button class="discord-button" type="button">
@@ -8,6 +8,54 @@
             Se connecter avec Discord
         </button>
         <small>En vous connectant, vous acceptez nos conditions d'utilisation et notre politique de confidentialite.</small>
+
+        <div class="admin-login-separator">
+            <span>ou</span>
+        </div>
+
+        <a href="{{ path('admin_login') }}" class="admin-login-link">
+            Connexion administrateur
+        </a>
     </div>
     <p class="login-note">Pas encore membre ? Rejoignez notre Discord pour postuler !</p>
 </section>
+
+<style>
+    .admin-login-separator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 20px 0;
+        color: #999;
+        font-size: 12px;
+    }
+
+    .admin-login-separator::before,
+    .admin-login-separator::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #ddd;
+    }
+
+    .admin-login-link {
+        display: inline-block;
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .admin-login-link:hover {
+        background-color: #e8e8e8;
+        border-color: #999;
+    }
+</style>
+

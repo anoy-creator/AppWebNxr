@@ -1,0 +1,229 @@
+<div class="admin-bar">
+    <div class="admin-bar-content">
+        <div class="admin-info">
+            <span class="admin-badge">⚙️ Admin</span>
+            <span class="admin-user">{{ app.user.username }}</span>
+        </div>
+        
+        <div class="admin-actions">
+            <button class="admin-btn admin-add-btn" id="toggleAdminPanel">
+                ➕ Ajouter un élément
+            </button>
+            <a href="{{ path('app_logout') }}" class="admin-btn admin-logout-btn">
+                Déconnexion
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="adminPanel" style="display: none;">
+        <div class="admin-panel-content">
+            <h3>Ajouter un élément</h3>
+            
+            <div class="admin-quick-actions">
+                <a href="{{ path('app_news') }}" class="admin-action-card">
+                    <span class="icon">📰</span>
+                    <span class="label">Ajouter une actualité</span>
+                </a>
+                <a href="{{ path('app_players') }}" class="admin-action-card">
+                    <span class="icon">👤</span>
+                    <span class="label">Ajouter un joueur</span>
+                </a>
+                <a href="{{ path('app_rosters') }}" class="admin-action-card">
+                    <span class="icon">👥</span>
+                    <span class="label">Ajouter un roster</span>
+                </a>
+                <a href="{{ path('app_schedule') }}" class="admin-action-card">
+                    <span class="icon">📅</span>
+                    <span class="label">Ajouter un match</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        border-top: 2px solid #7c3aed;
+        z-index: 1000;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .admin-bar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .admin-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: white;
+    }
+
+    .admin-badge {
+        background-color: #7c3aed;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .admin-user {
+        font-size: 14px;
+        color: #d1d5db;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .admin-btn {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .admin-add-btn {
+        background-color: #7c3aed;
+        color: white;
+    }
+
+    .admin-add-btn:hover {
+        background-color: #6d28d9;
+        transform: translateY(-2px);
+    }
+
+    .admin-logout-btn {
+        background-color: transparent;
+        color: #d1d5db;
+        border: 1px solid #4b5563;
+    }
+
+    .admin-logout-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .admin-panel {
+        border-top: 1px solid #374151;
+        background: #0f172a;
+        padding: 20px;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .admin-panel-content {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .admin-panel-content h3 {
+        color: white;
+        margin: 0 0 15px 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .admin-quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .admin-action-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 15px;
+        background-color: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .admin-action-card:hover {
+        background-color: #374151;
+        border-color: #7c3aed;
+        transform: translateY(-2px);
+    }
+
+    .admin-action-card .icon {
+        font-size: 24px;
+    }
+
+    .admin-action-card .label {
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .admin-bar-content {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .admin-actions {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+        .admin-btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        .admin-quick-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggleAdminPanel');
+        const adminPanel = document.getElementById('adminPanel');
+
+        if (toggleBtn && adminPanel) {
+            toggleBtn.addEventListener('click', function() {
+                if (adminPanel.style.display === 'none') {
+                    adminPanel.style.display = 'block';
+                    toggleBtn.textContent = '✕ Fermer';
+                } else {
+                    adminPanel.style.display = 'none';
+                    toggleBtn.textContent = '➕ Ajouter un élément';
+                }
+            });
+        }
+    });
+</script>

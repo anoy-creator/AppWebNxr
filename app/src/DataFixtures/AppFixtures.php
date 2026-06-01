@@ -8,13 +8,20 @@ use App\Entity\News;
 use App\Entity\Player;
 use App\Entity\Roster;
 use App\Entity\Team;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class AppFixtures extends Fixture
 {
+    public function __construct(private UserPasswordHasherInterface $passwordHasher)
+    {
+    }
+
     public function load(ObjectManager $manager): void
     {
+        // Crée les rosters d'abord
         $rosters = [];
 
         $rostersData = [
@@ -52,6 +59,33 @@ final class AppFixtures extends Fixture
             $rosters[$data['name']] = $roster;
         }
 
+        // Admin user
+        $admin = new User();
+        $admin->setUsername('admin');
+        $admin->setEmail('admin@nxr.com');
+        $admin->setDiscordId('admin-fixture');
+        $admin->setDiscordName('Admin NxR');
+        $admin->setRoles(['ROLE_ADMIN']);
+        
+        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'adminNxr');
+        $admin->setPassword($hashedPassword);
+        
+        $manager->persist($admin);
+
+        // Admin joueur
+        $adminPlayer = new Player();
+        $adminPlayer
+            ->setPseudo('Admin Pro')
+            ->setAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700')
+            ->setRole('Admin')
+            ->setGrade('Founder')
+            ->setGame('All Games')
+            ->setRoster($rosters['NxR Warzone'])
+            ->setSocials(['twitter' => 'admin_nxr', 'twitch' => 'admin_nxr', 'youtube' => 'nxr_official']);
+
+        $manager->persist($adminPlayer);
+
+        // Autres joueurs
         $playersData = [
             ['pseudo' => 'ShadowX', 'avatar' => 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=700', 'role' => 'Joueur', 'grade' => 'Captain', 'game' => 'Call of Duty', 'roster' => 'NxR Warzone', 'socials' => ['twitter' => 'shadowx', 'twitch' => 'shadowx_nxr']],
             ['pseudo' => 'NeonKnight', 'avatar' => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=700', 'role' => 'Joueur', 'grade' => 'Pro Player', 'game' => 'Warzone', 'roster' => 'NxR Warzone', 'socials' => ['twitch' => 'neonknight', 'youtube' => 'neonknight']],

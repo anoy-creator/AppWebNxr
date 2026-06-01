@@ -1,0 +1,192 @@
+<!-- Admin Modals -->
+{% if is_granted('ROLE_ADMIN') %}
+    <!-- Add News Modal -->
+    <div class="modal fade" id="add-news" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">📰 Ajouter une actualité</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="admin-form" data-endpoint="/admin/news/create">
+                        <div class="mb-3">
+                            <label class="form-label">Titre</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Auteur</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="author" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Extrait</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="excerpt" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contenu</label>
+                            <textarea class="form-control bg-secondary text-light border-secondary" name="content" rows="4" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Image URL</label>
+                            <input type="url" class="form-control bg-secondary text-light border-secondary" name="image">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Player Modal -->
+    <div class="modal fade" id="add-player" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">👤 Ajouter un joueur</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="admin-form" data-endpoint="/admin/players/create">
+                        <div class="mb-3">
+                            <label class="form-label">Pseudo</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="pseudo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rôle</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="role" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Grade</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="grade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Jeu</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="game" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Avatar URL</label>
+                            <input type="url" class="form-control bg-secondary text-light border-secondary" name="avatar">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Roster Modal -->
+    <div class="modal fade" id="add-roster" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">👥 Ajouter un roster</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="admin-form" data-endpoint="/admin/rosters/create">
+                        <div class="mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Jeu</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="game" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Victoires</label>
+                            <input type="number" class="form-control bg-secondary text-light border-secondary" name="wins" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Défaites</label>
+                            <input type="number" class="form-control bg-secondary text-light border-secondary" name="losses" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Banner URL</label>
+                            <input type="url" class="form-control bg-secondary text-light border-secondary" name="banner">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal fade" id="add-event" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">📅 Ajouter un event</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="admin-form" data-endpoint="/admin/events/create">
+                        <div class="mb-3">
+                            <label class="form-label">Titre</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-control bg-secondary text-light border-secondary" name="type" required>
+                                <option value="training">Entrainement</option>
+                                <option value="meeting">Réunion</option>
+                                <option value="tournament">Tournoi</option>
+                                <option value="match">Match</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control bg-secondary text-light border-secondary" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Heure</label>
+                            <input type="time" class="form-control bg-secondary text-light border-secondary" name="time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control bg-secondary text-light border-secondary" name="description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Match Modal -->
+    <div class="modal fade" id="add-match" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">⚽ Ajouter un match</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="admin-form" data-endpoint="/admin/matches/create">
+                        <div class="mb-3">
+                            <label class="form-label">Équipe A</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="teamA" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Équipe B</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="teamB" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mode</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="mode" placeholder="ex: Hardpoint">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date & Heure</label>
+                            <input type="datetime-local" class="form-control bg-secondary text-light border-secondary" name="playedAt" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Score</label>
+                            <input type="text" class="form-control bg-secondary text-light border-secondary" name="score" placeholder="ex: 3-1">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

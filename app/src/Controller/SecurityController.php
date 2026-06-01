@@ -9,14 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->redirectToRoute('hwi_oauth_service_redirect', [
-            'service' => 'discord',
-        ]);
-    }
-
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
@@ -38,6 +30,19 @@ class SecurityController extends AbstractController
     {
         $this->addFlash('error', 'Connexion Discord échouée !');
 
-        return $this->redirectToRoute('homepage');
+        return $this->redirectToRoute('app_index');
+    }
+
+    #[Route('/ajax/profile', name: 'ajax_profile')]
+    public function profileAjax(): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Not authenticated'], 401);
+        }
+
+        return $this->render('pages/profile/profile.html.twig', [
+            'user' => $user,
+        ]);
     }
 }
