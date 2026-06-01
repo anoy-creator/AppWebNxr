@@ -534,6 +534,10 @@ p {
     margin-bottom: 4px;
 }
 
+.ban-b-nav {
+    width: 48%;
+}
+
 .ban-b-acc {
     width: 50%;
     height: 120px;
