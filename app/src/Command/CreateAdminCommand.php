@@ -32,7 +32,7 @@ class CreateAdminCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $helper = $this->getHelper('question');
-        
+
         $username = $input->getArgument('username');
         if (!$username) {
             $question = new Question('Nom d\'utilisateur: ');
@@ -48,7 +48,7 @@ class CreateAdminCommand extends Command
 
         $user = new User();
         $user->setUsername($username);
-        $user->setDiscordId('admin-' . uniqid());
+        $user->setDiscordId('admin-'.uniqid());
         $user->setDiscordName($username);
         $user->setRoles(['ROLE_ADMIN']);
 
@@ -58,7 +58,7 @@ class CreateAdminCommand extends Command
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $output->writeln("<info>✅ Admin créé avec succès!</info>");
+        $output->writeln('<info>✅ Admin créé avec succès!</info>');
         $output->writeln("Username: <fg=cyan>$username</>");
 
         return Command::SUCCESS;
