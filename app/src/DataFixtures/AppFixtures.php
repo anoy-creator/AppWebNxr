@@ -66,10 +66,10 @@ final class AppFixtures extends Fixture
         $admin->setDiscordId('admin-fixture');
         $admin->setDiscordName('Admin NxR');
         $admin->setRoles(['ROLE_ADMIN']);
-        
+
         $hashedPassword = $this->passwordHasher->hashPassword($admin, 'adminNxr');
         $admin->setPassword($hashedPassword);
-        
+
         $manager->persist($admin);
 
         // Admin joueur

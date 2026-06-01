@@ -2,11 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Event;
+use App\Entity\GameMatch;
 use App\Entity\News;
 use App\Entity\Player;
 use App\Entity\Roster;
-use App\Entity\Event;
-use App\Entity\GameMatch;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
