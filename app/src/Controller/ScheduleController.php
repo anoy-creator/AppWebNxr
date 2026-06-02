@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
+use App\Entity\GameMatch;
 use App\Repository\EventRepository;
 use App\Repository\GameMatchRepository;
+use App\Repository\PlayerMatchStatRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +22,64 @@ class ScheduleController extends AbstractController
         EventRepository $eventRepository,
         GameMatchRepository $gameMatchRepository,
     ): Response {
+        $types = $request->query->all('types');
+
+        if (empty($types)) {
+            $types = ['training', 'meeting', 'tournament', 'match'];
+        }
+
+        $eventTypes = array_values(array_intersect($types, [
+            'training',
+            'meeting',
+            'tournament',
+        ]));
+
+        $events = [];
+
+        if (!empty($eventTypes)) {
+            $events = $eventRepository->createQueryBuilder('e')
+                ->andWhere('e.type IN (:types)')
+                ->setParameter('types', $eventTypes)
+                ->orderBy('e.date', 'ASC')
+                ->getQuery()
+                ->getResult();
+        }
+
+        $matches = [];
+
+        if (in_array('match', $types, true)) {
+            $matches = $gameMatchRepository->findBy([], [
+                'playedAt' => 'ASC',
+            ]);
+        }
+
         return $this->renderPage($request, 'schedule', 'Planning - Naxera', [
-            'events' => $eventRepository->findBy([], ['date' => 'ASC']),
-            'matches' => $gameMatchRepository->findBy([], ['playedAt' => 'ASC']),
+            'events' => $events,
+            'matches' => $matches,
+            'activeTypes' => $types,
+        ]);
+    }
+
+    #[Route('/schedule/event/{id}/details', name: 'app_schedule_event_details', methods: ['GET'])]
+    public function eventDetails(Event $event): Response
+    {
+        return $this->render('pages/schedule/_scheduleEvent_details.html.twig', [
+            'event' => $event,
+        ]);
+    }
+
+    #[Route('/schedule/match/{id}/details', name: 'app_schedule_match_details', methods: ['GET'])]
+    public function matchDetails(
+        GameMatch $match,
+        PlayerMatchStatRepository $statRepository,
+    ): Response {
+        $stats = $statRepository->findBy([
+            'match' => $match,
+        ]);
+
+        return $this->render('pages/schedule/_scheduleMatch_details.html.twig', [
+            'match' => $match,
+            'stats' => $stats,
         ]);
     }
 }

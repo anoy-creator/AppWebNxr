@@ -9,29 +9,20 @@
     position: relative;
     display: grid;
     place-items: center;
-
     min-height: calc(100vh - 80px);
     padding: 48px 16px;
-
     overflow: hidden;
     text-align: center;
 }
-
-/* =========================
-   BACKGROUND GLOW
-========================= */
 
 .admin-locked::before,
 .admin-locked::after {
     content: "";
     position: absolute;
-
     width: 560px;
     height: 560px;
-
     border-radius: 999px;
     background: var(--purple);
-
     filter: blur(150px);
     opacity: .18;
 }
@@ -46,48 +37,182 @@
     bottom: 12%;
 }
 
-/* =========================
-   CONTENT CARD
-========================= */
-
 .admin-locked div {
     position: relative;
     z-index: 1;
-
     width: min(100%, 620px);
     padding: 42px;
-
     border: 1px solid rgba(255, 255, 255, .1);
     border-radius: 24px;
-
-    background: linear-gradient(
-        145deg,
-        rgba(38, 24, 55, .95),
-        rgba(15, 12, 22, .95)
-    );
-
+    background: linear-gradient(145deg, rgba(38, 24, 55, .95), rgba(15, 12, 22, .95));
     box-shadow: 0 30px 90px rgba(0, 0, 0, .45);
 }
 
-/* =========================
-   TEXT
-========================= */
-
 .admin-locked h1 {
     margin: 0 0 12px;
-
     color: #fff;
-
     font-size: 2.5rem;
     font-weight: 900;
 }
 
 .admin-locked p {
     margin: 0;
-
     color: var(--muted);
     line-height: 1.7;
     font-weight: 700;
+}
+
+/* =========================
+   ADMIN DROPDOWN
+========================= */
+
+.admin-dropdown {
+    position: relative;
+}
+
+.admin-add-btn {
+    cursor: pointer;
+}
+
+.admin-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 10001;
+    display: none;
+    min-width: 220px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 16px;
+    background: #15101f;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
+}
+
+.admin-dropdown-menu.show {
+    display: grid;
+    gap: 6px;
+}
+
+.admin-dropdown-menu .dropdown-item {
+    width: 100%;
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #fff;
+    text-align: left;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.admin-dropdown-menu .dropdown-item:hover {
+    background: rgba(123, 46, 255, .18);
+}
+
+/* =========================
+   ADMIN MODALS
+========================= */
+
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    place-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, .82);
+    backdrop-filter: blur(8px);
+}
+
+.admin-modal.is-open {
+    display: grid;
+}
+
+.admin-modal-box {
+    position: relative;
+    width: min(560px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 24px;
+    background: #15101f;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
+}
+
+.admin-modal-box h2 {
+    margin: 0 0 22px;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 900;
+}
+
+.admin-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: #7c2cff;
+    color: #fff;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* =========================
+   ADMIN FORMS
+========================= */
+
+.admin-form {
+    display: grid;
+    gap: 14px;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+    font: inherit;
+}
+
+.admin-form input::placeholder,
+.admin-form textarea::placeholder {
+    color: rgba(255, 255, 255, .45);
+}
+
+.admin-form select option {
+    background: #15101f;
+    color: #fff;
+}
+
+.admin-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.admin-form button[type="submit"] {
+    margin-top: 8px;
+    padding: 13px 18px;
+    border: 0;
+    border-radius: 14px;
+    background: #7c2cff;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.admin-form button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(123, 46, 255, .35);
 }
 
 /* =========================
@@ -95,11 +220,13 @@
 ========================= */
 
 @media (max-width: 720px) {
-    .admin-locked div {
-        padding: 28px 22px;
+    .admin-locked div,
+    .admin-modal-box {
+        padding: 26px 22px;
     }
 
-    .admin-locked h1 {
+    .admin-locked h1,
+    .admin-modal-box h2 {
         font-size: 2rem;
     }
 }
