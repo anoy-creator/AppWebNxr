@@ -36,6 +36,10 @@ class GameMatch
     #[ORM\Column(length: 20)]
     private string $score;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private Roster $roster;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,6 +125,18 @@ class GameMatch
     public function setScore(string $score): self
     {
         $this->score = $score;
+
+        return $this;
+    }
+
+    public function getRoster(): Roster
+    {
+        return $this->roster;
+    }
+
+    public function setRoster(Roster $roster): self
+    {
+        $this->roster = $roster;
 
         return $this;
     }

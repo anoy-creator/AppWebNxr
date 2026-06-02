@@ -6,13 +6,9 @@
 
     <div class="stack">
         {% for roster in rosters %}
-            <article class="roster-card">
-
+            <article class="roster-card js-roster-card" data-roster-id="{{ roster.id }}">
                 <div class="roster-hero">
-                    <img
-                        src="{{ roster.banner ?: '/images/roster-default.jpg' }}"
-                        alt="{{ roster.name }}"
-                    >
+                    <img src="{{ roster.banner ?: '/images/roster-default.jpg' }}" alt="{{ roster.name }}">
 
                     <div class="roster-title">
                         <img src="{{ asset('build/images/NxrLogo.png') }}" alt="NxR" class="logo-mark big">
@@ -25,22 +21,10 @@
                 </div>
 
                 <div class="roster-content">
-
                     <div class="mini-stats big-stats">
-                        <span>
-                            <strong>{{ roster.wins }}</strong>
-                            Victoires
-                        </span>
-
-                        <span>
-                            <strong>{{ roster.losses }}</strong>
-                            Défaites
-                        </span>
-
-                        <span>
-                            <strong>{{ roster.winrate }}</strong>
-                            Winrate
-                        </span>
+                        <span><strong>{{ roster.wins }}</strong> Victoires</span>
+                        <span><strong>{{ roster.losses }}</strong> Défaites</span>
+                        <span><strong>{{ roster.winrate }}</strong> Winrate</span>
                     </div>
 
                     <h3>Composition</h3>
@@ -55,7 +39,6 @@
                             <span>Aucun joueur</span>
                         {% endfor %}
                     </div>
-
                 </div>
             </article>
         {% else %}
@@ -63,3 +46,14 @@
         {% endfor %}
     </div>
 </section>
+
+<div class="roster-modal" id="rosterModal" aria-hidden="true">
+    <div class="roster-modal-overlay js-close-roster-modal"></div>
+
+    <div class="roster-modal-box">
+        <button type="button" class="roster-modal-close js-close-roster-modal">×</button>
+        <div id="rosterModalContent"></div>
+    </div>
+</div>
+
+{{ encore_entry_script_tags('roster') }}
