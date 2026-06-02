@@ -5,29 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/assets/js/pages/admin/admin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/assets/js/pages/schedule/schedule.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/Form/EventType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/Form/GameMatchType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/Form/NewsType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/Form/PlayerType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/Form/RosterType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/pages/schedule/_scheduleEvent_details.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/pages/schedule/_scheduleMatch_details.html.twig" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/Controller/Api/DiscordController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bot/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bot/cmd/api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/admin/admin.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/admin/admin.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/schedule/schedule.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/schedule/schedule.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/reference.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/AdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/AdminController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/ScheduleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/ScheduleController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/symfony.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/admin/modals.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/admin/modals.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/schedule/_schedule.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/schedule/_schedule.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/webpack.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Controller/DiscordController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/DiscordController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Form/NewsType.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Form/NewsType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/.env" beforeDir="false" afterPath="$PROJECT_DIR$/bot/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/cmd/help.js" beforeDir="false" afterPath="$PROJECT_DIR$/bot/cmd/help.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/bot/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,23 +76,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0981927796324573" />
-      <entry key="MS500" value="1.909086268104926" />
-      <entry key="S2" value="3.323593136867025" />
-      <entry key="S5" value="4.514054442550593" />
-      <entry key="S10" value="5.158801783095612" />
-      <entry key="S30" value="5.694058486984775" />
-      <entry key="S60" value="5.843571059477752" />
-      <entry key="M2" value="5.920899685922605" />
-      <entry key="M5" value="5.970074308338339" />
-      <entry key="M10" value="6.321813729693382" />
-      <entry key="M15" value="8.187332148774594" />
-      <entry key="M30" value="22.344559820740418" />
-      <entry key="H1" value="58.530025450253326" />
-      <entry key="H2" value="111.82661605554412" />
-      <entry key="H4" value="175.246916607816" />
-      <entry key="D1" value="462.6928403239694" />
-      <entry key="W1" value="683.748202516005" />
+      <entry key="MS100" value="1.0049102084942259" />
+      <entry key="MS500" value="1.3453186120359644" />
+      <entry key="S2" value="1.76657560893246" />
+      <entry key="S5" value="1.899137085235877" />
+      <entry key="S10" value="1.9510700209423248" />
+      <entry key="S30" value="2.124146589538971" />
+      <entry key="S60" value="2.3676275769723176" />
+      <entry key="M2" value="2.6107718493432093" />
+      <entry key="M5" value="2.8976419175309207" />
+      <entry key="M10" value="3.1856875407326415" />
+      <entry key="M15" value="3.419046722822101" />
+      <entry key="M30" value="5.442651857900745" />
+      <entry key="H1" value="19.43670190533789" />
+      <entry key="H2" value="62.500899886286895" />
+      <entry key="H4" value="134.93949209569107" />
+      <entry key="D1" value="459.19251291056685" />
+      <entry key="W1" value="707.355579098788" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -114,37 +100,37 @@
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
-      <entry key="S30" value="1.669951995478317E-126" />
-      <entry key="S60" value="1.2924703240473143E-63" />
-      <entry key="M2" value="3.685113821918876E-32" />
-      <entry key="M5" value="4.035471294990506E-13" />
-      <entry key="M10" value="1.2602204301081096E-6" />
-      <entry key="M15" value="1.9475553550438635E-4" />
-      <entry key="M30" value="0.0308650420664767" />
-      <entry key="H1" value="0.3921093590062803" />
-      <entry key="H2" value="1.4308219739282613" />
-      <entry key="H4" value="3.0084621137239016" />
-      <entry key="D1" value="8.83864687296975" />
-      <entry key="W1" value="12.975408206480841" />
+      <entry key="S30" value="2.0667416066718858E-218" />
+      <entry key="S60" value="1.4378436969355262E-109" />
+      <entry key="M2" value="3.8868381370391494E-55" />
+      <entry key="M5" value="2.6010726466604836E-22" />
+      <entry key="M10" value="3.1994521964808645E-11" />
+      <entry key="M15" value="1.6823223587561202E-7" />
+      <entry key="M30" value="9.071447186414662E-4" />
+      <entry key="H1" value="0.06722209757960527" />
+      <entry key="H2" value="0.5924313429047053" />
+      <entry key="H4" value="1.9358457956248651" />
+      <entry key="D1" value="8.212464120850433" />
+      <entry key="W1" value="12.839914445090718" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.8869455309990463" />
-      <entry key="MS500" value="1.8308281059403178" />
-      <entry key="S2" value="3.289146946613726" />
-      <entry key="S5" value="4.495255860454934" />
-      <entry key="S10" value="5.1480387341627445" />
-      <entry key="S30" value="5.690092789551679" />
-      <entry key="S60" value="5.841535370233613" />
-      <entry key="M2" value="5.9198681728847875" />
-      <entry key="M5" value="5.969656189525089" />
-      <entry key="M10" value="6.321557157415299" />
-      <entry key="M15" value="8.187265919113775" />
-      <entry key="M30" value="22.375096436388382" />
-      <entry key="H1" value="58.921721664090015" />
-      <entry key="H2" value="113.25699027983447" />
-      <entry key="H4" value="178.2549372569393" />
-      <entry key="D1" value="471.53120204424596" />
-      <entry key="W1" value="696.723547001426" />
+      <entry key="MS100" value="0.9330643670808338" />
+      <entry key="MS500" value="1.1119277770431677" />
+      <entry key="S2" value="1.5919686875104646" />
+      <entry key="S5" value="1.8113242117696244" />
+      <entry key="S10" value="1.9033796368800047" />
+      <entry key="S30" value="2.102809036172541" />
+      <entry key="S60" value="2.3529078224899713" />
+      <entry key="M2" value="2.6013815592946683" />
+      <entry key="M5" value="2.8931690714784764" />
+      <entry key="M10" value="3.183304349396341" />
+      <entry key="M15" value="3.4174221724086062" />
+      <entry key="M30" value="5.442714847894968" />
+      <entry key="H1" value="19.503423738497627" />
+      <entry key="H2" value="63.092924345800604" />
+      <entry key="H4" value="136.8749403156631" />
+      <entry key="D1" value="467.40469263237264" />
+      <entry key="W1" value="720.1954276944433" />
     </decayedShown>
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
@@ -272,7 +258,7 @@
     "git.auto.fetch.suggestion.counter": "1",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Selli/IdeaProjects/AppWebNxr/app/assets/img",
+    "last_opened_file_path": "C:/Users/Selli/IdeaProjects/AppWebNxr/bot",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -290,6 +276,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Selli\IdeaProjects\AppWebNxr\bot" />
       <recent name="C:\Users\Selli\IdeaProjects\AppWebNxr\app\assets\img" />
       <recent name="C:\Users\Selli\IdeaProjects\AppWebNxr\app\tests" />
     </key>
@@ -316,7 +303,7 @@
       <workItem from="1780219489313" duration="13000" />
       <workItem from="1780219512094" duration="11772000" />
       <workItem from="1780256426820" duration="7539000" />
-      <workItem from="1780271365118" duration="27498000" />
+      <workItem from="1780271365118" duration="30637000" />
     </task>
     <servers />
   </component>

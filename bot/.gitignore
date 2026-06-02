@@ -1,0 +1,10 @@
+/.env
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+/node_modules
+/node_modules/
+/.editorconfig
