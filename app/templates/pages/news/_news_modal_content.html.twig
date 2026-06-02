@@ -1,0 +1,19 @@
+<div class="news-modal-header">
+    <img src="{{ news.image|default('/images/news-default.jpg') }}" alt="{{ news.title }}">
+</div>
+
+<div class="news-modal-body">
+    <span class="news-modal-date">
+        {{ news.author|default('N/A') }} - {{ news.date ? news.date|date('d/m/Y') : '' }}
+    </span>
+
+    <h2>{{ news.title }}</h2>
+
+    <p class="news-modal-excerpt">
+        {{ news.excerpt }}
+    </p>
+
+    <div class="news-modal-content">
+        {{ news.content|nl2br }}
+    </div>
+</div>

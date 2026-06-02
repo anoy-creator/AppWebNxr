@@ -3,16 +3,41 @@
         <span>NEWS</span>
         <h1>Actualites</h1>
     </div>
-    <div class="card-grid two">
+
+    <div id="news-grid" class="card-grid two">
         {% for item in news %}
-            <article class="image-card large">
-                <img src="{{ item.image|default('/images/news-default.jpg') }}" alt="">
+            <article
+                class="image-card large js-news-card"
+                data-news-id="{{ item.id }}"
+            >
+                <img src="{{ item.image|default('/images/news-default.jpg') }}" alt="{{ item.title }}">
+
                 <div class="card-body">
                     <h2>{{ item.title }}</h2>
-                    <p>{{ item.content }}</p>
-                    <small>{{ item.author|default('N/A') }} - {{ item.date ? item.date|date('d/m/Y') : '' }}</small>
+                    <p>{{ item.excerpt }}</p>
+                    <small>
+                        {{ item.author|default('N/A') }}
+                        -
+                        {{ item.date ? item.date|date('d/m/Y') : '' }}
+                    </small>
                 </div>
             </article>
+        {% else %}
+            <p>Aucune actualité trouvée.</p>
         {% endfor %}
     </div>
 </section>
+
+<div class="news-modal" id="newsModal" aria-hidden="true">
+    <div class="news-modal-overlay js-close-news-modal"></div>
+
+    <div class="news-modal-box">
+        <button type="button" class="news-modal-close js-close-news-modal">
+            ×
+        </button>
+
+        <div id="newsModalContent"></div>
+    </div>
+</div>
+
+{{ encore_entry_script_tags('news') }}
