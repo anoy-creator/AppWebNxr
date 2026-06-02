@@ -45,5 +45,13 @@ services:
       - ./app:/var/www/app
     tty: true
 
+  discord_bot:
+    image: node:22
+    container_name: discord_bot
+    working_dir: /bot
+    volumes:
+      - ./bot:/bot
+    tty: true
+
 volumes:
   db_data:

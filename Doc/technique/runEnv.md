@@ -1,5 +1,9 @@
 ﻿# Commandes rapides — workflow pour les contributeurs
+# BOTDISCORD
 
+# 1 conteneur du bot
+docker exec -it discord_bot bash
+# APPWEB
 # 1. Récupérer la branche principale et créer la branche locale
 git checkout main
 git pull origin main
