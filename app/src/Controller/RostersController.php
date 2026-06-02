@@ -27,7 +27,7 @@ class RostersController extends AbstractController
     public function modal(
         Roster $roster,
         GameMatchRepository $matchRepository,
-        PlayerMatchStatRepository $statRepository
+        PlayerMatchStatRepository $statRepository,
     ): Response {
         $matches = $matchRepository->findBy(
             ['roster' => $roster],
@@ -71,11 +71,11 @@ class RostersController extends AbstractController
         $losses = 0;
 
         foreach ($matches as $match) {
-            if ($match->getResult() === 'Victory') {
+            if ('Victory' === $match->getResult()) {
                 ++$wins;
             }
 
-            if ($match->getResult() === 'Defeat') {
+            if ('Defeat' === $match->getResult()) {
                 ++$losses;
             }
         }
@@ -92,7 +92,7 @@ class RostersController extends AbstractController
                 'kd' => $totalDeaths > 0 ? round($totalKills / $totalDeaths, 2) : $totalKills,
                 'wins' => $wins,
                 'losses' => $losses,
-                'winrate' => $totalMatches > 0 ? round(($wins / $totalMatches) * 100, 1) . '%' : '0%',
+                'winrate' => $totalMatches > 0 ? round(($wins / $totalMatches) * 100, 1).'%' : '0%',
             ],
         ]);
     }

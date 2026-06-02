@@ -1,63 +1,175 @@
 @import '../../_variables.css';
 @import '../../common.css';
 
-.day-block h2 {
-    margin-bottom: 18px;
-    font-size: 1.8rem;
+/* =========================
+   DAY BLOCK
+========================= */
+
+.day-block {
+    margin-bottom: 32px;
 }
 
+.day-block h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+/* =========================
+   EVENT CARD
+========================= */
+
 .event-card {
-    margin-bottom: 12px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+
+    margin-bottom: 14px;
     padding: 22px;
-    transition: .25s ease;
+
+    border: 1px solid var(--line);
+    border-radius: 16px;
+
+    background:
+        radial-gradient(circle at top right, rgba(123, 46, 255, 0.08), transparent 45%),
+        rgba(255, 255, 255, 0.03);
+
+    backdrop-filter: blur(10px);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
 }
 
 .event-card:hover {
-    transform: translateX(4px);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
 }
+
+/* =========================
+   META
+========================= */
 
 .event-card div {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 14px;
 }
 
 .event-card div span {
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .09);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
     padding: 6px 12px;
-    font-size: .8rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    font-size: .78rem;
     font-weight: 700;
+    color: #e5e7eb;
 }
 
+/* =========================
+   CONTENT
+========================= */
+
 .event-card h3 {
-    margin-bottom: 8px;
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
 }
 
 .event-card p {
     margin: 0;
-    color: #d1d5db;
+    line-height: 1.6;
+    color: #c7ccd8;
 }
 
-.event-card.training { 
-    border-color: rgba(96, 165, 250, .3); 
-    background: rgba(96, 165, 250, .09); 
+/* =========================
+   TRAINING
+========================= */
+
+.event-card.training {
+    border-color: rgba(96, 165, 250, .25);
 }
 
-.event-card.meeting { 
-    border-color: rgba(250, 204, 21, .3); 
-    background: rgba(250, 204, 21, .08); 
+.event-card.training::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: #60a5fa;
 }
 
-.event-card.tournament { 
-    border-color: rgba(123, 46, 255, .36); 
-    background: rgba(123, 46, 255, .11); 
+/* =========================
+   MEETING
+========================= */
+
+.event-card.meeting {
+    border-color: rgba(250, 204, 21, .25);
 }
 
-.event-card.match { 
-    border-color: rgba(248, 113, 113, .3); 
-    background: rgba(248, 113, 113, .09); 
+.event-card.meeting::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: #facc15;
+}
+
+/* =========================
+   TOURNAMENT
+========================= */
+
+.event-card.tournament {
+    border-color: rgba(123, 46, 255, .35);
+}
+
+.event-card.tournament::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: #7b2eff;
+}
+
+/* =========================
+   MATCH
+========================= */
+
+.event-card.match {
+    border-color: rgba(248, 113, 113, .25);
+}
+
+.event-card.match::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: #f87171;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+    .event-card {
+        padding: 18px;
+    }
+
+    .day-block h2 {
+        font-size: 1.5rem;
+    }
+
+    .event-card h3 {
+        font-size: 1rem;
+    }
 }

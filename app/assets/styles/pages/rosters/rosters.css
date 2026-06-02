@@ -1,9 +1,160 @@
 @import '../../_variables.css';
 @import '../../common.css';
 
-.roster-card {
-    cursor: pointer;
+/* =========================
+   ROSTERS PAGE
+========================= */
+
+.stack {
+    display: grid;
+    gap: 32px;
 }
+
+.roster-card {
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(38, 24, 55, 0.95), rgba(15, 12, 22, 0.95));
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.roster-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(123, 46, 255, .35);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .35);
+}
+
+/* =========================
+   ROSTER HERO
+========================= */
+
+.roster-hero {
+    position: relative;
+    overflow: hidden;
+    height: 260px;
+}
+
+.roster-hero > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+}
+
+.roster-card:hover .roster-hero > img {
+    transform: scale(1.06);
+}
+
+.roster-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(0deg, rgba(10, 8, 15, .95), rgba(10, 8, 15, .35), transparent),
+        radial-gradient(circle at top right, rgba(123, 46, 255, .25), transparent 45%);
+}
+
+.roster-title {
+    position: absolute;
+    right: 26px;
+    bottom: 26px;
+    left: 26px;
+    z-index: 1;
+
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+}
+
+.roster-title h2 {
+    margin: 0 0 4px;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+}
+
+.roster-title p {
+    margin: 0;
+    color: #d1d5db;
+    font-weight: 700;
+}
+
+/* =========================
+   ROSTER CONTENT
+========================= */
+
+.roster-content {
+    padding: 32px;
+}
+
+.roster-content h3 {
+    margin: 0 0 18px;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.mini-stats span {
+    padding: 18px 16px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .045);
+    text-align: center;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.mini-stats strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--purple);
+    font-size: 1.7rem;
+    font-weight: 900;
+}
+
+.composition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.composition-grid span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .045);
+
+    color: #fff;
+    font-weight: 800;
+}
+
+.composition-grid em {
+    color: var(--muted);
+    font-size: .78rem;
+    font-style: normal;
+    font-weight: 700;
+}
+
+/* =========================
+   ROSTER MODAL
+========================= */
 
 .roster-modal {
     position: fixed;
@@ -19,21 +170,23 @@
 .roster-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.82);
+    background: rgba(0, 0, 0, .82);
     backdrop-filter: blur(8px);
 }
 
 .roster-modal-box {
     position: relative;
     z-index: 1;
+
     width: min(980px, calc(100% - 32px));
     max-height: calc(100vh - 70px);
     margin: 35px auto;
     overflow: auto;
-    background: #15101f;
-    border: 1px solid rgba(255,255,255,.12);
+
+    border: 1px solid rgba(255, 255, 255, .12);
     border-radius: 28px;
-    box-shadow: 0 30px 90px rgba(0,0,0,.55);
+    background: #15101f;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
 }
 
 .roster-modal-close {
@@ -41,21 +194,29 @@
     top: 18px;
     right: 18px;
     z-index: 3;
+
     width: 42px;
     height: 42px;
+
     border: 0;
     border-radius: 50%;
     background: #7c2cff;
     color: #fff;
+
     font-size: 28px;
+    line-height: 1;
     cursor: pointer;
 }
+
+/* =========================
+   MODAL HEADER
+========================= */
 
 .roster-modal-header {
     position: relative;
     min-height: 260px;
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     padding: 34px;
     overflow: hidden;
 }
@@ -63,9 +224,11 @@
 .roster-modal-header img {
     position: absolute;
     inset: 0;
+
     width: 100%;
     height: 100%;
     object-fit: cover;
+
     opacity: .35;
 }
 
@@ -73,7 +236,9 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, #15101f, transparent);
+    background:
+        linear-gradient(to top, #15101f, transparent),
+        radial-gradient(circle at top right, rgba(123, 46, 255, .25), transparent 45%);
 }
 
 .roster-modal-header div {
@@ -82,25 +247,40 @@
 }
 
 .roster-modal-header h2 {
+    margin: 0;
     color: #fff;
     font-size: 46px;
-    margin: 0;
+    font-weight: 900;
 }
 
 .roster-modal-header p {
+    margin: 8px 0 0;
     color: #8b3dff;
     font-weight: 800;
-    margin: 8px 0 0;
 }
+
+/* =========================
+   MODAL BODY
+========================= */
 
 .roster-modal-body {
     padding: 32px;
 }
 
 .roster-modal-body h3 {
-    color: #fff;
     margin: 28px 0 16px;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 900;
 }
+
+.roster-modal-body h3:first-child {
+    margin-top: 0;
+}
+
+/* =========================
+   MODAL GLOBAL STATS
+========================= */
 
 .roster-modal-stats {
     display: grid;
@@ -109,19 +289,26 @@
 }
 
 .roster-modal-stats span {
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 16px;
     padding: 18px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .06);
     color: #aeb3c4;
     text-align: center;
+    font-weight: 700;
 }
 
 .roster-modal-stats strong {
     display: block;
+    margin-bottom: 4px;
     color: #fff;
     font-size: 28px;
+    font-weight: 900;
 }
+
+/* =========================
+   MODAL PLAYER TABLE
+========================= */
 
 .roster-player-table {
     display: grid;
@@ -132,17 +319,24 @@
     display: grid;
     grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
     gap: 12px;
+
     padding: 14px 16px;
     border-radius: 14px;
-    background: rgba(255,255,255,.05);
+
+    background: rgba(255, 255, 255, .05);
     color: #d8d9e2;
+    font-weight: 700;
 }
 
 .roster-player-row.head {
-    background: rgba(124,44,255,.22);
+    background: rgba(124, 44, 255, .22);
     color: #fff;
-    font-weight: 800;
+    font-weight: 900;
 }
+
+/* =========================
+   MODAL MATCH LIST
+========================= */
 
 .roster-match-list {
     display: grid;
@@ -152,26 +346,34 @@
 .roster-match-item {
     display: grid;
     grid-template-columns: 2fr 1.5fr auto;
-    gap: 12px;
     align-items: center;
-    background: rgba(255,255,255,.05);
-    border-radius: 14px;
+    gap: 12px;
+
     padding: 16px;
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, .05);
     color: #d8d9e2;
 }
 
 .roster-match-item strong {
     color: #fff;
+    font-weight: 900;
 }
 
 .roster-match-item span {
     color: #aeb3c4;
+    font-weight: 700;
 }
 
 .roster-match-item em {
     font-style: normal;
-    font-weight: 800;
+    font-weight: 900;
 }
+
+/* =========================
+   STATES
+========================= */
 
 .is-win {
     color: #38d996;
@@ -181,241 +383,47 @@
     color: #ff5c7a;
 }
 
-@media (max-width: 800px) {
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1020px) {
+    .composition-grid {
+        grid-template-columns: 1fr;
+    }
+
     .roster-modal-stats {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .roster-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .roster-title h2,
+    .roster-modal-header h2 {
+        font-size: 2rem;
+    }
+
+    .roster-modal-stats,
+    .mini-stats {
+        grid-template-columns: 1fr;
     }
 
     .roster-player-row,
     .roster-match-item {
         grid-template-columns: 1fr;
     }
-}
 
-.roster-card {
-    overflow: hidden;
-    border-radius: 18px;
-}
-
-.roster-banner {
-    position: relative;
-    overflow: hidden;
-    height: 170px;
-}
-
-.roster-banner img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .35s ease;
-}
-
-.roster-banner::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(0deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .22), transparent);
-}
-
-.roster-banner div {
-    position: absolute;
-    right: 24px;
-    bottom: 18px;
-    left: 24px;
-    z-index: 1;
-}
-
-.roster-banner h3 {
-    margin-bottom: 4px;
-    font-size: 1.7rem;
-    font-weight: 900;
-}
-
-.roster-banner p {
-    margin: 0;
-    color: #d1d5db;
-}
-
-.roster-banner:hover img {
-    transform: scale(1.06);
-}
-
-.mini-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    padding: 20px;
-}
-
-.mini-stats span {
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .055);
-    padding: 14px;
-    text-align: center;
-    color: var(--muted);
-}
-
-.mini-stats strong {
-    display: block;
-    margin-bottom: 4px;
-    color: var(--purple);
-    font-size: 1.55rem;
-}
-
-.player-list {
-    display: grid;
-    gap: 8px;
-    padding: 0 20px 22px;
-}
-
-.player-list span {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, .045);
-    padding: 11px 14px;
-    font-weight: 700;
-}
-
-.player-list em {
-    color: var(--muted);
-    font-size: .78rem;
-    font-style: normal;
-}
-
-.composition-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-}
-
-.composition-grid span {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, .045);
-    padding: 11px 14px;
-    font-weight: 700;
-}
-
-.composition-grid em {
-    color: var(--muted);
-    font-size: .78rem;
-    font-style: normal;
-}
-
-.composition-grid .captain {
-    border-color: rgba(123, 46, 255, .36);
-    background: rgba(123, 46, 255, .12);
-}
-
-.composition-grid .sub {
-    opacity: .65;
-}
-
-.roster-hero {
-    position: relative;
-    overflow: hidden;
-    height: 260px;
-}
-
-.roster-hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .35s ease;
-}
-
-.roster-hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(0deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .22), transparent);
-}
-
-.roster-hero:hover img {
-    transform: scale(1.06);
-}
-
-.roster-title {
-    position: absolute;
-    bottom: 26px;
-    left: 26px;
-    z-index: 1;
-    display: flex;
-    align-items: flex-end;
-    gap: 24px;
-}
-
-.roster-title h2 {
-    margin-bottom: 4px;
-    font-size: 2.5rem;
-    font-weight: 900;
-}
-
-.roster-title p {
-    margin: 0;
-    color: #d1d5db;
-}
-
-.roster-content {
-    padding: 32px;
-}
-
-.big-stats {
-    padding: 0 0 30px;
-}
-
-.stack {
-    display: grid;
-    gap: 32px;
-}
-
-.card-grid.two {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-}
-
-@media (max-width: 1020px) {
-    .composition-grid,
-    .card-grid.two {
-        grid-template-columns: 1fr;
-    }
-
-    .mini-stats {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 720px) {
-    .composition-grid,
-    .card-grid.two,
-    .mini-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .section-title,
-    .roster-title {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .button {
-        width: 100%;
+    .roster-modal-body,
+    .roster-content {
+        padding: 24px;
     }
 
     .roster-hero {
-        height: 330px;
-    }
-
-    .roster-content {
-        padding: 24px;
+        height: 320px;
     }
 }

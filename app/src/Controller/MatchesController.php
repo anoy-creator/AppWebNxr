@@ -21,7 +21,7 @@ class MatchesController extends AbstractController
 
         $criteria = [];
 
-        if ($game && $game !== 'Tous') {
+        if ($game && 'Tous' !== $game) {
             $criteria['game'] = $game;
         }
 
@@ -36,7 +36,7 @@ class MatchesController extends AbstractController
     #[Route('/matches/{id}/details', name: 'app_match_details', methods: ['GET'])]
     public function details(
         GameMatch $match,
-        PlayerMatchStatRepository $statRepository
+        PlayerMatchStatRepository $statRepository,
     ): Response {
         $stats = $statRepository->createQueryBuilder('s')
             ->andWhere('s.match = :match')
