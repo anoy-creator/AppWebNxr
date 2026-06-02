@@ -5,15 +5,16 @@
     </div>
 
     <div class="filter-row">
-        {% for filter in ['Tous', 'Staff', 'Joueur', 'Streamer', 'Createur'] %}
-            <span>{{ filter }}</span>
-        {% endfor %}
+        <span role="button" tabindex="0" class="player-filter is-active" data-role="all">Tous</span>
+        <span role="button" tabindex="0" class="player-filter" data-role="Staff">Staff</span>
+        <span role="button" tabindex="0" class="player-filter" data-role="Joueur">Joueur</span>
+        <span role="button" tabindex="0" class="player-filter" data-role="Streamer">Streamer</span>
+        <span role="button" tabindex="0" class="player-filter" data-role="Createur">Créateur</span>
     </div>
 
-    <div class="card-grid three">
+    <div id="players-grid" class="card-grid three">
         {% for player in players %}
-            <article class="player-card">
-
+            <article class="player-card js-player-card" data-player-id="{{ player.id }}">
                 <div class="player-photo">
                     <img
                         src="{{ player.avatar ?: '/images/default-avatar.png' }}"
@@ -47,10 +48,23 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-
             </article>
         {% else %}
             <p>Aucun joueur trouvé.</p>
         {% endfor %}
     </div>
 </section>
+
+<div class="player-modal" id="playerModal" aria-hidden="true">
+    <div class="player-modal-overlay js-close-player-modal"></div>
+
+    <div class="player-modal-box">
+        <button type="button" class="player-modal-close js-close-player-modal">
+            ×
+        </button>
+
+        <div id="playerModalContent"></div>
+    </div>
+</div>
+
+{{ encore_entry_script_tags('joueur') }}
