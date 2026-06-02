@@ -24,6 +24,7 @@ Encore
     .addEntry('joueur', './assets/js/pages/players/joueur.js')
     .addEntry('news', './assets/js/pages/news/news.js')
     .addEntry('roster', './assets/js/pages/rosters/roster.js')
+    .addEntry('matches', './assets/js/pages/matches/matches.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
