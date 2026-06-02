@@ -96,7 +96,8 @@ img {
 .nav-link,
 .login-link,
 .button,
-.filter-row span {
+.filter-row span,
+.filter-row button {
     border-radius: 8px;
     font-weight: 700;
     transition: .25s ease;
