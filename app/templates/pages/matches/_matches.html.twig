@@ -1,7 +1,7 @@
 {% set total = games|length %}
 {% set victories = games|filter(g => g.result == 'Victory')|length %}
 {% set defeats = games|filter(g => g.result == 'Defeat')|length %}
-{% set winrate = total > 0 ? ((victories / total) * 100)|number_format(1) : '0' %}
+{% set winrate = total > 0 ? ((victories / total) * 100)|number_format(1) : '0.0' %}
 
 <section class="page container">
     <div class="page-heading">
@@ -10,24 +10,47 @@
     </div>
 
     <div class="stat-grid match-stats">
-        <article class="stat-card"><strong>{{ total }}</strong><p>Total matchs</p></article>
-        <article class="stat-card green"><strong>{{ victories }}</strong><p>Victoires</p></article>
-        <article class="stat-card red"><strong>{{ defeats }}</strong><p>Defaites</p></article>
-        <article class="stat-card purple"><strong>{{ winrate }}%</strong><p>Winrate</p></article>
+        <article class="stat-card">
+            <strong>{{ total }}</strong>
+            <p>Total matchs</p>
+        </article>
+
+        <article class="stat-card">
+            <strong class="text-green">{{ victories }}</strong>
+            <p>Victoires</p>
+        </article>
+
+        <article class="stat-card">
+            <strong class="text-red">{{ defeats }}</strong>
+            <p>Défaites</p>
+        </article>
+
+        <article class="stat-card">
+            <strong class="text-purple">{{ winrate }}%</strong>
+            <p>Winrate</p>
+        </article>
     </div>
 
-    <div class="filter-row">
+    <div class="filter-row match-filter-row">
         {% for filter in ['Tous', 'CDL', 'Warzone', 'Tournament'] %}
-            <span>{{ filter }}</span>
+            <span
+                role="button"
+                tabindex="0"
+                class="match-filter {{ activeFilter is defined and activeFilter == filter ? 'is-active' : '' }}"
+                data-game="{{ filter }}"
+            >
+                {{ filter }}
+            </span>
         {% endfor %}
     </div>
 
-    <div class="table-card">
+    <div id="matches-table-wrapper" class="table-card">
         <table>
             <thead>
                 <tr>
                     <th>Date</th>
                     <th>Match</th>
+                    <th>Roster</th>
                     <th>Jeu</th>
                     <th>Mode</th>
                     <th>Score</th>
@@ -35,9 +58,9 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="matches-table-body">
                 {% for match in games %}
-                    <tr>
+                    <tr class="js-match-row" data-match-id="{{ match.id }}">
                         <td>{{ match.playedAt ? match.playedAt|date('d/m/Y') : '-' }}</td>
 
                         <td>
@@ -45,6 +68,8 @@
                             vs
                             {{ match.teamB ? match.teamB.name : 'TBA' }}
                         </td>
+
+                        <td>{{ match.roster ? match.roster.name : '-' }}</td>
 
                         <td>
                             <span class="pill">{{ match.game }}</span>
@@ -54,7 +79,7 @@
 
                         <td>{{ match.score }}</td>
 
-                        <td>
+                        <td class="match-result-cell">
                             {% if match.result == 'Victory' %}
                                 <span class="result win">Victoire</span>
                             {% elseif match.result == 'Defeat' %}
@@ -64,12 +89,20 @@
                             {% endif %}
                         </td>
                     </tr>
+
+                    <tr class="match-details-row" id="match-details-{{ match.id }}">
+                        <td colspan="7">
+                            <div class="match-details-content"></div>
+                        </td>
+                    </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6">Aucun match disponible.</td>
+                        <td colspan="7">Aucun match disponible.</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
+
+{{ encore_entry_script_tags('matches') }}

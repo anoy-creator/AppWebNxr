@@ -1,0 +1,38 @@
+<div class="match-detail-box">
+    <div class="match-detail-header">
+        <div>
+            <span>{{ match.playedAt|date('d/m/Y') }}</span>
+            <h3>{{ match.teamA.name }} vs {{ match.teamB.name }}</h3>
+            <p>{{ match.roster.name }} — {{ match.game }} — {{ match.mode }}</p>
+        </div>
+
+        <div class="match-detail-score">
+            <strong>{{ match.score }}</strong>
+            <em class="{{ match.result == 'Victory' ? 'is-win' : 'is-loss' }}">
+                {{ match.result == 'Victory' ? 'Victoire' : 'Défaite' }}
+            </em>
+        </div>
+    </div>
+
+    <div class="match-player-stats">
+        <div class="match-player-row head">
+            <span>Joueur</span>
+            <span>Rôle</span>
+            <span>Kills</span>
+            <span>Deaths</span>
+            <span>K/D</span>
+        </div>
+
+        {% for stat in stats %}
+            <div class="match-player-row">
+                <span>{{ stat.player.pseudo }}</span>
+                <span>{{ stat.player.grade }}</span>
+                <span>{{ stat.kills }}</span>
+                <span>{{ stat.deaths }}</span>
+                <span>{{ stat.kd }}</span>
+            </div>
+        {% else %}
+            <p>Aucune stat joueur disponible.</p>
+        {% endfor %}
+    </div>
+</div>

@@ -19,16 +19,12 @@ const closePlayerModal = () => {
 };
 
 $(document).on('click', '.player-filter', function () {
-    if (isFiltering) {
-        return;
-    }
+    if (isFiltering) return;
 
     const $filter = $(this);
     const role = $filter.data('role');
 
-    if ($filter.hasClass('is-active')) {
-        return;
-    }
+    if ($filter.hasClass('is-active')) return;
 
     $('.player-filter').removeClass('is-active');
     $filter.addClass('is-active');
@@ -70,15 +66,12 @@ $(document).on('keydown', '.player-filter', function (e) {
 });
 
 $(document).on('click', '.js-player-card', function () {
-    if (isModalLoading) {
-        return;
-    }
+    if (isModalLoading) return;
 
     const playerId = $(this).data('player-id');
 
     isModalLoading = true;
     $('#playerModalContent').empty();
-    openPlayerModal();
     setPlayerLoading(true);
 
     $.ajax({
@@ -89,9 +82,11 @@ $(document).on('click', '.js-player-card', function () {
         },
         success: function (html) {
             $('#playerModalContent').html(html);
+            openPlayerModal();
         },
         error: function () {
             $('#playerModalContent').html('<p>Erreur lors du chargement du joueur.</p>');
+            openPlayerModal();
         },
         complete: function () {
             isModalLoading = false;

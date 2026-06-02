@@ -1,6 +1,174 @@
 @import '../../_variables.css';
 @import '../../common.css';
 
+.stat-card {
+    background: linear-gradient(145deg, rgba(38, 24, 55, 0.95), rgba(20, 16, 28, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+}
+
+.stat-card.green,
+.stat-card.red,
+.stat-card.purple {
+    background: linear-gradient(145deg, rgba(38, 24, 55, 0.95), rgba(20, 16, 28, 0.95));
+}
+
+.text-green {
+    color: #4ee986;
+}
+
+.text-red {
+    color: #ff6b6b;
+}
+
+.text-purple {
+    color: #8b3dff;
+}
+
+.match-filter {
+    cursor: pointer;
+}
+
+.match-filter.is-active {
+    background: #7c2cff;
+    color: #fff;
+}
+
+.js-match-row {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.js-match-row:hover {
+    background: rgba(124, 44, 255, 0.12);
+}
+
+.match-result-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.match-result-loader {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #8b3dff;
+    border-radius: 50%;
+    animation: matchSpin 0.7s linear infinite;
+}
+
+@keyframes matchSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.match-details-row {
+    display: none;
+}
+
+.match-details-row.is-open {
+    display: table-row;
+}
+
+.match-details-row td {
+    padding: 0;
+    border: 0;
+}
+
+.match-detail-box {
+    margin: 12px;
+    padding: 24px;
+    background: linear-gradient(145deg, rgba(38, 24, 55, 0.98), rgba(12, 10, 18, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+}
+
+.match-detail-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+.match-detail-header span {
+    color: #8b3dff;
+    font-weight: 800;
+}
+
+.match-detail-header h3 {
+    margin: 6px 0;
+    color: #fff;
+}
+
+.match-detail-header p {
+    color: #aeb3c4;
+}
+
+.match-detail-score {
+    text-align: right;
+}
+
+.match-detail-score strong {
+    display: block;
+    color: #fff;
+    font-size: 36px;
+}
+
+.match-detail-score em {
+    font-style: normal;
+    font-weight: 800;
+}
+
+.is-win {
+    color: #4ee986;
+}
+
+.is-loss {
+    color: #ff6b6b;
+}
+
+.match-player-stats {
+    display: grid;
+    gap: 10px;
+}
+
+.match-player-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #d8d9e2;
+}
+
+.match-player-row.head {
+    background: rgba(124, 44, 255, 0.22);
+    color: #fff;
+    font-weight: 800;
+}
+
+@media (max-width: 800px) {
+    .match-detail-header {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .match-detail-score {
+        text-align: left;
+    }
+
+    .match-player-row {
+        grid-template-columns: 1fr;
+    }
+
+    .match-result-cell {
+        justify-content: flex-start;
+    }
+}
+
 .card-grid.two {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

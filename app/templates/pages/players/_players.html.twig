@@ -16,14 +16,9 @@
         {% for player in players %}
             <article class="player-card js-player-card" data-player-id="{{ player.id }}">
                 <div class="player-photo">
-                    <img
-                        src="{{ player.avatar ?: '/images/default-avatar.png' }}"
-                        alt="{{ player.pseudo }}"
-                    >
+                    <img src="{{ player.avatar ?: '/images/default-avatar.png' }}" alt="{{ player.pseudo }}">
 
-                    <span>
-                        {{ player.roster ? player.roster.name : 'Sans roster' }}
-                    </span>
+                    <span>{{ player.roster ? player.roster.name : 'Sans roster' }}</span>
 
                     <div>
                         <h2>{{ player.pseudo }}</h2>
@@ -59,10 +54,7 @@
     <div class="player-modal-overlay js-close-player-modal"></div>
 
     <div class="player-modal-box">
-        <button type="button" class="player-modal-close js-close-player-modal">
-            ×
-        </button>
-
+        <button type="button" class="player-modal-close js-close-player-modal">×</button>
         <div id="playerModalContent"></div>
     </div>
 </div>
