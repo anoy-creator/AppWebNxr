@@ -1,0 +1,72 @@
+<div class="schedule-detail-box">
+    <div class="schedule-detail-header">
+        <div>
+            <span>{{ match.game }} — {{ match.mode }}</span>
+
+            <h3>
+                {{ match.teamA ? match.teamA.name : 'TBA' }}
+                vs
+                {{ match.teamB ? match.teamB.name : 'TBA' }}
+            </h3>
+
+            <p>{{ match.roster ? match.roster.name : 'Roster non defini' }}</p>
+        </div>
+
+        <div class="schedule-detail-date">
+            <strong>{{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}</strong>
+            <em>{{ match.score }}</em>
+        </div>
+    </div>
+
+    <div class="schedule-info-grid">
+        <span>
+            <strong>Date début</strong>
+            {{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}
+        </span>
+
+        <span>
+            <strong>Roster concerné</strong>
+            {{ match.roster ? match.roster.name : '-' }}
+        </span>
+
+        <span>
+            <strong>Jeu</strong>
+            {{ match.game }}
+        </span>
+
+        <span>
+            <strong>Mode / Map</strong>
+            {{ match.mode }}
+        </span>
+    </div>
+
+    <h4>Joueurs concernés</h4>
+
+    <div class="schedule-player-list">
+        {% for stat in stats %}
+            <div class="schedule-player-row">
+                <span>{{ stat.player.pseudo }}</span>
+                <span>{{ stat.player.grade }}</span>
+                <span>{{ stat.kills }} kills</span>
+                <span>{{ stat.deaths }} deaths</span>
+                <span>K/D {{ stat.kd }}</span>
+            </div>
+        {% else %}
+            {% if match.roster %}
+                {% for player in match.roster.players %}
+                    <div class="schedule-player-row">
+                        <span>{{ player.pseudo }}</span>
+                        <span>{{ player.grade }}</span>
+                        <span>-</span>
+                        <span>-</span>
+                        <span>-</span>
+                    </div>
+                {% else %}
+                    <p>Aucun joueur concerné.</p>
+                {% endfor %}
+            {% else %}
+                <p>Aucun roster lié à ce match.</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>*

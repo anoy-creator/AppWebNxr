@@ -1,0 +1,53 @@
+<div class="schedule-detail-box">
+    <div class="schedule-detail-header">
+        <div>
+            <span>
+                {% if event.type == 'training' %}
+                    Entrainement
+                {% elseif event.type == 'meeting' %}
+                    Reunion
+                {% elseif event.type == 'tournament' %}
+                    Tournoi
+                {% else %}
+                    {{ event.type|capitalize }}
+                {% endif %}
+            </span>
+
+            <h3>{{ event.title }}</h3>
+            <p>{{ event.description }}</p>
+        </div>
+
+        <div class="schedule-detail-date">
+            <strong>{{ event.date ? event.date|date('d/m/Y') : 'TBD' }}</strong>
+            <em>{{ event.time ?: 'TBD' }}</em>
+        </div>
+    </div>
+
+    <div class="schedule-info-grid">
+        <span>
+            <strong>Date début</strong>
+            {{ event.date ? event.date|date('d/m/Y') : 'TBD' }}
+        </span>
+
+        <span>
+            <strong>Heure début</strong>
+            {{ event.time ?: 'TBD' }}
+        </span>
+
+        <span>
+            <strong>Date fin</strong>
+            {{ event.date ? event.date|date('d/m/Y') : 'TBD' }}
+        </span>
+
+        <span>
+            <strong>Participants</strong>
+            Staff / joueurs concernés
+        </span>
+    </div>
+
+    <h4>Description</h4>
+
+    <div class="schedule-detail-description">
+        {{ event.description|nl2br }}
+    </div>
+</div>

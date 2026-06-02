@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/content')]
-class AdminController extends AbstractController
+class AdminContentController extends AbstractController
 {
     #[Route('/news', name: 'admin_content_news', methods: ['POST'])]
     public function news(Request $request, EntityManagerInterface $em): JsonResponse

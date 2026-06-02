@@ -92,6 +92,35 @@ const loadPage = async (url, pushState = true) => {
     }
 };
 
+const loadProfileAjax = async () => {
+    const $content = $('#ajax-content').length ? $('#ajax-content') : $('#ajax-root');
+
+    if (!$content.length) {
+        return;
+    }
+
+    setLoading(true);
+
+    try {
+        const response = await fetch('/ajax/profile', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+
+        if (response.ok) {
+            $content.html(await response.text());
+        } else {
+            $content.html('<p>Erreur lors du chargement du profil</p>');
+        }
+    } catch (error) {
+        console.error(error);
+        $content.html('<p>Erreur réseau</p>');
+    } finally {
+        setLoading(false);
+    }
+};
+
 $(document).on('click', 'a', function (event) {
     const $link = $(this);
 
@@ -107,111 +136,23 @@ $(window).on('popstate', () => {
     loadPage(new URL(window.location.href), false);
 });
 
-// Load profile via AJAX
-const loadProfileAjax = async () => {
-    const $content = $('#ajax-content').length ? $('#ajax-content') : $('#ajax-root');
+$(document).on('click', '#profileMenuBtn', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-    if (!$content.length) return;
+    $('#profileMenu').toggleClass('show');
+    $('#adminMenu').removeClass('show');
+});
 
-    try {
-        const response = await fetch('/ajax/profile', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        });
+$(document).on('click', '[data-load-profile]', async function (e) {
+    e.preventDefault();
 
-        if (response.ok) {
-            $content.html(await response.text());
-        } else {
-            $content.html('<p>Erreur lors du chargement du profil</p>');
-        }
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        $content.html('<p>Erreur réseau</p>');
+    $('#profileMenu').removeClass('show');
+    await loadProfileAjax();
+});
+
+$(document).on('click', function (e) {
+    if (!$(e.target).closest('.user-menu').length) {
+        $('#profileMenu').removeClass('show');
     }
-};
-
-// Admin Dropdowns
-$(document).ready(() => {
-    const $adminMenuBtn = $('#adminMenuBtn');
-    const $adminMenu = $('#adminMenu');
-    const $profileMenuBtn = $('#profileMenuBtn');
-    const $profileMenu = $('#profileMenu');
-
-    if ($adminMenuBtn.length && $adminMenu.length) {
-        $adminMenuBtn.on('click', () => {
-            $adminMenu.toggleClass('show');
-            $profileMenu.removeClass('show');
-        });
-
-        $('.admin-dropdown-menu .dropdown-item').on('click', () => {
-            $adminMenu.removeClass('show');
-        });
-    }
-
-    if ($profileMenuBtn.length && $profileMenu.length) {
-        $profileMenuBtn.on('click', () => {
-            $profileMenu.toggleClass('show');
-            $adminMenu.removeClass('show');
-        });
-
-        const $profileLink = $profileMenu.find('a[data-load-profile]');
-
-        if ($profileLink.length) {
-            $profileLink.on('click', async (e) => {
-                e.preventDefault();
-                $profileMenu.removeClass('show');
-                console.log('Loading profile...');
-                await loadProfileAjax();
-            });
-        }
-    }
-
-    $(document).on('click', (e) => {
-        if (
-            !$(e.target).closest('.admin-dropdown').length &&
-            !$(e.target).closest('.user-menu').length
-        ) {
-            $adminMenu.removeClass('show');
-            $profileMenu.removeClass('show');
-        }
-    });
-
-    $('.admin-form').on('submit', async function (e) {
-        e.preventDefault();
-
-        const $form = $(this);
-        const endpoint = $form.data('endpoint');
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
-
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify(data),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('✅ Élément ajouté avec succès!');
-                this.reset();
-
-                const modal = $form.closest('.modal')[0];
-                const bsModal = bootstrap.Modal.getInstance(modal);
-                bsModal?.hide();
-
-                window.location.reload();
-            } else {
-                alert('❌ Erreur: ' + (result.message || 'Une erreur est survenue'));
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('❌ Erreur réseau');
-        }
-    });
 });

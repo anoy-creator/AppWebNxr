@@ -4,23 +4,42 @@
         <h1>Planning</h1>
     </div>
 
-    {% if events|length == 0 and matches|length == 0 %}
-        <p>Aucun evenement programme.</p>
-    {% else %}
+    <div class="legend schedule-filters">
+        {% set filters = {
+            'training': {'label': 'Entrainement', 'color': 'blue'},
+            'meeting': {'label': 'Reunion', 'color': 'yellow'},
+            'tournament': {'label': 'Tournoi', 'color': 'purple'},
+            'match': {'label': 'Match officiel', 'color': 'red'}
+        } %}
 
-        <div class="legend">
-            <span><i class="blue"></i>Entrainement</span>
-            <span><i class="yellow"></i>Reunion</span>
-            <span><i class="purple"></i>Tournoi</span>
-            <span><i class="red"></i>Match officiel</span>
-        </div>
+        {% for value, item in filters %}
+            <label class="schedule-filter">
+                <input
+                    type="checkbox"
+                    name="types[]"
+                    value="{{ value }}"
+                    {% if activeTypes is not defined or value in activeTypes %}checked{% endif %}
+                >
 
-        <div class="stack">
+                <span>
+                    <i class="{{ item.color }}"></i>
+                    {{ item.label }}
+                </span>
+            </label>
+        {% endfor %}
+    </div>
 
-            {# EVENTS #}
+    <div id="schedule-list" class="stack">
+        {% if events|length == 0 and matches|length == 0 %}
+            <p>Aucun evenement programme.</p>
+        {% else %}
             {% for event in events %}
-                <article class="event-card {{ event.type }}">
-                    <div>
+                <article
+                    class="event-card js-schedule-item {{ event.type }}"
+                    data-detail-url="{{ path('app_schedule_event_details', { id: event.id }) }}"
+                    data-item-id="event-{{ event.id }}"
+                >
+                    <div class="event-card-meta">
                         <span>{{ event.title }}</span>
                         <span>
                             {{ event.date ? event.date|date('d/m/Y') : 'TBD' }}
@@ -31,20 +50,23 @@
                     </div>
 
                     <h3>{{ event.title }}</h3>
-
                     <p>{{ event.description }}</p>
                 </article>
+
+                <div class="schedule-detail-row" id="schedule-detail-event-{{ event.id }}">
+                    <div class="schedule-detail-content"></div>
+                </div>
             {% endfor %}
 
-            {# MATCHES #}
             {% for match in matches %}
-                <article class="event-card match">
-
-                    <div>
+                <article
+                    class="event-card js-schedule-item match"
+                    data-detail-url="{{ path('app_schedule_match_details', { id: match.id }) }}"
+                    data-item-id="match-{{ match.id }}"
+                >
+                    <div class="event-card-meta">
                         <span>Match officiel</span>
-                        <span>
-                            {{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}
-                        </span>
+                        <span>{{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}</span>
                     </div>
 
                     <h3>
@@ -59,11 +81,14 @@
                             - {{ match.mode }}
                         {% endif %}
                     </p>
-
                 </article>
+
+                <div class="schedule-detail-row" id="schedule-detail-match-{{ match.id }}">
+                    <div class="schedule-detail-content"></div>
+                </div>
             {% endfor %}
-
-        </div>
-
-    {% endif %}
+        {% endif %}
+    </div>
 </section>
+
+{{ encore_entry_script_tags('schedule') }}
