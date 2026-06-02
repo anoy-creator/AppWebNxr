@@ -1,0 +1,61 @@
+<div class="roster-modal-header">
+    <img src="{{ roster.banner ?: '/images/roster-default.jpg' }}" alt="{{ roster.name }}">
+
+    <div>
+        <h2>{{ roster.name }}</h2>
+        <p>{{ roster.game }}</p>
+    </div>
+</div>
+
+<div class="roster-modal-body">
+    <h3>Stats globales - 10 derniers matchs</h3>
+
+    <div class="roster-modal-stats">
+        <span><strong>{{ globalStats.kills }}</strong> Kills</span>
+        <span><strong>{{ globalStats.deaths }}</strong> Deaths</span>
+        <span><strong>{{ globalStats.kd }}</strong> K/D</span>
+        <span><strong>{{ globalStats.wins }}</strong> Wins</span>
+        <span><strong>{{ globalStats.losses }}</strong> Loses</span>
+        <span><strong>{{ globalStats.winrate }}</strong> Winrate</span>
+    </div>
+
+    <h3>Stats par joueur</h3>
+
+    <div class="roster-player-table">
+        <div class="roster-player-row head">
+            <span>Joueur</span>
+            <span>Grade</span>
+            <span>Kills</span>
+            <span>Deaths</span>
+            <span>K/D</span>
+        </div>
+
+        {% for row in playersStats %}
+            <div class="roster-player-row">
+                <span>{{ row.player.pseudo }}</span>
+                <span>{{ row.player.grade }}</span>
+                <span>{{ row.kills }}</span>
+                <span>{{ row.deaths }}</span>
+                <span>{{ row.kd }}</span>
+            </div>
+        {% else %}
+            <p>Aucune statistique joueur disponible.</p>
+        {% endfor %}
+    </div>
+
+    <h3>10 derniers matchs</h3>
+
+    <div class="roster-match-list">
+        {% for match in matches %}
+            <div class="roster-match-item">
+                <strong>{{ match.teamA.name }} vs {{ match.teamB.name }}</strong>
+                <span>{{ match.playedAt|date('d/m/Y') }} - {{ match.mode }}</span>
+                <em class="{{ match.result == 'Victory' ? 'is-win' : 'is-loss' }}">
+                    {{ match.result }} - {{ match.score }}
+                </em>
+            </div>
+        {% else %}
+            <p>Aucun match disponible.</p>
+        {% endfor %}
+    </div>
+</div>
