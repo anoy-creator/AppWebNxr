@@ -1,40 +1,54 @@
 import './styles/app.css';
+import $ from 'jquery';
 
-const root = document.querySelector('#ajax-root');
-const loader = document.querySelector('.ajax-loader');
+window.$ = $;
+window.jQuery = $;
+
+const $root = $('#ajax-root');
+const $loader = $('.ajax-loader');
 
 let activeController = null;
 
-const isInternalPageLink = (link) => {
-    if (!link || link.target || link.hasAttribute('download') || link.dataset.noAjax === 'true') {
+const isInternalPageLink = ($link) => {
+    if (
+        !$link.length ||
+        $link.attr('target') ||
+        $link.attr('download') !== undefined ||
+        $link.data('noAjax') === true
+    ) {
         return false;
     }
 
-    const url = new URL(link.href, window.location.href);
+    const url = new URL($link.attr('href'), window.location.href);
 
-    return url.origin === window.location.origin && !url.hash && url.pathname !== window.location.pathname;
+    return (
+        url.origin === window.location.origin &&
+        !url.hash &&
+        url.pathname !== window.location.pathname
+    );
 };
 
 const setLoading = (isLoading) => {
-    document.body.classList.toggle('is-ajax-loading', isLoading);
-    loader?.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
+    $('body').toggleClass('is-ajax-loading', isLoading);
+    $loader.attr('aria-hidden', isLoading ? 'false' : 'true');
 };
 
 const updateActiveNavigation = (pathname) => {
-    document.querySelectorAll('.nav-link').forEach((link) => {
-        const url = new URL(link.href);
-        link.classList.toggle('is-active', url.pathname === pathname);
+    $('.nav-link').each(function () {
+        const url = new URL($(this).attr('href'), window.location.href);
+        $(this).toggleClass('is-active', url.pathname === pathname);
     });
 };
 
 const loadPage = async (url, pushState = true) => {
-    if (!root) {
+    if (!$root.length) {
         window.location.href = url.href;
         return;
     }
 
     activeController?.abort();
     activeController = new AbortController();
+
     setLoading(true);
 
     try {
@@ -50,14 +64,18 @@ const loadPage = async (url, pushState = true) => {
             throw new Error(`HTTP ${response.status}`);
         }
 
-        root.innerHTML = await response.text();
+        $root.html(await response.text());
+
         const title = response.headers.get('X-Page-Title');
 
         if (title) {
             document.title = title;
         }
 
-        document.body.classList.toggle('hide-site-footer', response.headers.get('X-Hide-Footer') === '1');
+        $('body').toggleClass(
+            'hide-site-footer',
+            response.headers.get('X-Hide-Footer') === '1'
+        );
 
         if (pushState) {
             window.history.pushState({ ajax: true }, title || '', url.href);
@@ -74,25 +92,26 @@ const loadPage = async (url, pushState = true) => {
     }
 };
 
-document.addEventListener('click', (event) => {
-    const link = event.target.closest('a');
+$(document).on('click', 'a', function (event) {
+    const $link = $(this);
 
-    if (!isInternalPageLink(link)) {
+    if (!isInternalPageLink($link)) {
         return;
     }
 
     event.preventDefault();
-    loadPage(new URL(link.href));
+    loadPage(new URL($link.attr('href'), window.location.href));
 });
 
-window.addEventListener('popstate', () => {
+$(window).on('popstate', () => {
     loadPage(new URL(window.location.href), false);
 });
 
 // Load profile via AJAX
 const loadProfileAjax = async () => {
-    const content = document.getElementById('ajax-content') || document.getElementById('ajax-root');
-    if (!content) return;
+    const $content = $('#ajax-content').length ? $('#ajax-content') : $('#ajax-root');
+
+    if (!$content.length) return;
 
     try {
         const response = await fetch('/ajax/profile', {
@@ -102,101 +121,97 @@ const loadProfileAjax = async () => {
         });
 
         if (response.ok) {
-            content.innerHTML = await response.text();
+            $content.html(await response.text());
         } else {
-            content.innerHTML = '<p>Erreur lors du chargement du profil</p>';
+            $content.html('<p>Erreur lors du chargement du profil</p>');
         }
     } catch (error) {
         console.error('Error loading profile:', error);
-        content.innerHTML = '<p>Erreur réseau</p>';
+        $content.html('<p>Erreur réseau</p>');
     }
 };
 
 // Admin Dropdowns
-document.addEventListener('DOMContentLoaded', () => {
-    const adminMenuBtn = document.getElementById('adminMenuBtn');
-    const adminMenu = document.getElementById('adminMenu');
-    const profileMenuBtn = document.getElementById('profileMenuBtn');
-    const profileMenu = document.getElementById('profileMenu');
+$(document).ready(() => {
+    const $adminMenuBtn = $('#adminMenuBtn');
+    const $adminMenu = $('#adminMenu');
+    const $profileMenuBtn = $('#profileMenuBtn');
+    const $profileMenu = $('#profileMenu');
 
-    // Admin dropdown toggle
-    if (adminMenuBtn && adminMenu) {
-        adminMenuBtn.addEventListener('click', () => {
-            adminMenu.classList.toggle('show');
-            profileMenu?.classList.remove('show');
+    if ($adminMenuBtn.length && $adminMenu.length) {
+        $adminMenuBtn.on('click', () => {
+            $adminMenu.toggleClass('show');
+            $profileMenu.removeClass('show');
         });
 
-        document.querySelectorAll('.admin-dropdown-menu .dropdown-item').forEach(item => {
-            item.addEventListener('click', () => {
-                adminMenu.classList.remove('show');
-            });
+        $('.admin-dropdown-menu .dropdown-item').on('click', () => {
+            $adminMenu.removeClass('show');
         });
     }
 
-    // Profile dropdown toggle
-    if (profileMenuBtn && profileMenu) {
-        profileMenuBtn.addEventListener('click', () => {
-            profileMenu.classList.toggle('show');
-            adminMenu?.classList.remove('show');
+    if ($profileMenuBtn.length && $profileMenu.length) {
+        $profileMenuBtn.on('click', () => {
+            $profileMenu.toggleClass('show');
+            $adminMenu.removeClass('show');
         });
 
-        // Load profile on click - attach to the menu itself
-        const profileLink = profileMenu.querySelector('a[data-load-profile]');
-        if (profileLink) {
-            profileLink.addEventListener('click', async (e) => {
+        const $profileLink = $profileMenu.find('a[data-load-profile]');
+
+        if ($profileLink.length) {
+            $profileLink.on('click', async (e) => {
                 e.preventDefault();
-                profileMenu.classList.remove('show');
+                $profileMenu.removeClass('show');
                 console.log('Loading profile...');
                 await loadProfileAjax();
             });
         }
     }
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.admin-dropdown') && !e.target.closest('.user-menu')) {
-            adminMenu?.classList.remove('show');
-            profileMenu?.classList.remove('show');
+    $(document).on('click', (e) => {
+        if (
+            !$(e.target).closest('.admin-dropdown').length &&
+            !$(e.target).closest('.user-menu').length
+        ) {
+            $adminMenu.removeClass('show');
+            $profileMenu.removeClass('show');
         }
     });
 
-    // Admin form submission
-    document.querySelectorAll('.admin-form').forEach(form => {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    $('.admin-form').on('submit', async function (e) {
+        e.preventDefault();
 
-            const endpoint = form.dataset.endpoint;
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData);
+        const $form = $(this);
+        const endpoint = $form.data('endpoint');
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
 
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    body: JSON.stringify(data),
-                });
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify(data),
+            });
 
-                const result = await response.json();
+            const result = await response.json();
 
-                if (response.ok) {
-                    alert('✅ Élément ajouté avec succès!');
-                    form.reset();
-                    // Close modal
-                    const modal = form.closest('.modal');
-                    const bsModal = bootstrap.Modal.getInstance(modal);
-                    bsModal?.hide();
-                    // Reload page
-                    window.location.reload();
-                } else {
-                    alert('❌ Erreur: ' + (result.message || 'Une erreur est survenue'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Erreur réseau');
+            if (response.ok) {
+                alert('✅ Élément ajouté avec succès!');
+                this.reset();
+
+                const modal = $form.closest('.modal')[0];
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                bsModal?.hide();
+
+                window.location.reload();
+            } else {
+                alert('❌ Erreur: ' + (result.message || 'Une erreur est survenue'));
             }
-        });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Erreur réseau');
+        }
     });
 });
