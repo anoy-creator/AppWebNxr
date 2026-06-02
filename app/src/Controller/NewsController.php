@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\News;
 use App\Repository\NewsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,14 @@ class NewsController extends AbstractController
     {
         return $this->renderPage($request, 'news', 'Actualites - Naxera', [
             'news' => $newsRepository->findBy([], ['date' => 'DESC']),
+        ]);
+    }
+
+    #[Route('/news/{id}/modal', name: 'app_news_modal', methods: ['GET'])]
+    public function modal(News $news): Response
+    {
+        return $this->render('pages/news/_news_modal_content.html.twig', [
+            'news' => $news,
         ]);
     }
 }
