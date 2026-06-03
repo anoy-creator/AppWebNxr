@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\Player;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -46,15 +47,30 @@ class CreateAdminCommand extends Command
             $password = $helper->ask($input, $output, $question);
         }
 
+        $discordId = 'admin-'.uniqid();
+
         $user = new User();
         $user->setUsername($username);
-        $user->setDiscordId('admin-'.uniqid());
+        $user->setDiscordId($discordId);
         $user->setDiscordName($username);
         $user->setRoles(['ROLE_ADMIN']);
+
+        $player = new Player();
+        $player
+            ->setPseudo($username)
+            ->setDiscordId($discordId)
+            ->setAvatar('')
+            ->setRole('Staff')
+            ->setGrade('Admin')
+            ->setGame('All Games')
+            ->setSocials(['discord' => $discordId]);
+
+        $user->setPlayer($player);
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
 
+        $this->entityManager->persist($player);
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 

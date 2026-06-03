@@ -77,6 +77,7 @@ final class AppFixtures extends Fixture
         $adminPlayer = new Player();
         $adminPlayer
             ->setPseudo('Admin Pro')
+            ->setDiscordId('admin-fixture')
             ->setAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700')
             ->setRole('Staff')
             ->setGrade('Founder')
@@ -86,7 +87,10 @@ final class AppFixtures extends Fixture
                 'twitter' => 'admin_nxr',
                 'twitch' => 'admin_nxr',
                 'youtube' => 'nxr_official',
+                'discord' => 'admin-fixture',
             ]);
+
+        $admin->setPlayer($adminPlayer);
 
         $manager->persist($adminPlayer);
         $players['Admin Pro'] = $adminPlayer;

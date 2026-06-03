@@ -2,6 +2,7 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\Player;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
@@ -35,6 +36,17 @@ class UserTest extends TestCase
         $this->assertSame('123456789', $user->getUserIdentifier());
         $this->assertSame($createdAt, $user->getCreatedAt());
         $this->assertSame($lastLoginAt, $user->getLastLoginAt());
+    }
+
+    public function testUserCanBeLinkedToPlayer(): void
+    {
+        $user = new User();
+        $player = new Player();
+
+        $user->setPlayer($player);
+
+        $this->assertSame($player, $user->getPlayer());
+        $this->assertSame($user, $player->getUser());
     }
 
     public function testDefaultRoleIsUser(): void

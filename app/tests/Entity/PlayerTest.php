@@ -13,6 +13,7 @@ class PlayerTest extends TestCase
 
         $player
             ->setPseudo('ShadowX')
+            ->setDiscordId('123456789')
             ->setAvatar('avatar.png')
             ->setRole('Joueur')
             ->setGrade('Captain')
@@ -21,6 +22,7 @@ class PlayerTest extends TestCase
 
         $this->assertNull($player->getId());
         $this->assertSame('ShadowX', $player->getPseudo());
+        $this->assertSame('123456789', $player->getDiscordId());
         $this->assertSame('avatar.png', $player->getAvatar());
         $this->assertSame('Joueur', $player->getRole());
         $this->assertSame('Captain', $player->getGrade());

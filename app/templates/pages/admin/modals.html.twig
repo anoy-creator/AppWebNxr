@@ -90,7 +90,7 @@
 
                     <div class="admin-form-group">
                         <label>Joueurs titulaires</label>
-                        <select name="players[]" class="select-custom-multiple" multiple data-placeholder="Rechercher un joueur...">
+                        <select name="players[]" id="event-players" class="select-custom-multiple" multiple data-placeholder="Rechercher un joueur...">
                             {% for player in players|default([]) %}
                                 <option value="{{ player.id }}">{{ player.pseudo }}</option>
                             {% endfor %}
@@ -99,7 +99,7 @@
 
                     <div class="admin-form-group">
                         <label>Remplacants</label>
-                        <select name="substitutes[]" class="select-custom-multiple" multiple data-placeholder="Rechercher un remplacant...">
+                        <select name="substitutes[]" id="event-substitutes" class="select-custom-multiple" multiple data-placeholder="Rechercher un remplacant...">
                             {% for player in players|default([]) %}
                                 <option value="{{ player.id }}">{{ player.pseudo }}</option>
                             {% endfor %}

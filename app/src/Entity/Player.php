@@ -34,6 +34,12 @@ class Player
     #[ORM\ManyToOne(inversedBy: 'players')]
     private ?Roster $roster = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $discordId = null;
+
+    #[ORM\OneToOne(mappedBy: 'player', targetEntity: User::class)]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +125,34 @@ class Player
     public function setRoster(?Roster $roster): self
     {
         $this->roster = $roster;
+
+        return $this;
+    }
+
+    public function getDiscordId(): ?string
+    {
+        return $this->discordId;
+    }
+
+    public function setDiscordId(?string $discordId): self
+    {
+        $this->discordId = $discordId;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        if ($user !== null && $user->getPlayer() !== $this) {
+            $user->setPlayer($this);
+        }
 
         return $this;
     }

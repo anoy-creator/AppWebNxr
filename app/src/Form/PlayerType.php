@@ -18,6 +18,9 @@ class PlayerType extends AbstractType
     {
         $builder
             ->add('pseudo', TextType::class)
+            ->add('discordId', TextType::class, [
+                'required' => false,
+            ])
             ->add('avatar', TextType::class)
             ->add('role', ChoiceType::class, [
                 'choices' => [

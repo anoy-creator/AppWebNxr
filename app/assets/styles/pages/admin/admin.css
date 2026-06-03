@@ -1,10 +1,6 @@
 @import '../../_variables.css';
 @import '../../common.css';
 
-/* =========================
-   ADMIN LOCKED
-========================= */
-
 .admin-locked {
     position: relative;
     display: grid;
@@ -62,10 +58,6 @@
     font-weight: 700;
 }
 
-/* =========================
-   ADMIN DROPDOWN
-========================= */
-
 .admin-dropdown {
     position: relative;
 }
@@ -109,10 +101,6 @@
     background: rgba(123, 46, 255, .18);
 }
 
-/* =========================
-   ADMIN MODALS
-========================= */
-
 .admin-modal {
     position: fixed;
     inset: 0;
@@ -130,9 +118,10 @@
 
 .admin-modal-box {
     position: relative;
-    width: min(560px, 100%);
-    max-height: calc(100vh - 48px);
-    overflow: auto;
+    width: min(900px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 32px;
     border: 1px solid rgba(255, 255, 255, .12);
     border-radius: 24px;
@@ -161,10 +150,6 @@
     line-height: 1;
     cursor: pointer;
 }
-
-/* =========================
-   ADMIN FORMS
-========================= */
 
 .admin-form {
     display: grid;
@@ -318,32 +303,41 @@
 .admin-form-group label {
     color: #fff;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: .9rem;
 }
 
-/* =========================
-   TOM SELECT
-========================= */
+.admin-form select.ts-hidden-accessible {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
 
 .admin-form .ts-wrapper {
     width: 100%;
+    min-width: 0;
 }
 
 .admin-form .ts-control {
     min-height: 52px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 6px;
     padding: 12px 14px !important;
     background: rgba(255, 255, 255, .06) !important;
     border: 1px solid rgba(255, 255, 255, .12) !important;
     border-radius: 12px !important;
     box-shadow: none !important;
     color: #fff !important;
+    overflow: hidden;
 }
 
 .admin-form .ts-control input {
     width: auto !important;
-    min-width: 140px !important;
+    min-width: 120px !important;
     padding: 0 !important;
     border: 0 !important;
     background: transparent !important;
@@ -375,19 +369,19 @@
 }
 
 .admin-form .ts-control .item {
-    background: transparent !important;
     color: #fff !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
 }
 
-.admin-form .select-custom-multiple + .ts-wrapper .item {
+.admin-form .select-custom-multiple + .ts-wrapper .item,
+.admin-form .ts-wrapper.multi .item {
+    max-width: 100%;
     background: #7c2cff !important;
     color: #fff !important;
     border-radius: 999px !important;
     padding: 4px 10px !important;
     margin: 2px !important;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .admin-form .select-custom,
@@ -395,14 +389,19 @@
     width: 100%;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-
 @media (max-width: 720px) {
+    .admin-modal {
+        padding: 12px;
+    }
+
     .admin-locked div,
     .admin-modal-box {
         padding: 26px 22px;
+    }
+
+    .admin-modal-box {
+        width: 100%;
+        max-width: 100%;
     }
 
     .admin-locked h1,

@@ -40,6 +40,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastLoginAt = null;
 
+    #[ORM\OneToOne(inversedBy: 'user', targetEntity: Player::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Player $player = null;
+
     public function __construct()
     {
         $this->roles = ['ROLE_USER'];
@@ -140,6 +144,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLoginAt(?\DateTimeImmutable $lastLoginAt): self
     {
         $this->lastLoginAt = $lastLoginAt;
+
+        return $this;
+    }
+
+    public function getPlayer(): ?Player
+    {
+        return $this->player;
+    }
+
+    public function setPlayer(?Player $player): self
+    {
+        $this->player = $player;
+
+        if ($player !== null && $player->getUser() !== $this) {
+            $player->setUser($this);
+        }
 
         return $this;
     }

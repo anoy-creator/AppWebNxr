@@ -10,6 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {
+    const Entrainement = 'training';
+    const Reunion = 'meeting';
+    const Tournoi = 'tournament';
+    const MatchOfficiel = 'match';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

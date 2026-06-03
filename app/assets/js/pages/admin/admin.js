@@ -11,13 +11,13 @@ const escapeHtml = (value) => String(value)
 
 const getTomSelectItems = (selector) => {
     const el = document.querySelector(selector);
-
     return el?.tomselect ? [...el.tomselect.items] : [];
 };
 
 const getPlayerLabel = (id) => {
-    const normalizedId = String(id).replace(/"/g, '\\"');
-    const option = document.querySelector(`#match-players option[value="${normalizedId}"]`);
+    const option =
+        document.querySelector(`#match-players option[value="${CSS.escape(String(id))}"]`) ||
+        document.querySelector(`#event-players option[value="${CSS.escape(String(id))}"]`);
 
     return option?.textContent?.trim() || `Joueur ${id}`;
 };
@@ -77,6 +77,7 @@ const renderMatchStats = (players) => {
             <input type="number" min="0" value="${escapeHtml(values.kills)}" data-stat="kills" aria-label="Kills ${escapeHtml(label)}">
             <input type="number" min="0" value="${escapeHtml(values.deaths)}" data-stat="deaths" aria-label="Morts ${escapeHtml(label)}">
         `;
+
         container.appendChild(row);
     });
 };
@@ -90,9 +91,50 @@ const updateMatchCompositionTools = () => {
     renderMatchStats(players);
 };
 
+const syncExclusivePlayerSelects = (changedSelect = null) => {
+    const pairs = [
+        ['#event-players', '#event-substitutes'],
+        ['#match-players', '#match-substitutes'],
+    ];
+
+    pairs.forEach(([playersSelector, substitutesSelector]) => {
+        const players = document.querySelector(playersSelector)?.tomselect;
+        const substitutes = document.querySelector(substitutesSelector)?.tomselect;
+
+        if (!players || !substitutes) return;
+
+        const playersItems = [...players.items].map(String);
+        const substitutesItems = [...substitutes.items].map(String);
+        const duplicates = playersItems.filter((id) => substitutesItems.includes(id));
+
+        duplicates.forEach((id) => {
+            if (changedSelect === players) {
+                substitutes.removeItem(id, true);
+                return;
+            }
+
+            if (changedSelect === substitutes) {
+                players.removeItem(id, true);
+                return;
+            }
+
+            substitutes.removeItem(id, true);
+        });
+
+        players.refreshOptions(false);
+        substitutes.refreshOptions(false);
+        players.refreshItems();
+        substitutes.refreshItems();
+    });
+
+    updateMatchCompositionTools();
+};
+
 const initSelectCustom = () => {
     document.querySelectorAll('.select-custom-multiple').forEach((el) => {
-        if (el.tomselect) return;
+        if (el.tomselect) {
+            el.tomselect.destroy();
+        }
 
         new TomSelect(el, {
             plugins: ['remove_button'],
@@ -108,16 +150,19 @@ const initSelectCustom = () => {
             hideSelected: true,
             preload: true,
             openOnFocus: true,
+
             onFocus() {
                 this.refreshOptions(false);
                 this.open();
             },
+
             onClick() {
                 this.refreshOptions(false);
                 this.open();
             },
+
             onChange() {
-                updateMatchCompositionTools();
+                syncExclusivePlayerSelects(this);
             },
         });
     });
@@ -151,10 +196,10 @@ const openModal = (modalId) => {
     const modal = document.getElementById(modalId);
 
     $(`#${modalId}`).addClass('is-open');
-    initSelectCustom();
+
     toggleEventPlayersFields();
     refreshVisibleSelects(modal || document);
-    updateMatchCompositionTools();
+    syncExclusivePlayerSelects();
 };
 
 const closeModal = ($modal) => {
@@ -178,7 +223,7 @@ const setTomSelectValues = (selector, values) => {
         el.tomselect.setValue(values.map(String), true);
     }
 
-    updateMatchCompositionTools();
+    syncExclusivePlayerSelects(el.tomselect);
 };
 
 const loadTournamentPlayers = async (tournamentId) => {
@@ -218,12 +263,16 @@ const moveMatchPlayer = (fromSelector, toSelector, playerId) => {
 
     from.removeItem(String(playerId), true);
     to.addItem(String(playerId), true);
+
     from.refreshOptions(false);
     to.refreshOptions(false);
-    updateMatchCompositionTools();
+
+    syncExclusivePlayerSelects(to);
 };
 
 const serializeForm = (form) => {
+    syncExclusivePlayerSelects();
+
     const formData = new FormData(form);
     const data = {};
 
@@ -340,7 +389,7 @@ $(document).on('submit', '.admin-form', async function (e) {
         this.reset();
 
         this.querySelectorAll('.select-custom-multiple').forEach((el) => {
-            el.tomselect?.clear();
+            el.tomselect?.clear(true);
         });
 
         updateMatchCompositionTools();
@@ -390,5 +439,5 @@ $(document).on('submit', '.match-result-form', async function (e) {
 $(document).ready(() => {
     initSelectCustom();
     toggleEventPlayersFields();
-    updateMatchCompositionTools();
+    syncExclusivePlayerSelects();
 });

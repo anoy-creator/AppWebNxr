@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Service\DiscordAccountLinker;
 use Doctrine\ORM\EntityManagerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
@@ -15,42 +16,32 @@ class DiscordUserProvider implements OAuthAwareUserProviderInterface, UserProvid
 {
     private EntityManagerInterface $em;
     private LoggerInterface $logger;
+    private DiscordAccountLinker $discordAccountLinker;
 
-    public function __construct(EntityManagerInterface $em, LoggerInterface $logger)
+    public function __construct(
+        EntityManagerInterface $em,
+        LoggerInterface $logger,
+        DiscordAccountLinker $discordAccountLinker
+    )
     {
         $this->em = $em;
         $this->logger = $logger;
+        $this->discordAccountLinker = $discordAccountLinker;
     }
 
     public function loadUserByOAuthUserResponse(UserResponseInterface $response): UserInterface
     {
         $data = $response->getData();
         $discordId = $response->getUserIdentifier();
-        $username = $data['username'];
-        $avatar = $data['avatar'];
+        $username = $data['username'] ?? $discordId;
+        $avatar = $data['avatar'] ?? null;
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['discordId' => $discordId]);
-
-        if (!$user) {
-            $user = new User();
-            $user->setDiscordId($discordId);
-            $user->setUsername($username);
-            $user->setAvatar($avatar);
-            $user->setCreatedAt(new \DateTimeImmutable());
-
-            $this->em->persist($user);
-        } else {
-            if ($user->getUsername() !== $username && null != $username) {
-                $user->setUsername($username);
-            }
-            if ($user->getAvatar() !== $avatar) {
-                $user->setAvatar($avatar);
-            }
-        }
-
-        $this->em->flush();
-
-        return $user;
+        return $this->discordAccountLinker->syncUserFromDiscord([
+            'discordId' => $discordId,
+            'username' => $username,
+            'displayName' => $data['global_name'] ?? $data['displayName'] ?? $username,
+            'avatar' => $avatar,
+        ]);
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface

@@ -11,7 +11,7 @@ const TOKEN = process.env.TOKEN;
 const PREFIX = process.env.PREFIX || '!nxr';
 
 if (!TOKEN || TOKEN === '#') {
-    console.error('❌ TOKEN manquant ou invalide dans le .env');
+    console.error('TOKEN manquant ou invalide dans le .env');
     process.exit(1);
 }
 
@@ -25,6 +25,7 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+client.slashCommands = new Collection();
 
 const commandsPath = path.join(__dirname, 'cmd');
 const commandFiles = fs
@@ -36,16 +37,24 @@ for (const file of commandFiles) {
     const { default: command } = await import(pathToFileURL(commandPath).href);
 
     if (!command?.name || !command?.execute) {
-        console.warn(`⚠️ Commande ignorée : ${file}`);
+        console.warn(`Commande ignoree : ${file}`);
         continue;
     }
 
     client.commands.set(command.name, command);
+
+    if (command.data?.name && command.executeInteraction) {
+        client.slashCommands.set(command.data.name, command);
+    }
+
+    if (command.setup) {
+        command.setup(client);
+    }
 }
 
 client.once('ready', () => {
-    console.log(`✅ Bot connecté : ${client.user.tag}`);
-    console.log(`✅ Préfixe : ${PREFIX}`);
+    console.log(`Bot connecte : ${client.user.tag}`);
+    console.log(`Prefixe : ${PREFIX}`);
 });
 
 client.on('messageCreate', async message => {
@@ -65,7 +74,40 @@ client.on('messageCreate', async message => {
         await command.execute(message, args, client);
     } catch (error) {
         console.error(error);
-        await message.reply('❌ Une erreur est survenue.');
+        await message.reply('Une erreur est survenue.');
+    }
+});
+
+client.on('interactionCreate', async interaction => {
+    try {
+        if (interaction.isButton()) {
+            for (const command of client.slashCommands.values()) {
+                if (command.handleButton && await command.handleButton(interaction, client)) {
+                    return;
+                }
+            }
+
+            return;
+        }
+
+        if (!interaction.isChatInputCommand()) return;
+
+        const command = client.slashCommands.get(interaction.commandName);
+        if (!command) return;
+
+        await command.executeInteraction(interaction, client);
+    } catch (error) {
+        console.error(error);
+
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({ content: 'Une erreur est survenue.' }).catch(() => {});
+            return;
+        }
+
+        await interaction.reply({
+            content: 'Une erreur est survenue.',
+            ephemeral: true,
+        }).catch(() => {});
     }
 });
 
