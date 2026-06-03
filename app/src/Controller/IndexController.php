@@ -41,7 +41,7 @@ class IndexController extends AbstractController
         ));
 
         $winrate = $matchesPlayed > 0
-            ? number_format(($victories / $matchesPlayed) * 100, 1) . '%'
+            ? number_format(($victories / $matchesPlayed) * 100, 1).'%'
             : '0%';
 
         return $this->renderPage($request, 'index', 'Naxera eSport', [

@@ -41,10 +41,16 @@ class GameMatch
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Player $captain = null;
 
+    /**
+     * @var Collection<int, Player>
+     */
     #[ORM\ManyToMany(targetEntity: Player::class)]
     #[ORM\JoinTable(name: 'game_match_players')]
     private Collection $players;
 
+    /**
+     * @var Collection<int, Player>
+     */
     #[ORM\ManyToMany(targetEntity: Player::class)]
     #[ORM\JoinTable(name: 'game_match_substitutes')]
     private Collection $substitutes;

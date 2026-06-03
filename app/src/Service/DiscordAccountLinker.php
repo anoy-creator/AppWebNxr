@@ -46,7 +46,7 @@ class DiscordAccountLinker
         string $discordId,
         ?string $pseudo = null,
         ?string $avatar = null,
-        bool $flush = false
+        bool $flush = false,
     ): Player {
         $player = $this->findOrCreatePlayer($discordId, $pseudo ?? $discordId, $avatar);
         $this->entityManager->persist($player);
@@ -106,7 +106,7 @@ class DiscordAccountLinker
     {
         $value = $this->readString($data, $key);
 
-        if ($value === null) {
+        if (null === $value) {
             throw new \InvalidArgumentException(sprintf('%s est obligatoire', $key));
         }
 
@@ -117,7 +117,7 @@ class DiscordAccountLinker
     {
         $value = $data[$key] ?? null;
 
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return null;
         }
 

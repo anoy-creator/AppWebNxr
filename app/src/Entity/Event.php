@@ -10,11 +10,35 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {
-    const Entrainement = 'training';
-    const Reunion = 'meeting';
-    const Tournoi = 'tournament';
-    const MatchOfficiel = 'match';
+    public const Entrainement = 'training';
+    public const Reunion = 'meeting';
+    public const Tournoi = 'tournament';
+    public const MatchOfficiel = 'match';
     public const TournamentFormats = ['1v1', '2v2', '3v3', '4v4', '5v5', '6v6'];
+    public const TypeLabels = [
+        self::Entrainement => 'Entrainement',
+        self::Reunion => 'Reunion',
+        self::Tournoi => 'Tournoi',
+        self::MatchOfficiel => 'Match officiel',
+    ];
+    public const TypeColors = [
+        self::Entrainement => 'blue',
+        self::Reunion => 'yellow',
+        self::Tournoi => 'purple',
+        self::MatchOfficiel => 'red',
+    ];
+    public const EventTypes = [
+        self::Entrainement,
+        self::Reunion,
+        self::Tournoi,
+        self::MatchOfficiel,
+    ];
+    public const ScheduleTypes = [
+        self::Entrainement,
+        self::Reunion,
+        self::Tournoi,
+        self::MatchOfficiel,
+    ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -43,14 +67,23 @@ class Event
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Player $captain = null;
 
+    /**
+     * @var Collection<int, Player>
+     */
     #[ORM\ManyToMany(targetEntity: Player::class)]
     #[ORM\JoinTable(name: 'event_players')]
     private Collection $players;
 
+    /**
+     * @var Collection<int, Player>
+     */
     #[ORM\ManyToMany(targetEntity: Player::class)]
     #[ORM\JoinTable(name: 'event_substitutes')]
     private Collection $substitutes;
 
+    /**
+     * @var Collection<int, GameMatch>
+     */
     #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: GameMatch::class)]
     private Collection $matches;
 

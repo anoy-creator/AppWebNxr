@@ -150,7 +150,7 @@ class Player
     {
         $this->user = $user;
 
-        if ($user !== null && $user->getPlayer() !== $this) {
+        if (null !== $user && $user->getPlayer() !== $this) {
             $user->setPlayer($this);
         }
 

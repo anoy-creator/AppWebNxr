@@ -157,7 +157,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->player = $player;
 
-        if ($player !== null && $player->getUser() !== $this) {
+        if (null !== $player && $player->getUser() !== $this) {
             $player->setUser($this);
         }
 

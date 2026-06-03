@@ -21,6 +21,12 @@ $(document).on('change', '.schedule-filter input', function () {
         return;
     }
 
+    const selectedTypes = $('.schedule-filter input:checked')
+        .map(function () {
+            return $(this).val();
+        })
+        .get();
+
     closeScheduleDetail();
 
     isFiltering = true;
@@ -29,7 +35,9 @@ $(document).on('change', '.schedule-filter input', function () {
     $.ajax({
         url: '/schedule',
         method: 'GET',
-        data: $('.schedule-filter input:checked').serialize(),
+        data: {
+            types: selectedTypes.length ? selectedTypes : ['__none__']
+        },
         headers: {
             'X-Naxera-Ajax': '1',
             'X-Requested-With': 'XMLHttpRequest'

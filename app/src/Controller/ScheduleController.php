@@ -22,17 +22,11 @@ class ScheduleController extends AbstractController
         EventRepository $eventRepository,
         GameMatchRepository $gameMatchRepository,
     ): Response {
-        $types = $request->query->all('types');
+        $hasTypeFilter = $request->query->has('types');
+        $types = $hasTypeFilter ? $request->query->all('types') : Event::ScheduleTypes;
+        $types = array_values(array_intersect($types, Event::ScheduleTypes));
 
-        if (empty($types)) {
-            $types = ['training', 'meeting', 'tournament', 'match'];
-        }
-
-        $eventTypes = array_values(array_intersect($types, [
-            'training',
-            'meeting',
-            'tournament',
-        ]));
+        $eventTypes = array_values(array_intersect($types, Event::EventTypes));
 
         $events = [];
 
@@ -47,16 +41,26 @@ class ScheduleController extends AbstractController
 
         $matches = [];
 
-        if (in_array('match', $types, true)) {
+        if (in_array(Event::MatchOfficiel, $types, true)) {
             $matches = $gameMatchRepository->findBy([], [
                 'playedAt' => 'ASC',
             ]);
         }
 
+        $scheduleFilters = array_map(
+            static fn (string $type) => [
+                'value' => $type,
+                'label' => Event::TypeLabels[$type],
+                'color' => Event::TypeColors[$type],
+            ],
+            Event::ScheduleTypes
+        );
+
         return $this->renderPage($request, 'schedule', 'Planning - Naxera', [
             'events' => $events,
             'matches' => $matches,
             'activeTypes' => $types,
+            'scheduleFilters' => $scheduleFilters,
         ]);
     }
 

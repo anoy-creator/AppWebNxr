@@ -156,6 +156,11 @@ function hasCaptainRole(interaction) {
     return interaction.member.roles.cache.some(role => role.name === roleName);
 }
 
+function hasCaptainRoleMessage(message) {
+    const roleName = process.env.CAPITAINE_ROLE_NAME || 'Capitaine';
+    return message.member?.roles?.cache?.some(role => role.name === roleName);
+}
+
 async function checkCommandChannel(interaction) {
     if (!process.env.COMMAND_CHANNEL_ID) return true;
 
@@ -163,6 +168,17 @@ async function checkCommandChannel(interaction) {
         await interaction.editReply({
             content: `Cette commande doit etre utilisee dans le salon <#${process.env.COMMAND_CHANNEL_ID}>.`,
         });
+        return false;
+    }
+
+  return true;
+}
+
+async function checkMessageCommandChannel(message) {
+    if (!process.env.COMMAND_CHANNEL_ID) return true;
+
+    if (message.channelId !== process.env.COMMAND_CHANNEL_ID) {
+        await message.reply(`Cette commande doit etre utilisee dans le salon <#${process.env.COMMAND_CHANNEL_ID}>.`);
         return false;
     }
 
@@ -227,6 +243,81 @@ async function syncTournamentWithSite(tournoi) {
             message: error.response?.data?.message || error.message,
         };
     }
+}
+
+async function handleSiteTournamentUpdate(client, payload) {
+    const tournois = loadTournois();
+    const siteEventId = payload.siteEventId ? String(payload.siteEventId) : null;
+    const botTournoiId = payload.botTournoiId ? String(payload.botTournoiId) : null;
+    let tournoi = tournois.find(item =>
+        (siteEventId && String(item.siteEventId || '') === siteEventId) ||
+        (botTournoiId && String(item.id) === botTournoiId),
+    );
+
+    if (!tournoi) {
+        tournoi = {
+            id: botTournoiId || `site-${siteEventId || Date.now()}`,
+            status: 'active',
+            createdBy: 'site',
+            checkins: {},
+            reminder24hSent: false,
+            reminder2hSent: false,
+        };
+        tournois.push(tournoi);
+    }
+
+    const previousUsers = getAllTournamentUsers(tournoi);
+
+    tournoi.siteEventId = siteEventId;
+    tournoi.title = payload.title || tournoi.title || 'Tournoi NxR';
+    tournoi.date = payload.date || tournoi.date;
+    tournoi.heure = payload.heure || tournoi.heure;
+    tournoi.format = payload.format || tournoi.format;
+    tournoi.timestamp = payload.timestamp ? Number(payload.timestamp) : tournoi.timestamp;
+    tournoi.captain = payload.captain || tournoi.captain || null;
+    tournoi.players = Array.isArray(payload.players) ? payload.players.filter(Boolean).map(String) : (tournoi.players || []);
+    tournoi.substitutes = Array.isArray(payload.substitutes) ? payload.substitutes.filter(Boolean).map(String) : (tournoi.substitutes || []);
+    tournoi.checkins = tournoi.checkins || {};
+    tournoi.reminder24hSent = false;
+    tournoi.reminder2hSent = false;
+    tournoi.updatedBy = 'site';
+    tournoi.updatedAt = Date.now();
+
+    for (const userId of getAllTournamentUsers(tournoi)) {
+        if (!previousUsers.includes(userId)) {
+            tournoi.checkins[userId] = undefined;
+        }
+    }
+
+    saveTournois(tournois);
+    await updateRosterBoard(client, tournois);
+
+    await sendLog(
+        client,
+        '**Tournoi modifie depuis le site**\n' +
+        `ID bot : \`${tournoi.id}\`\n` +
+        `ID site : \`${siteEventId || 'inconnu'}\`\n` +
+        `Date : **${tournoi.timestamp ? formatDateFR(tournoi.timestamp) : `${tournoi.date || '?'} ${tournoi.heure || ''}`}**\n` +
+        `Format : **${tournoi.format || 'Non precise'}**\n` +
+        `Capitaine : ${tournoi.captain ? `<@${tournoi.captain}>` : 'Non precise'}`,
+    );
+
+    for (const userId of getAllTournamentUsers(tournoi)) {
+        await sendDm(
+            client,
+            userId,
+            '**Tournoi NxR modifie**\n\n' +
+            `Le tournoi **${tournoi.title || tournoi.format || ''}** a ete modifie depuis le site.\n\n` +
+            `Nouvelle date : **${tournoi.timestamp ? formatDateFR(tournoi.timestamp) : `${tournoi.date || '?'} ${tournoi.heure || ''}`}**\n` +
+            `Format : **${tournoi.format || 'Non precise'}**\n` +
+            `Capitaine : ${tournoi.captain ? `<@${tournoi.captain}>` : 'Non precise'}\n` +
+            `Statut : **${getStatusForUser(tournoi, userId)}**\n\n` +
+            'Merci de confirmer ta presence avec les boutons ci-dessous.',
+            [buildCheckinButtons(tournoi.id)],
+        );
+    }
+
+    return tournoi;
 }
 
 function buildRosterEmbed(tournois) {
@@ -360,6 +451,298 @@ async function handleCheckin(interaction, client) {
     return true;
 }
 
+function splitTournamentMentions(tokens) {
+    const separatorIndex = tokens.findIndex(token =>
+        ['remplacants', 'remplacants:', 'remplaçants', 'remplaçants:', 'subs', 'subs:'].includes(token.toLowerCase()),
+    );
+
+    if (separatorIndex === -1) {
+        return {
+            playersInput: tokens.join(' '),
+            substitutesInput: '',
+        };
+    }
+
+    return {
+        playersInput: tokens.slice(0, separatorIndex).join(' '),
+        substitutesInput: tokens.slice(separatorIndex + 1).join(' '),
+    };
+}
+
+function parseKeyValueArgs(tokens) {
+    const data = {};
+    let currentKey = null;
+
+    for (const token of tokens) {
+        const match = token.match(/^([a-zA-Z]+)=(.*)$/);
+
+        if (match) {
+            currentKey = match[1].toLowerCase();
+            data[currentKey] = match[2] ? [match[2]] : [];
+            continue;
+        }
+
+        if (currentKey) {
+            data[currentKey].push(token);
+        }
+    }
+
+    return Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, value.join(' ').trim()]),
+    );
+}
+
+async function executeAddMessage(message, args, client) {
+    const [date, heure, format, captainMention, ...memberTokens] = args;
+
+    if (!date || !heure || !format || !captainMention || memberTokens.length === 0) {
+        return message.reply(
+            'Utilise : `!nxr tournoi ajouter 10/06/2026 21:00 2v2 @capitaine @joueur1 @joueur2 remplacants: @remplacant1`',
+        );
+    }
+
+    const validationError = validateDateHeure(date, heure);
+    if (validationError) return message.reply(validationError);
+
+    const formatError = validateTournamentFormat(format);
+    if (formatError) return message.reply(formatError);
+
+    const tournamentDate = parseDateTime(date, heure);
+    if (isNaN(tournamentDate.getTime())) {
+        return message.reply('Date invalide. Exemple valide : 10/06/2026 a 21:00');
+    }
+
+    const captainIds = extractMentionIds(captainMention);
+    if (captainIds.length === 0) {
+        return message.reply('Capitaine invalide. Mentionne le capitaine avec @.');
+    }
+
+    const { playersInput, substitutesInput } = splitTournamentMentions(memberTokens);
+    const playerIds = extractMentionIds(playersInput);
+    const substituteIds = extractMentionIds(substitutesInput);
+
+    if (playerIds.length === 0) {
+        return message.reply('Aucun joueur detecte. Mentionne les joueurs avec @.');
+    }
+
+    const tournoi = {
+        id: Date.now().toString(),
+        status: 'active',
+        createdBy: message.author.id,
+        captain: captainIds[0],
+        date,
+        heure,
+        format,
+        timestamp: tournamentDate.getTime(),
+        players: playerIds,
+        substitutes: substituteIds,
+        checkins: {},
+        reminder24hSent: false,
+        reminder2hSent: false,
+    };
+
+    const tournois = loadTournois();
+    tournois.push(tournoi);
+    saveTournois(tournois);
+    await updateRosterBoard(client, tournois);
+    const siteSync = await syncTournamentWithSite(tournoi);
+
+    if (siteSync.success && siteSync.event?.id) {
+        tournoi.siteEventId = String(siteSync.event.id);
+        saveTournois(tournois);
+    }
+
+    const dmResults = [];
+
+    for (const userId of getAllTournamentUsers(tournoi)) {
+        const rosterStatus = getStatusForUser(tournoi, userId);
+        const success = await sendDm(
+            client,
+            userId,
+            '**Tournoi NxR**\n\n' +
+            `Tu as ete inscrit au tournoi du **${formatDateFR(tournoi.timestamp)}**.\n\n` +
+            `Format : **${tournoi.format}**\n` +
+            `Capitaine : <@${tournoi.captain}>\n` +
+            `Statut : **${rosterStatus}**\n\n` +
+            'Merci de confirmer ta presence avec les boutons ci-dessous.\n\n' +
+            'Ceci est un message automatique du Colonel Moutarde.',
+            [buildCheckinButtons(tournoi.id)],
+        );
+
+        dmResults.push(`${success ? 'OK' : 'NON'} <@${userId}>`);
+    }
+
+    await sendLog(
+        client,
+        '**Nouveau tournoi cree**\n' +
+        `ID : \`${tournoi.id}\`\n` +
+        `Cree par : <@${message.author.id}>\n` +
+        `Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+        `Format : **${tournoi.format}**\n` +
+        `Capitaine : <@${tournoi.captain}>`,
+    );
+
+    return message.reply(
+        '**Tournoi NxR enregistre**\n\n' +
+        `ID : \`${tournoi.id}\`\n` +
+        `Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+        `Format : **${tournoi.format}**\n` +
+        `Capitaine : <@${tournoi.captain}>\n` +
+        `Joueurs : ${playerIds.map(id => `<@${id}>`).join(', ')}\n` +
+        `Remplacants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
+        `Site : ${siteSync.success ? `event cree (${siteSync.event?.title || `Tournoi ${format}`})` : `non synchronise - ${siteSync.message}`}\n` +
+        `MP envoyes : ${dmResults.join(', ')}`,
+    );
+}
+
+async function executeListMessage(message) {
+    const activeTournois = loadTournois()
+        .filter(t => t.status !== 'cancelled')
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+    if (activeTournois.length === 0) {
+        return message.reply('Aucun tournoi prevu.');
+    }
+
+    return message.reply(
+        '**Tournois NxR prevus**\n\n' +
+        activeTournois.map(t =>
+            `\`${t.id}\` - **${formatDateFR(t.timestamp)}** - **${t.format || '?'}** - Capitaine : <@${t.captain}>`,
+        ).join('\n'),
+    );
+}
+
+async function executeCancelMessage(message, args, client) {
+    const [id, ...reasonTokens] = args;
+    const raison = reasonTokens.join(' ') || 'Aucune raison precisee';
+
+    if (!id) {
+        return message.reply('Utilise : `!nxr tournoi annuler <id> [raison]`');
+    }
+
+    const tournois = loadTournois();
+    const tournoi = tournois.find(t => t.id === id);
+
+    if (!tournoi) return message.reply('Tournoi introuvable.');
+    if (tournoi.status === 'cancelled') return message.reply('Ce tournoi est deja annule.');
+
+    tournoi.status = 'cancelled';
+    tournoi.cancelledBy = message.author.id;
+    tournoi.cancelReason = raison;
+    tournoi.cancelledAt = Date.now();
+
+    saveTournois(tournois);
+    await updateRosterBoard(client, tournois);
+
+    await sendLog(
+        client,
+        '**Tournoi annule**\n' +
+        `ID : \`${tournoi.id}\`\n` +
+        `Annule par : <@${message.author.id}>\n` +
+        `Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+        `Raison : ${raison}`,
+    );
+
+    return message.reply(`Tournoi \`${tournoi.id}\` annule.`);
+}
+
+async function executeModifyMessage(message, args, client) {
+    const [id, ...tokens] = args;
+
+    if (!id || tokens.length === 0) {
+        return message.reply(
+            'Utilise : `!nxr tournoi modifier <id> date=10/06/2026 heure=21:00 format=3v3 capitaine=@capitaine joueurs=@j1 @j2 remplacants=@r1`',
+        );
+    }
+
+    const tournois = loadTournois();
+    const tournoi = tournois.find(t => t.id === id);
+
+    if (!tournoi) return message.reply('Tournoi introuvable.');
+    if (tournoi.status === 'cancelled') return message.reply('Impossible de modifier un tournoi annule.');
+
+    const data = parseKeyValueArgs(tokens);
+    const finalDate = data.date || tournoi.date;
+    const finalHeure = data.heure || tournoi.heure;
+
+    const validationError = validateDateHeure(finalDate, finalHeure);
+    if (validationError) return message.reply(validationError);
+
+    if (data.format) {
+        const formatError = validateTournamentFormat(data.format);
+        if (formatError) return message.reply(formatError);
+        tournoi.format = data.format;
+    }
+
+    const newTimestamp = parseDateTime(finalDate, finalHeure).getTime();
+    if (isNaN(newTimestamp)) return message.reply('Date invalide.');
+
+    tournoi.date = finalDate;
+    tournoi.heure = finalHeure;
+    tournoi.timestamp = newTimestamp;
+
+    if (data.capitaine) {
+        const captainIds = extractMentionIds(data.capitaine);
+        if (captainIds.length > 0) tournoi.captain = captainIds[0];
+    }
+
+    if (data.joueurs) {
+        const playerIds = extractMentionIds(data.joueurs);
+        if (playerIds.length === 0) return message.reply('Aucun joueur detecte dans la modification.');
+        tournoi.players = playerIds;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(data, 'remplacants')) {
+        tournoi.substitutes = extractMentionIds(data.remplacants);
+    }
+
+    tournoi.checkins = tournoi.checkins || {};
+    tournoi.reminder24hSent = false;
+    tournoi.reminder2hSent = false;
+    tournoi.updatedBy = message.author.id;
+    tournoi.updatedAt = Date.now();
+
+    saveTournois(tournois);
+    await updateRosterBoard(client, tournois);
+
+    return message.reply(
+        '**Tournoi modifie**\n\n' +
+        `ID : \`${tournoi.id}\`\n` +
+        `Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+        `Format : **${tournoi.format || 'Non precise'}**\n` +
+        `Capitaine : <@${tournoi.captain}>\n` +
+        `Joueurs : ${(tournoi.players || []).map(userId => `<@${userId}>`).join(', ')}\n` +
+        `Remplacants : ${tournoi.substitutes?.length ? tournoi.substitutes.map(userId => `<@${userId}>`).join(', ') : 'Aucun'}`,
+    );
+}
+
+async function executeMessage(message, args, client) {
+    if (!(await checkMessageCommandChannel(message))) return;
+
+    if (!hasCaptainRoleMessage(message)) {
+        return message.reply('Tu dois avoir le role Capitaine pour utiliser cette commande.');
+    }
+
+    const subcommand = args.shift()?.toLowerCase();
+
+    if (!subcommand || ['aide', 'help'].includes(subcommand)) {
+        return message.reply(
+            '**Commande tournoi**\n\n' +
+            '`!nxr tournoi ajouter 10/06/2026 21:00 2v2 @capitaine @joueur1 @joueur2 remplacants: @remplacant1`\n' +
+            '`!nxr tournoi liste`\n' +
+            '`!nxr tournoi annuler <id> [raison]`\n' +
+            '`!nxr tournoi modifier <id> date=10/06/2026 heure=21:00 format=3v3 capitaine=@capitaine joueurs=@j1 @j2 remplacants=@r1`',
+        );
+    }
+
+    if (subcommand === 'ajouter') return executeAddMessage(message, args, client);
+    if (subcommand === 'liste') return executeListMessage(message);
+    if (subcommand === 'annuler') return executeCancelMessage(message, args, client);
+    if (subcommand === 'modifier') return executeModifyMessage(message, args, client);
+
+    return message.reply('Sous-commande inconnue. Utilise `!nxr tournoi aide`.');
+}
+
 async function executeInteraction(interaction, client) {
     await interaction.deferReply();
 
@@ -425,6 +808,11 @@ async function executeInteraction(interaction, client) {
         saveTournois(tournois);
         await updateRosterBoard(client, tournois);
         const siteSync = await syncTournamentWithSite(tournoi);
+
+        if (siteSync.success && siteSync.event?.id) {
+            tournoi.siteEventId = String(siteSync.event.id);
+            saveTournois(tournois);
+        }
 
         const dmResults = [];
 
@@ -819,10 +1207,11 @@ export default {
                         .setRequired(false),
                 ),
         ),
-    async execute(message) {
-        await message.reply('Cette commande s utilise avec /tournoi.');
+    async execute(message, args, client) {
+        await executeMessage(message, args, client);
     },
     executeInteraction,
     handleButton: handleCheckin,
+    handleSiteTournamentUpdate,
     setup,
 };

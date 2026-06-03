@@ -655,3 +655,37 @@ p {
         padding: 48px 0;
     }
 }
+.admin-edit-btn,
+.admin-edit-inline-btn {
+    border: 1px solid rgba(255, 255, 255, .24);
+    background: rgba(10, 12, 18, .72);
+    color: #fff;
+    border-radius: 6px;
+    font-size: .78rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.admin-edit-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 4;
+}
+
+.admin-edit-btn:hover,
+.admin-edit-inline-btn:hover {
+    background: rgba(123, 44, 255, .9);
+    border-color: rgba(255, 255, 255, .48);
+    transform: translateY(-1px);
+}
+
+.image-card,
+.player-card,
+.roster-card,
+.event-card {
+    position: relative;
+}

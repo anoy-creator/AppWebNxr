@@ -23,15 +23,30 @@ for (const file of commandFiles) {
     }
 }
 
+if (!process.env.TOKEN || !process.env.CLIENT_ID) {
+    console.error('TOKEN et CLIENT_ID sont obligatoires pour deployer des commandes slash.');
+    process.exit(1);
+}
+
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+const guildId = process.env.GUILD_ID || process.env.DISCORD_GUILD_ID || process.env.SERVER_ID;
 
 try {
-    await rest.put(
-        Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-        { body: commands },
-    );
+    if (guildId) {
+        await rest.put(
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId),
+            { body: commands },
+        );
 
-    console.log('Commandes NxR deployees.');
+        console.log('Commandes NxR deployees sur le serveur.');
+    } else {
+        await rest.put(
+            Routes.applicationCommands(process.env.CLIENT_ID),
+            { body: commands },
+        );
+
+        console.log('Commandes NxR deployees en global. Ajoute GUILD_ID dans le .env pour un deploiement instantane sur un serveur.');
+    }
 } catch (error) {
     console.error('Erreur deploiement commandes :', error);
 }

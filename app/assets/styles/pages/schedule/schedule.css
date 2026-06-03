@@ -42,16 +42,34 @@
     border-color: rgba(123,46,255,.35);
 }
 
-.schedule-filter input:checked + span {
-    background: rgba(123,46,255,.22);
-    border-color: rgba(123,46,255,.45);
-    color: #fff;
-}
-
 .schedule-filter i {
     width: 14px;
     height: 14px;
     border-radius: 4px;
+}
+
+.schedule-filter input:checked + span {
+    color: #fff;
+}
+
+.schedule-filter--blue input:checked + span {
+    background: rgba(96,165,250,.18);
+    border-color: rgba(96,165,250,.55);
+}
+
+.schedule-filter--yellow input:checked + span {
+    background: rgba(250,204,21,.16);
+    border-color: rgba(250,204,21,.55);
+}
+
+.schedule-filter--purple input:checked + span {
+    background: rgba(123,46,255,.22);
+    border-color: rgba(123,46,255,.55);
+}
+
+.schedule-filter--red input:checked + span {
+    background: rgba(248,113,113,.16);
+    border-color: rgba(248,113,113,.55);
 }
 
 /* ==========================================

@@ -127,7 +127,9 @@
         </footer>
     {% endif %}
 
-    {% include 'pages/admin/modals.html.twig' %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div id="admin-modal-root"></div>
+    {% endif %}
 
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}

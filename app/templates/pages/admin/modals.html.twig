@@ -1,4 +1,6 @@
 {% if is_granted('ROLE_ADMIN') %}
+    {% set requested_modal = modal|default(null) %}
+    {% if requested_modal is same as(null) or requested_modal == 'add-news' %}
     <div class="admin-modal" id="add-news">
         <div class="admin-modal-box">
             <button class="admin-modal-close">x</button>
@@ -15,7 +17,9 @@
             </form>
         </div>
     </div>
+    {% endif %}
 
+    {% if requested_modal is same as(null) or requested_modal == 'add-player' %}
     <div class="admin-modal" id="add-player">
         <div class="admin-modal-box">
             <button class="admin-modal-close">x</button>
@@ -23,6 +27,7 @@
 
             <form class="admin-form" data-endpoint="{{ path('admin_content_player') }}">
                 <input name="pseudo" placeholder="Pseudo" required>
+                <input name="discordId" placeholder="ID Discord">
                 <input name="avatar" placeholder="URL avatar" required>
 
                 <select name="role" required>
@@ -34,13 +39,23 @@
 
                 <input name="grade" placeholder="Grade" required>
                 <input name="game" placeholder="Jeu principal" required>
+
+                <select name="roster">
+                    <option value="">Sans roster</option>
+                    {% for roster in rosters|default([]) %}
+                        <option value="{{ roster.id }}">{{ roster.name }}</option>
+                    {% endfor %}
+                </select>
+
                 <input name="socials" placeholder='{"twitter":"pseudo"}' value="{}">
 
                 <button type="submit">Ajouter</button>
             </form>
         </div>
     </div>
+    {% endif %}
 
+    {% if requested_modal is same as(null) or requested_modal == 'add-roster' %}
     <div class="admin-modal" id="add-roster">
         <div class="admin-modal-box">
             <button class="admin-modal-close">x</button>
@@ -57,7 +72,9 @@
             </form>
         </div>
     </div>
+    {% endif %}
 
+    {% if requested_modal is same as(null) or requested_modal == 'add-event' %}
     <div class="admin-modal" id="add-event">
         <div class="admin-modal-box">
             <button class="admin-modal-close">x</button>
@@ -121,7 +138,9 @@
             </form>
         </div>
     </div>
+    {% endif %}
 
+    {% if requested_modal is same as(null) or requested_modal == 'add-match' %}
     <div class="admin-modal" id="add-match">
         <div class="admin-modal-box">
             <button class="admin-modal-close">x</button>
@@ -238,4 +257,5 @@
             </form>
         </div>
     </div>
+    {% endif %}
 {% endif %}

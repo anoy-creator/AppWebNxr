@@ -7,6 +7,10 @@
     <div class="stack">
         {% for roster in rosters %}
             <article class="roster-card js-roster-card" data-roster-id="{{ roster.id }}">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <button type="button" class="admin-edit-btn" data-admin-edit="roster" data-admin-edit-id="{{ roster.id }}">Modifier</button>
+                {% endif %}
+
                 <div class="roster-hero">
                     <img src="{{ roster.banner ?: '/images/roster-default.jpg' }}" alt="{{ roster.name }}">
 

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import fs from 'fs';
+import http from 'http';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
@@ -55,7 +56,82 @@ for (const file of commandFiles) {
 client.once('ready', () => {
     console.log(`Bot connecte : ${client.user.tag}`);
     console.log(`Prefixe : ${PREFIX}`);
+    startSiteWebhookServer();
 });
+
+function readJsonBody(request) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+
+        request.on('data', chunk => {
+            body += chunk;
+
+            if (body.length > 1024 * 1024) {
+                reject(new Error('Payload trop volumineux'));
+                request.destroy();
+            }
+        });
+
+        request.on('end', () => {
+            try {
+                resolve(body ? JSON.parse(body) : {});
+            } catch (error) {
+                reject(error);
+            }
+        });
+    });
+}
+
+function sendJson(response, statusCode, payload) {
+    response.writeHead(statusCode, {
+        'Content-Type': 'application/json',
+    });
+    response.end(JSON.stringify(payload));
+}
+
+function startSiteWebhookServer() {
+    const port = Number(process.env.BOT_WEBHOOK_PORT || 3010);
+
+    const server = http.createServer(async (request, response) => {
+        if (request.method !== 'POST' || request.url !== '/site/tournament-updated') {
+            sendJson(response, 404, { success: false, message: 'Route introuvable' });
+            return;
+        }
+
+        if (process.env.API_KEY && request.headers['x-api-key'] !== process.env.API_KEY) {
+            sendJson(response, 401, { success: false, message: 'API key invalide' });
+            return;
+        }
+
+        try {
+            const payload = await readJsonBody(request);
+            const tournoiCommand = client.commands.get('tournoi');
+
+            if (!tournoiCommand?.handleSiteTournamentUpdate) {
+                sendJson(response, 500, { success: false, message: 'Handler tournoi indisponible' });
+                return;
+            }
+
+            const tournoi = await tournoiCommand.handleSiteTournamentUpdate(client, payload);
+            sendJson(response, 200, {
+                success: true,
+                message: 'Tournoi bot mis a jour',
+                id: tournoi.id,
+            });
+        } catch (error) {
+            console.error('Erreur webhook site:', error);
+            sendJson(response, 500, { success: false, message: error.message || 'Erreur webhook' });
+        }
+    });
+
+    server.listen(port, '0.0.0.0', () => {
+        console.log(`Webhook site ecoute sur le port ${port}`);
+    });
+
+    server.on('error', error => {
+        console.error('Impossible de demarrer le webhook site:', error.message);
+    });
+}
 
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
@@ -81,7 +157,7 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
     try {
         if (interaction.isButton()) {
-            for (const command of client.slashCommands.values()) {
+            for (const command of client.commands.values()) {
                 if (command.handleButton && await command.handleButton(interaction, client)) {
                     return;
                 }

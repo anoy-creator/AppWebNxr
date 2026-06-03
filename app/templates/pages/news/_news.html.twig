@@ -10,6 +10,10 @@
                 class="image-card large js-news-card"
                 data-news-id="{{ item.id }}"
             >
+                {% if is_granted('ROLE_ADMIN') %}
+                    <button type="button" class="admin-edit-btn" data-admin-edit="news" data-admin-edit-id="{{ item.id }}">Modifier</button>
+                {% endif %}
+
                 <img src="{{ item.image|default('/images/news-default.jpg') }}" alt="{{ item.title }}">
 
                 <div class="card-body">

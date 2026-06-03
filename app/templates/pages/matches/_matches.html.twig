@@ -55,6 +55,9 @@
                     <th>Mode</th>
                     <th>Score</th>
                     <th>Resultat</th>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <th>Action</th>
+                    {% endif %}
                 </tr>
             </thead>
 
@@ -84,16 +87,21 @@
                                 <span class="result">{{ match.result }}</span>
                             {% endif %}
                         </td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <td>
+                                <button type="button" class="admin-edit-inline-btn" data-admin-edit="match" data-admin-edit-id="{{ match.id }}">Modifier</button>
+                            </td>
+                        {% endif %}
                     </tr>
 
                     <tr class="match-details-row" id="match-details-{{ match.id }}">
-                        <td colspan="7">
+                        <td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}">
                             <div class="match-details-content"></div>
                         </td>
                     </tr>
                 {% else %}
-                    <tr>
-                        <td colspan="7">Aucun match disponible.</td>
+                <tr>
+                        <td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}">Aucun match disponible.</td>
                     </tr>
                 {% endfor %}
             </tbody>

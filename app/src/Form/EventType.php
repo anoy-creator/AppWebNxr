@@ -20,15 +20,11 @@ class EventType extends AbstractType
         $builder
             ->add('title', TextType::class)
             ->add('type', ChoiceType::class, [
-                'choices' => [
-                    'Entrainement' => 'training',
-                    'Reunion' => 'meeting',
-                    'Tournoi' => 'tournament',
-                    'Match officiel' => 'match',
-                ],
+                'choices' => array_flip(Event::TypeLabels),
             ])
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
+                'input' => 'datetime_immutable',
             ])
             ->add('time', TextType::class)
             ->add('description', TextareaType::class)

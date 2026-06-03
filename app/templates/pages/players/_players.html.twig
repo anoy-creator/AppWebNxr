@@ -15,6 +15,10 @@
     <div id="players-grid" class="card-grid three">
         {% for player in players %}
             <article class="player-card js-player-card" data-player-id="{{ player.id }}">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <button type="button" class="admin-edit-btn" data-admin-edit="player" data-admin-edit-id="{{ player.id }}">Modifier</button>
+                {% endif %}
+
                 <div class="player-photo">
                     <img src="{{ player.avatar ?: '/images/default-avatar.png' }}" alt="{{ player.pseudo }}">
 

@@ -5,20 +5,13 @@
     </div>
 
     <div class="legend schedule-filters">
-        {% set filters = {
-            'training': {'label': 'Entrainement', 'color': 'blue'},
-            'meeting': {'label': 'Reunion', 'color': 'yellow'},
-            'tournament': {'label': 'Tournoi', 'color': 'purple'},
-            'match': {'label': 'Match officiel', 'color': 'red'}
-        } %}
-
-        {% for value, item in filters %}
-            <label class="schedule-filter">
+        {% for item in scheduleFilters %}
+            <label class="schedule-filter schedule-filter--{{ item.color }}">
                 <input
                     type="checkbox"
                     name="types[]"
-                    value="{{ value }}"
-                    {% if activeTypes is not defined or value in activeTypes %}checked{% endif %}
+                    value="{{ item.value }}"
+                    {% if item.value in activeTypes %}checked{% endif %}
                 >
 
                 <span>
@@ -39,6 +32,10 @@
                     data-detail-url="{{ path('app_schedule_event_details', { id: event.id }) }}"
                     data-item-id="event-{{ event.id }}"
                 >
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <button type="button" class="admin-edit-btn" data-admin-edit="event" data-admin-edit-id="{{ event.id }}">Modifier</button>
+                    {% endif %}
+
                     <div class="event-card-meta">
                         <span>{{ event.title }}</span>
                         <span>
@@ -64,6 +61,10 @@
                     data-detail-url="{{ path('app_schedule_match_details', { id: match.id }) }}"
                     data-item-id="match-{{ match.id }}"
                 >
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <button type="button" class="admin-edit-btn" data-admin-edit="match" data-admin-edit-id="{{ match.id }}">Modifier</button>
+                    {% endif %}
+
                     <div class="event-card-meta">
                         <span>Match officiel</span>
                         <span>{{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}</span>

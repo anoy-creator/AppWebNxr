@@ -21,9 +21,8 @@ class DiscordUserProvider implements OAuthAwareUserProviderInterface, UserProvid
     public function __construct(
         EntityManagerInterface $em,
         LoggerInterface $logger,
-        DiscordAccountLinker $discordAccountLinker
-    )
-    {
+        DiscordAccountLinker $discordAccountLinker,
+    ) {
         $this->em = $em;
         $this->logger = $logger;
         $this->discordAccountLinker = $discordAccountLinker;

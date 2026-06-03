@@ -183,7 +183,7 @@ const toggleEventPlayersFields = () => {
 
     if (!eventTypeSelect || !eventPlayersFields) return;
 
-    const shouldShow = ['tournament', 'match'].includes(eventTypeSelect.value);
+    const shouldShow = ['training', 'tournament', 'match'].includes(eventTypeSelect.value);
 
     eventPlayersFields.style.display = shouldShow ? 'flex' : 'none';
 
@@ -192,14 +192,58 @@ const toggleEventPlayersFields = () => {
     }
 };
 
-const openModal = (modalId) => {
-    const modal = document.getElementById(modalId);
+const ensureModalLoaded = async (modalId) => {
+    let modal = document.getElementById(modalId);
+
+    if (modal) {
+        return modal;
+    }
+
+    const root = document.querySelector('#admin-modal-root') || document.body;
+    const response = await fetch(`/admin/content/modal/${encodeURIComponent(modalId)}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Impossible de charger la modale ${modalId}`);
+    }
+
+    root.insertAdjacentHTML('beforeend', await response.text());
+    modal = document.getElementById(modalId);
+
+    initSelectCustom();
+    toggleEventPlayersFields();
+    syncExclusivePlayerSelects();
+
+    return modal;
+};
+
+const openModal = async (modalId) => {
+    const modal = await ensureModalLoaded(modalId);
 
     $(`#${modalId}`).addClass('is-open');
 
     toggleEventPlayersFields();
     refreshVisibleSelects(modal || document);
     syncExclusivePlayerSelects();
+};
+
+const modalByType = {
+    news: 'add-news',
+    player: 'add-player',
+    roster: 'add-roster',
+    event: 'add-event',
+    match: 'add-match',
+};
+
+const modalTitles = {
+    news: 'Modifier une actualite',
+    player: 'Modifier un joueur',
+    roster: 'Modifier un roster',
+    event: 'Modifier un event',
+    match: 'Modifier un match',
 };
 
 const closeModal = ($modal) => {
@@ -224,6 +268,120 @@ const setTomSelectValues = (selector, values) => {
     }
 
     syncExclusivePlayerSelects(el.tomselect);
+};
+
+const setFieldValue = (form, key, value) => {
+    const field = form.querySelector(`[name="${CSS.escape(key)}"]`);
+    if (!field) return;
+
+    field.value = value ?? '';
+};
+
+const setMultiFieldValues = (form, key, values) => {
+    const field = form.querySelector(`[name="${CSS.escape(key)}[]"]`);
+    if (!field) return;
+
+    if (field.tomselect) {
+        field.tomselect.clear(true);
+        field.tomselect.setValue((values || []).map(String), true);
+        return;
+    }
+
+    [...field.options].forEach((option) => {
+        option.selected = (values || []).map(String).includes(String(option.value));
+    });
+};
+
+const resetModalFormMode = (modal) => {
+    const form = modal?.querySelector('.admin-form');
+    if (!form) return;
+
+    if (form.dataset.createEndpoint) {
+        form.dataset.endpoint = form.dataset.createEndpoint;
+    }
+
+    delete form.dataset.method;
+    form.reset();
+
+    form.querySelectorAll('.select-custom-multiple').forEach((el) => {
+        el.tomselect?.clear(true);
+    });
+
+    const submit = form.querySelector('[type="submit"]');
+    if (submit) submit.textContent = 'Ajouter';
+
+    const title = modal.querySelector('h2');
+    if (title && title.dataset.createTitle) title.textContent = title.dataset.createTitle;
+
+    toggleEventPlayersFields();
+    updateMatchCompositionTools();
+};
+
+const populateForm = (form, values) => {
+    const stats = values?.stats || [];
+
+    Object.entries(values || {}).forEach(([key, value]) => {
+        if (key === 'stats') return;
+
+        if (Array.isArray(value)) {
+            setMultiFieldValues(form, key, value);
+            return;
+        }
+
+        setFieldValue(form, key, value);
+    });
+
+    toggleEventPlayersFields();
+    syncExclusivePlayerSelects();
+
+    stats.forEach((row) => {
+        const statRow = form.querySelector(`.match-stat-row[data-player-id="${CSS.escape(String(row.player))}"]`);
+        if (!statRow) return;
+
+        const kills = statRow.querySelector('[data-stat="kills"]');
+        const deaths = statRow.querySelector('[data-stat="deaths"]');
+
+        if (kills) kills.value = row.kills ?? 0;
+        if (deaths) deaths.value = row.deaths ?? 0;
+    });
+};
+
+const openEditModal = async (type, id) => {
+    const response = await fetch(`/admin/content/edit/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || 'Impossible de charger l element');
+    }
+
+    const modalId = result.modal || modalByType[type];
+    await openModal(modalId);
+
+    const modal = document.getElementById(modalId);
+    const form = modal?.querySelector('.admin-form');
+
+    if (!form) return;
+
+    form.dataset.createEndpoint ??= form.dataset.endpoint;
+    form.dataset.endpoint = result.endpoint;
+    form.dataset.method = 'PATCH';
+
+    const title = modal.querySelector('h2');
+    if (title) {
+        title.dataset.createTitle ??= title.textContent;
+        title.textContent = modalTitles[type] || 'Modifier';
+    }
+
+    const submit = form.querySelector('[type="submit"]');
+    if (submit) submit.textContent = 'Modifier';
+
+    populateForm(form, result.values || {});
+    refreshVisibleSelects(modal);
 };
 
 const loadTournamentPlayers = async (tournamentId) => {
@@ -303,11 +461,30 @@ $(document).on('click', function (e) {
     }
 });
 
-$(document).on('click', '.dropdown-item[data-modal]', function () {
+$(document).on('click', '.dropdown-item[data-modal]', async function () {
     const modalId = $(this).data('modal');
 
     $('#adminMenu').removeClass('show');
-    openModal(modalId);
+
+    try {
+        await openModal(modalId);
+        resetModalFormMode(document.getElementById(modalId));
+    } catch (error) {
+        console.error(error);
+        alert('Impossible de charger la modale');
+    }
+});
+
+$(document).on('click', '[data-admin-edit]', async function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+        await openEditModal(this.dataset.adminEdit, this.dataset.adminEditId);
+    } catch (error) {
+        console.error(error);
+        alert('Impossible de charger la modification');
+    }
 });
 
 $(document).on('click', '.admin-modal-close', function () {
@@ -370,7 +547,7 @@ $(document).on('submit', '.admin-form', async function (e) {
 
     try {
         const response = await fetch(endpoint, {
-            method: 'POST',
+            method: this.dataset.method || 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
@@ -385,7 +562,7 @@ $(document).on('submit', '.admin-form', async function (e) {
             return;
         }
 
-        alert('Ajout effectue');
+        alert(this.dataset.method ? 'Modification effectuee' : 'Ajout effectue');
         this.reset();
 
         this.querySelectorAll('.select-custom-multiple').forEach((el) => {
