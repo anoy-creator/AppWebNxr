@@ -115,7 +115,16 @@ const commands = [
                         .setRequired(false)
                 )
         )
-
+        .addSubcommand(sub =>
+            sub
+                .setName("terminer")
+                .setDescription("Marquer un tournoi comme terminé")
+                .addStringOption(opt =>
+                    opt.setName("id")
+                        .setDescription("ID du tournoi")
+                        .setRequired(true)
+                )
+        )
         .addSubcommand(sub =>
             sub
                 .setName("modifier")

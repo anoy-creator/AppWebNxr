@@ -235,7 +235,11 @@ async function sendLog(message) {
 
 function buildRosterEmbed(tournois) {
   const activeTournois = tournois
-      .filter(t => t.status !== "cancelled")
+      .filter(
+          t =>
+              t.status !== "cancelled" &&
+              t.status !== "finished"
+      )
       .sort((a, b) => a.timestamp - b.timestamp);
 
   let description =
@@ -677,7 +681,50 @@ client.on("interactionCreate", async interaction => {
             ).join("\n")
       });
     }
+    if (subcommand === "terminer") {
 
+      const id = interaction.options.getString("id");
+
+      const tournoi = tournois.find(t => t.id === id);
+
+      if (!tournoi) {
+        return interaction.editReply({
+          content: "❌ Tournoi introuvable."
+        });
+      }
+
+      if (tournoi.status === "finished") {
+        return interaction.editReply({
+          content: "❌ Ce tournoi est déjà terminé."
+        });
+      }
+
+      tournoi.status = "finished";
+      tournoi.finishedBy = interaction.user.id;
+      tournoi.finishedAt = Date.now();
+
+      saveTournois(tournois);
+
+      await updateRosterBoard(tournois);
+
+      await sendLog(
+          `🏆 **Tournoi terminé**\n` +
+          `🆔 ID : \`${tournoi.id}\`\n` +
+          `👤 Clôturé par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+          `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
+          `🧢 Capitaine : <@${tournoi.captain}>`
+      );
+
+      return interaction.editReply({
+        content:
+            `🏆 **Tournoi terminé**\n\n` +
+            `🆔 ID : \`${tournoi.id}\`\n` +
+            `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `🎯 Format : **${tournoi.format || "Non précisé"}**\n\n` +
+            `Le tournoi a été retiré du roster.`
+      });
+    }
     if (subcommand === "annuler") {
       const id = interaction.options.getString("id");
       const raison = interaction.options.getString("raison") || "Aucune raison précisée";
