@@ -32,6 +32,11 @@ class EventType extends AbstractType
             ])
             ->add('time', TextType::class)
             ->add('description', TextareaType::class)
+            ->add('tournamentFormat', ChoiceType::class, [
+                'choices' => array_combine(Event::TournamentFormats, Event::TournamentFormats),
+                'required' => false,
+                'placeholder' => 'Format du tournoi',
+            ])
             ->add('captain', EntityType::class, [
                 'class' => Player::class,
                 'choice_label' => 'pseudo',

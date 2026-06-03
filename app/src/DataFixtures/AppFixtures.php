@@ -385,6 +385,7 @@ final class AppFixtures extends Fixture
             [
                 'title' => 'Tournoi Summer Cup',
                 'type' => 'tournament',
+                'tournamentFormat' => '5v5',
                 'date' => '2026-06-05',
                 'time' => '14:00',
                 'description' => 'Participation au tournoi Summer Cup 2026',
@@ -404,6 +405,7 @@ final class AppFixtures extends Fixture
             $event
                 ->setTitle($data['title'])
                 ->setType($data['type'])
+                ->setTournamentFormat($data['tournamentFormat'] ?? null)
                 ->setDate(new \DateTimeImmutable($data['date']))
                 ->setTime($data['time'])
                 ->setDescription($data['description']);

@@ -109,11 +109,19 @@ class DiscordController extends AbstractController
             }
 
             $time = (string) ($tournoiData['heure'] ?? $date->format('H:i'));
-            $format = (string) ($tournoiData['format'] ?? 'Format non precise');
+            $format = $this->normalizeTournamentFormat($tournoiData['format'] ?? null);
+
+            if ($format === null) {
+                return $this->json([
+                    'success' => false,
+                    'message' => sprintf('Format de tournoi invalide. Formats autorises: %s', implode(', ', Event::TournamentFormats)),
+                ], 400);
+            }
 
             $event
                 ->setType(Event::Tournoi)
-                ->setTitle(sprintf('Tournoi NxR %s', $format))
+                ->setTitle(sprintf('Tournoi %s', $format))
+                ->setTournamentFormat($format)
                 ->setDescription(sprintf('Tournoi importe depuis Discord. ID bot: %s', $tournoiData['id'] ?? 'inconnu'))
                 ->setDate($date)
                 ->setTime($time);
@@ -153,6 +161,7 @@ class DiscordController extends AbstractController
                 static fn (Event $event) => [
                     'id' => $event->getId(),
                     'title' => $event->getTitle(),
+                    'format' => $event->getTournamentFormat(),
                     'date' => $event->getDate()?->format('Y-m-d'),
                     'time' => $event->getTime(),
                 ],
@@ -215,5 +224,12 @@ class DiscordController extends AbstractController
         }
 
         return $dateTime;
+    }
+
+    private function normalizeTournamentFormat(mixed $format): ?string
+    {
+        $format = strtolower(trim((string) ($format ?? '')));
+
+        return in_array($format, Event::TournamentFormats, true) ? $format : null;
     }
 }

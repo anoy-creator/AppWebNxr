@@ -14,6 +14,7 @@ class Event
     const Reunion = 'meeting';
     const Tournoi = 'tournament';
     const MatchOfficiel = 'match';
+    public const TournamentFormats = ['1v1', '2v2', '3v3', '4v4', '5v5', '6v6'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -34,6 +35,9 @@ class Event
 
     #[ORM\Column(type: 'text')]
     private ?string $description = null;
+
+    #[ORM\Column(length: 3, nullable: true)]
+    private ?string $tournamentFormat = null;
 
     #[ORM\ManyToOne(targetEntity: Player::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -118,6 +122,18 @@ class Event
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getTournamentFormat(): ?string
+    {
+        return $this->tournamentFormat;
+    }
+
+    public function setTournamentFormat(?string $tournamentFormat): self
+    {
+        $this->tournamentFormat = $tournamentFormat;
 
         return $this;
     }

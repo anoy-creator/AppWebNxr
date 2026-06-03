@@ -14,6 +14,9 @@
             </span>
 
             <h3>{{ event.title }}</h3>
+            {% if event.tournamentFormat %}
+                <p>Format: {{ event.tournamentFormat }}</p>
+            {% endif %}
             <p>{{ event.description }}</p>
         </div>
 

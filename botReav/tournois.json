@@ -1,0 +1,175 @@
+[
+  {
+    "id": "1780476694967",
+    "createdBy": "200810925853376513",
+    "date": "2026-06-10",
+    "heure": "21:00",
+    "timestamp": 1781118000000,
+    "players": [
+      "302873451298029569"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "status": "cancelled",
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481279367
+  },
+  {
+    "id": "1780477230123",
+    "createdBy": "200810925853376513",
+    "date": "10/06/2026",
+    "heure": "21:00",
+    "timestamp": 1781118000000,
+    "players": [
+      "302873451298029569",
+      "200810925853376513"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "status": "cancelled",
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481301960
+  },
+  {
+    "id": "1780477374936",
+    "createdBy": "200810925853376513",
+    "date": "10/06/2026",
+    "heure": "21:00",
+    "timestamp": 1781118000000,
+    "players": [
+      "200810925853376513"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "status": "cancelled",
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481287978
+  },
+  {
+    "id": "1780477520189",
+    "createdBy": "200810925853376513",
+    "date": "10/06/2026",
+    "heure": "21:00",
+    "timestamp": 1781118000000,
+    "players": [
+      "200810925853376513"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "status": "cancelled",
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481309455
+  },
+  {
+    "id": "1780479112280",
+    "createdBy": "200810925853376513",
+    "captain": "302873451298029569",
+    "date": "10/06/2026",
+    "heure": "13:35",
+    "timestamp": 1781091300000,
+    "players": [
+      "200810925853376513"
+    ],
+    "substitutes": [
+      "1167929761855713354"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "status": "cancelled",
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Shakow n'a plus envie",
+    "cancelledAt": 1780480724404
+  },
+  {
+    "id": "1780479329728",
+    "createdBy": "200810925853376513",
+    "captain": "302873451298029569",
+    "date": "10/06/2026",
+    "heure": "13:40",
+    "timestamp": 1781091600000,
+    "players": [
+      "200810925853376513"
+    ],
+    "substitutes": [
+      "667466970765197322"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "status": "cancelled",
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481260788
+  },
+  {
+    "id": "1780480807625",
+    "status": "cancelled",
+    "createdBy": "200810925853376513",
+    "captain": "200810925853376513",
+    "date": "03/06/2026",
+    "heure": "14:05",
+    "timestamp": 1780488300000,
+    "players": [
+      "302873451298029569"
+    ],
+    "substitutes": [
+      "433743308548735016"
+    ],
+    "rosterMessageId": "1511670814989353020",
+    "reminder24hSent": false,
+    "reminder2hSent": true,
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481246374
+  },
+  {
+    "id": "1780481144661",
+    "status": "cancelled",
+    "createdBy": "200810925853376513",
+    "captain": "200810925853376513",
+    "date": "10/06/2026",
+    "heure": "14:10",
+    "format": "5v5",
+    "timestamp": 1781093400000,
+    "players": [
+      "200810925853376513"
+    ],
+    "substitutes": [
+      "200810925853376513"
+    ],
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481270735
+  },
+  {
+    "id": "1780481672124",
+    "status": "cancelled",
+    "createdBy": "200810925853376513",
+    "captain": "302873451298029569",
+    "date": "10/06/2026",
+    "heure": "18:00",
+    "format": "5v5",
+    "timestamp": 1781107200000,
+    "players": [
+      "200810925853376513",
+      "302873451298029569"
+    ],
+    "substitutes": [
+      "200810925853376513"
+    ],
+    "checkins": {
+      "200810925853376513": "unavailable",
+      "302873451298029569": "available"
+    },
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "cancelledBy": "200810925853376513",
+    "cancelReason": "Aucune raison précisée",
+    "cancelledAt": 1780481806500
+  }
+]

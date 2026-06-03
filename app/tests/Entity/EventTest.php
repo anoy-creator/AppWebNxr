@@ -15,6 +15,7 @@ class EventTest extends TestCase
         $event
             ->setTitle('Training')
             ->setType('training')
+            ->setTournamentFormat('2v2')
             ->setDate($date)
             ->setTime('19:00')
             ->setDescription('Session');
@@ -22,6 +23,7 @@ class EventTest extends TestCase
         $this->assertNull($event->getId());
         $this->assertSame('Training', $event->getTitle());
         $this->assertSame('training', $event->getType());
+        $this->assertSame('2v2', $event->getTournamentFormat());
         $this->assertSame($date, $event->getDate());
         $this->assertSame('19:00', $event->getTime());
         $this->assertSame('Session', $event->getDescription());

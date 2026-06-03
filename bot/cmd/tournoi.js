@@ -1,4 +1,5 @@
 import cron from 'node-cron';
+import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,6 +17,7 @@ const botRoot = path.resolve(__dirname, '..');
 
 const DB_FILE = path.join(botRoot, 'tournois.json');
 const STATE_FILE = path.join(botRoot, 'roster-state.json');
+const ALLOWED_FORMATS = ['1v1', '2v2', '3v3', '4v4', '5v5', '6v6'];
 
 function formatDateFR(timestamp) {
     return new Date(timestamp).toLocaleString('fr-FR', {
@@ -96,6 +98,14 @@ function validateDateHeure(date, heure) {
 
     if (date && !regexDate.test(date)) return 'Format de date invalide. Utilise : 10/06/2026';
     if (heure && !regexHeure.test(heure)) return "Format d'heure invalide. Utilise : 21:00";
+
+    return null;
+}
+
+function validateTournamentFormat(format) {
+    if (!ALLOWED_FORMATS.includes(format)) {
+        return `Format de tournoi invalide. Utilise : ${ALLOWED_FORMATS.join(', ')}`;
+    }
 
     return null;
 }
@@ -183,6 +193,40 @@ async function sendLog(client, message) {
     if (!channel) return;
 
     await channel.send(message).catch(() => null);
+}
+
+async function syncTournamentWithSite(tournoi) {
+    if (!process.env.ROUTE_API || process.env.ROUTE_API === '#' || !process.env.API_KEY || process.env.API_KEY === '#') {
+        return {
+            success: false,
+            message: 'API du site non configuree',
+        };
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.ROUTE_API}/discord/add-tournois`,
+            tournoi,
+            {
+                headers: {
+                    'x-api-key': process.env.API_KEY,
+                },
+            },
+        );
+
+        return {
+            success: true,
+            message: response.data?.message || 'Event cree sur le site',
+            event: response.data?.created?.[0] || null,
+        };
+    } catch (error) {
+        console.error('Erreur synchronisation site :', error.response?.data || error.message);
+
+        return {
+            success: false,
+            message: error.response?.data?.message || error.message,
+        };
+    }
 }
 
 function buildRosterEmbed(tournois) {
@@ -341,6 +385,9 @@ async function executeInteraction(interaction, client) {
         const validationError = validateDateHeure(date, heure);
         if (validationError) return interaction.editReply({ content: validationError });
 
+        const formatError = validateTournamentFormat(format);
+        if (formatError) return interaction.editReply({ content: formatError });
+
         const tournamentDate = parseDateTime(date, heure);
 
         if (isNaN(tournamentDate.getTime())) {
@@ -377,6 +424,7 @@ async function executeInteraction(interaction, client) {
         tournois.push(tournoi);
         saveTournois(tournois);
         await updateRosterBoard(client, tournois);
+        const siteSync = await syncTournamentWithSite(tournoi);
 
         const dmResults = [];
 
@@ -417,6 +465,7 @@ async function executeInteraction(interaction, client) {
                 `Capitaine : <@${tournoi.captain}>\n` +
                 `Joueurs : ${playerIds.map(id => `<@${id}>`).join(', ')}\n` +
                 `Remplacants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
+                `Site : ${siteSync.success ? `event cree (${siteSync.event?.title || 'Tournoi'})` : `non synchronise - ${siteSync.message}`}\n` +
                 `MP envoyes : ${dmResults.join(', ')}`,
         });
     }
@@ -510,6 +559,11 @@ async function executeInteraction(interaction, client) {
 
         const validationError = validateDateHeure(finalDate, finalHeure);
         if (validationError) return interaction.editReply({ content: validationError });
+
+        if (newFormat) {
+            const formatError = validateTournamentFormat(newFormat);
+            if (formatError) return interaction.editReply({ content: formatError });
+        }
 
         const newTimestamp = parseDateTime(finalDate, finalHeure).getTime();
         if (isNaN(newTimestamp)) return interaction.editReply({ content: 'Date invalide.' });
@@ -670,8 +724,16 @@ export default {
                 )
                 .addStringOption(opt =>
                     opt.setName('format')
-                        .setDescription('Format du tournoi : 3v3, 4v4, 5v5...')
-                        .setRequired(true),
+                        .setDescription('Format du tournoi')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1v1', value: '1v1' },
+                            { name: '2v2', value: '2v2' },
+                            { name: '3v3', value: '3v3' },
+                            { name: '4v4', value: '4v4' },
+                            { name: '5v5', value: '5v5' },
+                            { name: '6v6', value: '6v6' },
+                        ),
                 )
                 .addUserOption(opt =>
                     opt.setName('capitaine')
@@ -730,8 +792,16 @@ export default {
                 )
                 .addStringOption(opt =>
                     opt.setName('format')
-                        .setDescription('Nouveau format : 3v3, 4v4, 5v5...')
-                        .setRequired(false),
+                        .setDescription('Nouveau format')
+                        .setRequired(false)
+                        .addChoices(
+                            { name: '1v1', value: '1v1' },
+                            { name: '2v2', value: '2v2' },
+                            { name: '3v3', value: '3v3' },
+                            { name: '4v4', value: '4v4' },
+                            { name: '5v5', value: '5v5' },
+                            { name: '6v6', value: '6v6' },
+                        ),
                 )
                 .addUserOption(opt =>
                     opt.setName('capitaine')
