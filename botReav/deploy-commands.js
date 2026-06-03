@@ -6,7 +6,26 @@ const commands = [
   new SlashCommandBuilder()
     .setName("tournoi")
     .setDescription("Gestion des tournois NxR")
-
+      .addSubcommand(sub =>
+          sub
+              .setName("proposition")
+              .setDescription("Proposer un tournoi aux Forces d'élite")
+              .addStringOption(opt =>
+                  opt.setName("date")
+                      .setDescription("Date : 10/06/2026")
+                      .setRequired(true)
+              )
+              .addStringOption(opt =>
+                  opt.setName("heure")
+                      .setDescription("Heure : 21:00")
+                      .setRequired(true)
+              )
+              .addStringOption(opt =>
+                  opt.setName("format")
+                      .setDescription("Format : 3v3, 4v4, 5v5...")
+                      .setRequired(true)
+              )
+      )
     .addSubcommand(sub =>
       sub
         .setName("ajouter")

@@ -22,6 +22,7 @@ const client = new Client({
 
 const DB_FILE = "./tournois.json";
 const STATE_FILE = "./roster-state.json";
+const PROPOSITIONS_FILE = "./propositions-tournois.json";
 
 function formatDateFR(timestamp) {
   return new Date(timestamp).toLocaleString("fr-FR", {
@@ -49,9 +50,9 @@ function loadJson(file, fallback) {
     }
 
     const content = fs.readFileSync(file, "utf8")
-      .replace(/^\uFEFF/, "")
-      .replace(/\0/g, "")
-      .trim();
+        .replace(/^\uFEFF/, "")
+        .replace(/\0/g, "")
+        .trim();
 
     if (!content) {
       fs.writeFileSync(file, JSON.stringify(fallback, null, 2), "utf8");
@@ -83,6 +84,14 @@ function loadState() {
 
 function saveState(data) {
   saveJson(STATE_FILE, data);
+}
+
+function loadPropositions() {
+  return loadJson(PROPOSITIONS_FILE, []);
+}
+
+function savePropositions(data) {
+  saveJson(PROPOSITIONS_FILE, data);
 }
 
 function parseDateTime(date, heure) {
@@ -136,17 +145,39 @@ function getCheckinIcon(tournoi, userId) {
 
 function buildCheckinButtons(tournoiId) {
   return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`checkin_available_${tournoiId}`)
-      .setLabel("Je suis disponible")
-      .setEmoji("✅")
-      .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+          .setCustomId(`checkin_available_${tournoiId}`)
+          .setLabel("Je suis disponible")
+          .setEmoji("✅")
+          .setStyle(ButtonStyle.Success),
 
-    new ButtonBuilder()
-      .setCustomId(`checkin_unavailable_${tournoiId}`)
-      .setLabel("Je ne suis plus disponible")
-      .setEmoji("❌")
-      .setStyle(ButtonStyle.Danger)
+      new ButtonBuilder()
+          .setCustomId(`checkin_unavailable_${tournoiId}`)
+          .setLabel("Je ne suis plus disponible")
+          .setEmoji("❌")
+          .setStyle(ButtonStyle.Danger)
+  );
+}
+
+function buildProposalButtons(proposalId) {
+  return new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+          .setCustomId(`proposal_yes_${proposalId}`)
+          .setLabel("Oui")
+          .setEmoji("✅")
+          .setStyle(ButtonStyle.Success),
+
+      new ButtonBuilder()
+          .setCustomId(`proposal_no_${proposalId}`)
+          .setLabel("Non")
+          .setEmoji("❌")
+          .setStyle(ButtonStyle.Danger),
+
+      new ButtonBuilder()
+          .setCustomId(`proposal_sub_${proposalId}`)
+          .setLabel("Peut-être remplaçant")
+          .setEmoji("🔁")
+          .setStyle(ButtonStyle.Secondary)
   );
 }
 
@@ -196,14 +227,14 @@ async function sendLog(message) {
 
 function buildRosterEmbed(tournois) {
   const activeTournois = tournois
-    .filter(t => t.status !== "cancelled")
-    .sort((a, b) => a.timestamp - b.timestamp);
+      .filter(t => t.status !== "cancelled")
+      .sort((a, b) => a.timestamp - b.timestamp);
 
   let description =
-    `📢 **ANNONCE ROSTER — TOURNOIS NxR**\n\n` +
-    `Les rosters pour les tournois sont désormais confirmés.\n` +
-    `Merci aux joueurs sélectionnés d’être présents et prêts avant le début de la rencontre.\n\n` +
-    `✅ = confirmé | ❌ = indisponible | ⏳ = en attente\n\n`;
+      `📢 **ANNONCE ROSTER — TOURNOIS NxR**\n\n` +
+      `Les rosters pour les tournois sont désormais confirmés.\n` +
+      `Merci aux joueurs sélectionnés d’être présents et prêts avant le début de la rencontre.\n\n` +
+      `✅ = confirmé | ❌ = indisponible | ⏳ = en attente\n\n`;
 
   if (activeTournois.length === 0) {
     description += `Aucun tournoi prévu pour le moment.\n`;
@@ -211,34 +242,33 @@ function buildRosterEmbed(tournois) {
 
   for (const tournoi of activeTournois) {
     const jour = formatShortDate(tournoi.timestamp);
-    const heure = tournoi.heure;
 
     description +=
-      `━━━━━━━━━━━━━━━━━━\n\n` +
-      `**Tournoi prévu ${jour} à ${heure} en ${tournoi.format || "format non précisé"}**\n\n` +
-      `🎖️ **Capitaine :**\n` +
-      `${getCheckinIcon(tournoi, tournoi.captain)} <@${tournoi.captain}>\n\n` +
-      `🎮 **Joueurs titulaires :**\n` +
-      `${tournoi.players?.length
-        ? tournoi.players.map(id => `${getCheckinIcon(tournoi, id)} <@${id}>`).join("\n")
-        : "Aucun"}\n\n` +
-      `🙋‍♂️ **Remplaçant(e)s :**\n` +
-      `${tournoi.substitutes?.length
-        ? tournoi.substitutes.map(id => `${getCheckinIcon(tournoi, id)} <@${id}>`).join("\n")
-        : "Aucun"}\n\n` +
-      `🆔 ID tournoi : \`${tournoi.id}\`\n\n`;
+        `━━━━━━━━━━━━━━━━━━\n\n` +
+        `**Tournoi prévu ${jour} à ${tournoi.heure} en ${tournoi.format || "format non précisé"}**\n\n` +
+        `🎖️ **Capitaine :**\n` +
+        `${getCheckinIcon(tournoi, tournoi.captain)} <@${tournoi.captain}>\n\n` +
+        `🎮 **Joueurs titulaires :**\n` +
+        `${tournoi.players?.length
+            ? tournoi.players.map(id => `${getCheckinIcon(tournoi, id)} <@${id}>`).join("\n")
+            : "Aucun"}\n\n` +
+        `🙋‍♂️ **Remplaçant(e)s :**\n` +
+        `${tournoi.substitutes?.length
+            ? tournoi.substitutes.map(id => `${getCheckinIcon(tournoi, id)} <@${id}>`).join("\n")
+            : "Aucun"}\n\n` +
+        `🆔 ID tournoi : \`${tournoi.id}\`\n\n`;
   }
 
   description +=
-    `━━━━━━━━━━━━━━━━━━\n\n` +
-    `En cas d’imprévu, merci de prévenir un capitaine à l’avance.\n` +
-    `Bon tournoi à vous ! Peu importe qui l’emportera, l’essentiel est de représenter notre nom. ❤️`;
+      `━━━━━━━━━━━━━━━━━━\n\n` +
+      `En cas d’imprévu, merci de prévenir un capitaine à l’avance.\n` +
+      `Bon tournoi à vous ! Peu importe qui l’emportera, l’essentiel est de représenter notre nom. ❤️`;
 
   return new EmbedBuilder()
-    .setColor(0x7b2cff)
-    .setDescription(description)
-    .setFooter({ text: "Colonel Moutarde • NxR" })
-    .setTimestamp();
+      .setColor(0x7b2cff)
+      .setDescription(description)
+      .setFooter({ text: "Colonel Moutarde • NxR" })
+      .setTimestamp();
 }
 
 async function updateRosterBoard(tournois) {
@@ -251,8 +281,8 @@ async function updateRosterBoard(tournois) {
   const embed = buildRosterEmbed(tournois);
 
   const content = process.env.FORCES_ELITE_ROLE_ID
-    ? `<@&${process.env.FORCES_ELITE_ROLE_ID}>`
-    : "";
+      ? `<@&${process.env.FORCES_ELITE_ROLE_ID}>`
+      : "";
 
   if (state.rosterMessageId) {
     const oldMessage = await channel.messages.fetch(state.rosterMessageId).catch(() => null);
@@ -271,6 +301,60 @@ async function updateRosterBoard(tournois) {
   }
 }
 
+function buildProposalEmbed(proposal) {
+  const yes = [];
+  const no = [];
+  const sub = [];
+  const pending = [];
+
+  for (const userId of proposal.members || []) {
+    const response = proposal.responses?.[userId];
+
+    if (response === "yes") yes.push(`<@${userId}>`);
+    else if (response === "no") no.push(`<@${userId}>`);
+    else if (response === "sub") sub.push(`<@${userId}>`);
+    else pending.push(`<@${userId}>`);
+  }
+
+  return new EmbedBuilder()
+      .setColor(0x7b2cff)
+      .setTitle("📢 Proposition tournoi NxR")
+      .setDescription(
+          `🎮 **Nouveau tournoi proposé**\n\n` +
+          `📅 Date : **${formatDateFR(proposal.timestamp)}**\n` +
+          `🎯 Format : **${proposal.format}**\n` +
+          `👤 Proposé par : <@${proposal.createdBy}>\n\n` +
+          `✅ **Disponibles**\n${yes.length ? yes.join("\n") : "Aucun"}\n\n` +
+          `🔁 **Peut-être remplaçants**\n${sub.length ? sub.join("\n") : "Aucun"}\n\n` +
+          `❌ **Indisponibles**\n${no.length ? no.join("\n") : "Aucun"}\n\n` +
+          `⏳ **En attente**\n${pending.length ? pending.join("\n") : "Aucun"}\n\n` +
+          `🆔 ID proposition : \`${proposal.id}\``
+      )
+      .setFooter({ text: "Colonel Moutarde • Proposition tournoi" })
+      .setTimestamp();
+}
+
+async function updateProposalEmbed(proposal) {
+  if (!process.env.PROPOSITION_CHANNEL_ID) return null;
+
+  const channel = await client.channels.fetch(process.env.PROPOSITION_CHANNEL_ID).catch(() => null);
+  if (!channel) return null;
+
+  const embed = buildProposalEmbed(proposal);
+
+  if (proposal.messageId) {
+    const oldMessage = await channel.messages.fetch(proposal.messageId).catch(() => null);
+
+    if (oldMessage) {
+      await oldMessage.edit({ embeds: [embed] }).catch(() => null);
+      return proposal.messageId;
+    }
+  }
+
+  const sentMessage = await channel.send({ embeds: [embed] }).catch(() => null);
+  return sentMessage ? sentMessage.id : null;
+}
+
 client.once("clientReady", () => {
   console.log(`Bot NxR connecté : ${client.user.tag}`);
 });
@@ -278,12 +362,50 @@ client.once("clientReady", () => {
 client.on("interactionCreate", async interaction => {
   try {
     if (interaction.isButton()) {
-      const [prefix, status, tournoiId] = interaction.customId.split("_");
+      const [prefix, status, targetId] = interaction.customId.split("_");
+
+      if (prefix === "proposal") {
+        const proposals = loadPropositions();
+        const proposal = proposals.find(p => p.id === targetId);
+
+        if (!proposal) {
+          return interaction.reply({
+            content: "❌ Proposition introuvable.",
+            ephemeral: true
+          });
+        }
+
+        const userId = interaction.user.id;
+
+        if (!proposal.members.includes(userId)) {
+          return interaction.reply({
+            content: "❌ Tu n’es pas concerné par cette proposition.",
+            ephemeral: true
+          });
+        }
+
+        proposal.responses = proposal.responses || {};
+        proposal.responses[userId] = status;
+        proposal.updatedAt = Date.now();
+
+        savePropositions(proposals);
+        await updateProposalEmbed(proposal);
+
+        return interaction.reply({
+          content:
+              status === "yes"
+                  ? "✅ Réponse enregistrée : tu es disponible."
+                  : status === "no"
+                      ? "❌ Réponse enregistrée : tu n’es pas disponible."
+                      : "🔁 Réponse enregistrée : tu peux être remplaçant.",
+          ephemeral: true
+        });
+      }
 
       if (prefix !== "checkin") return;
 
       const tournois = loadTournois();
-      const tournoi = tournois.find(t => t.id === tournoiId);
+      const tournoi = tournois.find(t => t.id === targetId);
 
       if (!tournoi) {
         return interaction.reply({
@@ -317,19 +439,19 @@ client.on("interactionCreate", async interaction => {
 
       if (status === "unavailable") {
         await sendLog(
-          `❌ **Joueur indisponible**\n` +
-          `🆔 Tournoi : \`${tournoi.id}\`\n` +
-          `👤 Joueur : <@${userId}>\n` +
-          `📌 Statut roster : **${getStatusForUser(tournoi, userId)}**\n` +
-          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-          `🧢 Capitaine : <@${tournoi.captain}>`
+            `❌ **Joueur indisponible**\n` +
+            `🆔 Tournoi : \`${tournoi.id}\`\n` +
+            `👤 Joueur : <@${userId}>\n` +
+            `📌 Statut roster : **${getStatusForUser(tournoi, userId)}**\n` +
+            `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>`
         );
       }
 
       return interaction.reply({
         content: status === "available"
-          ? "✅ Présence confirmée."
-          : "❌ Indisponibilité enregistrée. Un capitaine sera prévenu.",
+            ? "✅ Présence confirmée."
+            : "❌ Indisponibilité enregistrée. Un capitaine sera prévenu.",
         ephemeral: true
       });
     }
@@ -349,6 +471,98 @@ client.on("interactionCreate", async interaction => {
 
     const subcommand = interaction.options.getSubcommand();
     const tournois = loadTournois();
+
+    if (subcommand === "proposition") {
+      const date = interaction.options.getString("date");
+      const heure = interaction.options.getString("heure");
+      const format = interaction.options.getString("format");
+
+      const validationError = validateDateHeure(date, heure);
+      if (validationError) return interaction.editReply({ content: validationError });
+
+      const tournamentDate = parseDateTime(date, heure);
+
+      if (isNaN(tournamentDate.getTime())) {
+        return interaction.editReply({
+          content: "❌ Date invalide. Exemple valide : **10/06/2026** à **21:00**"
+        });
+      }
+
+      const role = interaction.guild.roles.cache.get(process.env.FORCES_ELITE_ROLE_ID);
+
+      if (!role) {
+        return interaction.editReply({
+          content: "❌ Rôle Forces d'élite introuvable. Vérifie FORCES_ELITE_ROLE_ID dans le .env."
+        });
+      }
+
+      await interaction.guild.members.fetch();
+
+      const members = role.members
+          .filter(member => !member.user.bot)
+          .map(member => member.user.id);
+
+      if (members.length === 0) {
+        return interaction.editReply({
+          content: "❌ Aucun membre trouvé avec le rôle Forces d'élite."
+        });
+      }
+
+      const proposals = loadPropositions();
+
+      const proposal = {
+        id: Date.now().toString(),
+        createdBy: interaction.user.id,
+        date,
+        heure,
+        format,
+        timestamp: tournamentDate.getTime(),
+        members,
+        responses: {},
+        messageId: null,
+        createdAt: Date.now()
+      };
+
+      proposal.messageId = await updateProposalEmbed(proposal);
+
+      proposals.push(proposal);
+      savePropositions(proposals);
+
+      const dmResults = [];
+
+      for (const userId of members) {
+        const success = await sendDm(
+            userId,
+            `🎮 **Proposition tournoi NxR**\n\n` +
+            `Un nouveau tournoi est prévu le **${formatDateFR(proposal.timestamp)}** en **${proposal.format}**.\n\n` +
+            `Es-tu disponible ? Tu veux jouer ?\n\n` +
+            `Réponds avec les boutons ci-dessous.\n\n` +
+            `Ceci est un message automatique du Colonel Moutarde.`,
+            [buildProposalButtons(proposal.id)]
+        );
+
+        dmResults.push(`${success ? "✅" : "❌"} <@${userId}>`);
+      }
+
+      await sendLog(
+          `📢 **Proposition tournoi envoyée**\n` +
+          `🆔 ID : \`${proposal.id}\`\n` +
+          `👤 Créée par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(proposal.timestamp)}**\n` +
+          `🎯 Format : **${proposal.format}**\n` +
+          `👥 Membres contactés : **${members.length}**`
+      );
+
+      return interaction.editReply({
+        content:
+            `✅ **Proposition tournoi envoyée aux Forces d'élite**\n\n` +
+            `🆔 ID : \`${proposal.id}\`\n` +
+            `📅 Date : **${formatDateFR(proposal.timestamp)}**\n` +
+            `🎯 Format : **${proposal.format}**\n` +
+            `👥 Membres contactés : **${members.length}**\n\n` +
+            `📩 MP : ${dmResults.join(", ")}`
+      });
+    }
 
     if (subcommand === "ajouter") {
       const date = interaction.options.getString("date");
@@ -404,46 +618,46 @@ client.on("interactionCreate", async interaction => {
         const rosterStatus = getStatusForUser(tournoi, userId);
 
         const success = await sendDm(
-          userId,
-          `🎮 **Tournoi NxR**\n\n` +
-          `Tu as été inscrit au tournoi du **${formatDateFR(tournoi.timestamp)}**.\n\n` +
-          `🎯 Format : **${tournoi.format}**\n` +
-          `🧢 Capitaine : <@${tournoi.captain}>\n` +
-          `📌 Statut : **${rosterStatus}**\n\n` +
-          `Merci de confirmer ta présence avec les boutons ci-dessous.\n\n` +
-          `Ceci est un message automatique du Colonel Moutarde.`,
-          [buildCheckinButtons(tournoi.id)]
+            userId,
+            `🎮 **Tournoi NxR**\n\n` +
+            `Tu as été inscrit au tournoi du **${formatDateFR(tournoi.timestamp)}**.\n\n` +
+            `🎯 Format : **${tournoi.format}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `📌 Statut : **${rosterStatus}**\n\n` +
+            `Merci de confirmer ta présence avec les boutons ci-dessous.\n\n` +
+            `Ceci est un message automatique du Colonel Moutarde.`,
+            [buildCheckinButtons(tournoi.id)]
         );
 
         dmResults.push(`${success ? "✅" : "❌"} <@${userId}>`);
       }
 
       await sendLog(
-        `📋 **Nouveau tournoi créé**\n` +
-        `🆔 ID : \`${tournoi.id}\`\n` +
-        `👤 Créé par : <@${interaction.user.id}>\n` +
-        `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-        `🎯 Format : **${tournoi.format}**\n` +
-        `🧢 Capitaine : <@${tournoi.captain}>`
+          `📋 **Nouveau tournoi créé**\n` +
+          `🆔 ID : \`${tournoi.id}\`\n` +
+          `👤 Créé par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+          `🎯 Format : **${tournoi.format}**\n` +
+          `🧢 Capitaine : <@${tournoi.captain}>`
       );
 
       return interaction.editReply({
         content:
-          `✅ **Tournoi NxR enregistré**\n\n` +
-          `🆔 ID : \`${tournoi.id}\`\n` +
-          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-          `🎯 Format : **${tournoi.format}**\n` +
-          `🧢 Capitaine : <@${tournoi.captain}>\n` +
-          `👥 Joueurs : ${playerIds.map(id => `<@${id}>`).join(", ")}\n` +
-          `🔁 Remplaçants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(", ") : "Aucun"}\n\n` +
-          `📩 MP envoyés : ${dmResults.join(", ")}`
+            `✅ **Tournoi NxR enregistré**\n\n` +
+            `🆔 ID : \`${tournoi.id}\`\n` +
+            `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `🎯 Format : **${tournoi.format}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `👥 Joueurs : ${playerIds.map(id => `<@${id}>`).join(", ")}\n` +
+            `🔁 Remplaçants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(", ") : "Aucun"}\n\n` +
+            `📩 MP envoyés : ${dmResults.join(", ")}`
       });
     }
 
     if (subcommand === "liste") {
       const activeTournois = tournois
-        .filter(t => t.status !== "cancelled")
-        .sort((a, b) => a.timestamp - b.timestamp);
+          .filter(t => t.status !== "cancelled")
+          .sort((a, b) => a.timestamp - b.timestamp);
 
       if (activeTournois.length === 0) {
         return interaction.editReply({ content: "Aucun tournoi prévu." });
@@ -451,10 +665,10 @@ client.on("interactionCreate", async interaction => {
 
       return interaction.editReply({
         content:
-          `📋 **Tournois NxR prévus**\n\n` +
-          activeTournois.map(t =>
-            `🆔 \`${t.id}\` — **${formatDateFR(t.timestamp)}** — **${t.format || "?"}** — Capitaine : <@${t.captain}>`
-          ).join("\n")
+            `📋 **Tournois NxR prévus**\n\n` +
+            activeTournois.map(t =>
+                `🆔 \`${t.id}\` — **${formatDateFR(t.timestamp)}** — **${t.format || "?"}** — Capitaine : <@${t.captain}>`
+            ).join("\n")
       });
     }
 
@@ -480,32 +694,32 @@ client.on("interactionCreate", async interaction => {
         const rosterStatus = getStatusForUser(tournoi, userId);
 
         const success = await sendDm(
-          userId,
-          `🎮 **Tournoi NxR**\n\n` +
-          `❌ Le tournoi du **${formatDateFR(tournoi.timestamp)}** a été annulé.\n\n` +
-          `🧢 Capitaine : <@${tournoi.captain}>\n` +
-          `📌 Statut : **${rosterStatus}**\n\n` +
-          `Nous nous excusons pour la gêne occasionnée. Restez attentifs aux prochaines annonces pour les futurs tournois.\n\n` +
-          `Ceci est un message automatique du Colonel Moutarde.`
+            userId,
+            `🎮 **Tournoi NxR**\n\n` +
+            `❌ Le tournoi du **${formatDateFR(tournoi.timestamp)}** a été annulé.\n\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `📌 Statut : **${rosterStatus}**\n\n` +
+            `Nous nous excusons pour la gêne occasionnée. Restez attentifs aux prochaines annonces pour les futurs tournois.\n\n` +
+            `Ceci est un message automatique du Colonel Moutarde.`
         );
 
         dmResults.push(`${success ? "✅" : "❌"} <@${userId}>`);
       }
 
       await sendLog(
-        `❌ **Tournoi annulé**\n` +
-        `🆔 ID : \`${tournoi.id}\`\n` +
-        `👤 Annulé par : <@${interaction.user.id}>\n` +
-        `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-        `📝 Raison : ${raison}`
+          `❌ **Tournoi annulé**\n` +
+          `🆔 ID : \`${tournoi.id}\`\n` +
+          `👤 Annulé par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+          `📝 Raison : ${raison}`
       );
 
       return interaction.editReply({
         content:
-          `❌ **Tournoi annulé**\n\n` +
-          `🆔 ID : \`${tournoi.id}\`\n` +
-          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-          `📩 MP envoyés : ${dmResults.join(", ")}`
+            `❌ **Tournoi annulé**\n\n` +
+            `🆔 ID : \`${tournoi.id}\`\n` +
+            `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `📩 MP envoyés : ${dmResults.join(", ")}`
       });
     }
 
@@ -566,40 +780,40 @@ client.on("interactionCreate", async interaction => {
         const rosterStatus = getStatusForUser(tournoi, userId);
 
         const success = await sendDm(
-          userId,
-          `🎮 **Tournoi NxR**\n\n` +
-          `✏️ Le tournoi a été modifié.\n\n` +
-          `📅 Nouvelle date : **${formatDateFR(tournoi.timestamp)}**\n` +
-          `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
-          `🧢 Capitaine : <@${tournoi.captain}>\n` +
-          `📌 Statut : **${rosterStatus}**\n\n` +
-          `Merci de confirmer ta présence avec les boutons ci-dessous.\n\n` +
-          `Ceci est un message automatique du Colonel Moutarde.`,
-          [buildCheckinButtons(tournoi.id)]
+            userId,
+            `🎮 **Tournoi NxR**\n\n` +
+            `✏️ Le tournoi a été modifié.\n\n` +
+            `📅 Nouvelle date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `📌 Statut : **${rosterStatus}**\n\n` +
+            `Merci de confirmer ta présence avec les boutons ci-dessous.\n\n` +
+            `Ceci est un message automatique du Colonel Moutarde.`,
+            [buildCheckinButtons(tournoi.id)]
         );
 
         dmResults.push(`${success ? "✅" : "❌"} <@${userId}>`);
       }
 
       await sendLog(
-        `✏️ **Tournoi modifié**\n` +
-        `🆔 ID : \`${tournoi.id}\`\n` +
-        `👤 Modifié par : <@${interaction.user.id}>\n` +
-        `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-        `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
-        `🧢 Capitaine : <@${tournoi.captain}>`
+          `✏️ **Tournoi modifié**\n` +
+          `🆔 ID : \`${tournoi.id}\`\n` +
+          `👤 Modifié par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+          `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
+          `🧢 Capitaine : <@${tournoi.captain}>`
       );
 
       return interaction.editReply({
         content:
-          `✏️ **Tournoi modifié**\n\n` +
-          `🆔 ID : \`${tournoi.id}\`\n` +
-          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
-          `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
-          `🧢 Capitaine : <@${tournoi.captain}>\n` +
-          `👥 Joueurs : ${tournoi.players.map(id => `<@${id}>`).join(", ")}\n` +
-          `🔁 Remplaçants : ${tournoi.substitutes.length ? tournoi.substitutes.map(id => `<@${id}>`).join(", ") : "Aucun"}\n\n` +
-          `📩 MP envoyés : ${dmResults.join(", ")}`
+            `✏️ **Tournoi modifié**\n\n` +
+            `🆔 ID : \`${tournoi.id}\`\n` +
+            `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `👥 Joueurs : ${tournoi.players.map(id => `<@${id}>`).join(", ")}\n` +
+            `🔁 Remplaçants : ${tournoi.substitutes.length ? tournoi.substitutes.map(id => `<@${id}>`).join(", ") : "Aucun"}\n\n` +
+            `📩 MP envoyés : ${dmResults.join(", ")}`
       });
     }
 
@@ -628,14 +842,14 @@ cron.schedule("* * * * *", async () => {
     const timeLeft = tournoi.timestamp - now;
 
     const shouldSend24h =
-      timeLeft <= 24 * 60 * 60 * 1000 &&
-      timeLeft > 23 * 60 * 60 * 1000 &&
-      !tournoi.reminder24hSent;
+        timeLeft <= 24 * 60 * 60 * 1000 &&
+        timeLeft > 23 * 60 * 60 * 1000 &&
+        !tournoi.reminder24hSent;
 
     const shouldSend2h =
-      timeLeft <= 2 * 60 * 60 * 1000 &&
-      timeLeft > 1 * 60 * 60 * 1000 &&
-      !tournoi.reminder2hSent;
+        timeLeft <= 2 * 60 * 60 * 1000 &&
+        timeLeft > 1 * 60 * 60 * 1000 &&
+        !tournoi.reminder2hSent;
 
     if (!shouldSend24h && !shouldSend2h) continue;
 
@@ -645,16 +859,16 @@ cron.schedule("* * * * *", async () => {
       const rosterStatus = getStatusForUser(tournoi, userId);
 
       await sendDm(
-        userId,
-        `⚔️ **Rappel tournoi NxR**\n\n` +
-        `Tu es inscrit au tournoi prévu le **${formatDateFR(tournoi.timestamp)}**.\n\n` +
-        `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
-        `🧢 Capitaine : <@${tournoi.captain}>\n` +
-        `📌 Statut : **${rosterStatus}**\n` +
-        `⏰ Rappel : **${type} avant le tournoi**.\n\n` +
-        `Merci de confirmer que tu es toujours disponible avec les boutons ci-dessous.\n\n` +
-        `Ceci est un message automatique du Colonel Moutarde.`,
-        [buildCheckinButtons(tournoi.id)]
+          userId,
+          `⚔️ **Rappel tournoi NxR**\n\n` +
+          `Tu es inscrit au tournoi prévu le **${formatDateFR(tournoi.timestamp)}**.\n\n` +
+          `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
+          `🧢 Capitaine : <@${tournoi.captain}>\n` +
+          `📌 Statut : **${rosterStatus}**\n` +
+          `⏰ Rappel : **${type} avant le tournoi**.\n\n` +
+          `Merci de confirmer que tu es toujours disponible avec les boutons ci-dessous.\n\n` +
+          `Ceci est un message automatique du Colonel Moutarde.`,
+          [buildCheckinButtons(tournoi.id)]
       );
     }
 
@@ -662,9 +876,9 @@ cron.schedule("* * * * *", async () => {
     if (shouldSend2h) tournoi.reminder2hSent = true;
 
     await sendLog(
-      `⏰ **Rappel ${type} envoyé**\n` +
-      `🆔 ID : \`${tournoi.id}\`\n` +
-      `📅 Date : **${formatDateFR(tournoi.timestamp)}**`
+        `⏰ **Rappel ${type} envoyé**\n` +
+        `🆔 ID : \`${tournoi.id}\`\n` +
+        `📅 Date : **${formatDateFR(tournoi.timestamp)}**`
     );
 
     updated = true;
