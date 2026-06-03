@@ -115,9 +115,17 @@ function validateDateHeure(date, heure) {
   return null;
 }
 
-function extractMentionIds(input) {
-  if (!input) return [];
-  return [...input.matchAll(/<@!?(\d+)>/g)].map(match => match[1]);
+function getUserIdsFromOptions(interaction, prefix, max) {
+  const ids = [];
+
+  for (let i = 1; i <= max; i++) {
+    const user = interaction.options.getUser(`${prefix}${i}`);
+    if (user && !ids.includes(user.id)) {
+      ids.push(user.id);
+    }
+  }
+
+  return ids;
 }
 
 function getAllTournamentUsers(tournoi) {
@@ -569,8 +577,6 @@ client.on("interactionCreate", async interaction => {
       const heure = interaction.options.getString("heure");
       const format = interaction.options.getString("format");
       const capitaine = interaction.options.getUser("capitaine");
-      const joueursInput = interaction.options.getString("joueurs");
-      const remplacantsInput = interaction.options.getString("remplacants") || "";
 
       const validationError = validateDateHeure(date, heure);
       if (validationError) return interaction.editReply({ content: validationError });
@@ -583,12 +589,12 @@ client.on("interactionCreate", async interaction => {
         });
       }
 
-      const playerIds = extractMentionIds(joueursInput);
-      const substituteIds = extractMentionIds(remplacantsInput);
+      const playerIds = getUserIdsFromOptions(interaction, "joueur", 5);
+      const substituteIds = getUserIdsFromOptions(interaction, "remplacant", 3);
 
       if (playerIds.length === 0) {
         return interaction.editReply({
-          content: "❌ Aucun joueur détecté. Mentionne les joueurs avec @."
+          content: "❌ Aucun joueur détecté. Sélectionne au moins **joueur1**."
         });
       }
 
@@ -734,8 +740,6 @@ client.on("interactionCreate", async interaction => {
       const newHeure = interaction.options.getString("heure");
       const newFormat = interaction.options.getString("format");
       const newCapitaine = interaction.options.getUser("capitaine");
-      const newJoueursInput = interaction.options.getString("joueurs");
-      const newRemplacantsInput = interaction.options.getString("remplacants");
 
       const finalDate = newDate || tournoi.date;
       const finalHeure = newHeure || tournoi.heure;
@@ -753,16 +757,15 @@ client.on("interactionCreate", async interaction => {
       if (newFormat) tournoi.format = newFormat;
       if (newCapitaine) tournoi.captain = newCapitaine.id;
 
-      if (newJoueursInput) {
-        const newPlayers = extractMentionIds(newJoueursInput);
-        if (newPlayers.length === 0) {
-          return interaction.editReply({ content: "❌ Aucun joueur détecté dans la modification." });
-        }
+      const newPlayers = getUserIdsFromOptions(interaction, "joueur", 5);
+      const newSubstitutes = getUserIdsFromOptions(interaction, "remplacant", 3);
+
+      if (newPlayers.length > 0) {
         tournoi.players = newPlayers;
       }
 
-      if (newRemplacantsInput !== null) {
-        tournoi.substitutes = extractMentionIds(newRemplacantsInput);
+      if (newSubstitutes.length > 0) {
+        tournoi.substitutes = newSubstitutes;
       }
 
       tournoi.checkins = tournoi.checkins || {};
