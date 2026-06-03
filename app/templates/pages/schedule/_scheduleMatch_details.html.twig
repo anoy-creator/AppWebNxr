@@ -1,7 +1,7 @@
 <div class="schedule-detail-box">
     <div class="schedule-detail-header">
         <div>
-            <span>{{ match.game }} — {{ match.mode }}</span>
+            <span>{{ match.game }} - {{ match.mode }}{% if match.mapName %} - {{ match.mapName }}{% endif %}</span>
 
             <h3>
                 {{ match.teamA ? match.teamA.name : 'TBA' }}
@@ -13,19 +13,19 @@
         </div>
 
         <div class="schedule-detail-date">
-            <strong>{{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}</strong>
-            <em>{{ match.score }}</em>
+            <strong>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'TBD' }}</strong>
+            <em>{{ match.score ?: 'A venir' }}</em>
         </div>
     </div>
 
     <div class="schedule-info-grid">
         <span>
-            <strong>Date début</strong>
-            {{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}
+            <strong>Date debut</strong>
+            {{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'TBD' }}
         </span>
 
         <span>
-            <strong>Roster concerné</strong>
+            <strong>Roster concerne</strong>
             {{ match.roster ? match.roster.name : '-' }}
         </span>
 
@@ -36,11 +36,11 @@
 
         <span>
             <strong>Mode / Map</strong>
-            {{ match.mode }}
+            {{ match.mapName ? match.mode ~ ' - ' ~ match.mapName : match.mode }}
         </span>
     </div>
 
-    <h4>Joueurs concernés</h4>
+    <h4>Joueurs concernes</h4>
 
     <div class="schedule-player-list">
         {% for stat in stats %}
@@ -52,7 +52,19 @@
                 <span>K/D {{ stat.kd }}</span>
             </div>
         {% else %}
-            {% if match.roster %}
+            {% if match.players|length %}
+                {% for player in match.players %}
+                    <div class="schedule-player-row">
+                        <span>{{ player.pseudo }}</span>
+                        <span>{{ player.grade }}</span>
+                        <span>-</span>
+                        <span>-</span>
+                        <span>-</span>
+                    </div>
+                {% else %}
+                    <p>Aucun joueur concerne.</p>
+                {% endfor %}
+            {% elseif match.roster %}
                 {% for player in match.roster.players %}
                     <div class="schedule-player-row">
                         <span>{{ player.pseudo }}</span>
@@ -62,11 +74,11 @@
                         <span>-</span>
                     </div>
                 {% else %}
-                    <p>Aucun joueur concerné.</p>
+                    <p>Aucun joueur concerne.</p>
                 {% endfor %}
             {% else %}
-                <p>Aucun roster lié à ce match.</p>
+                <p>Aucun roster lie a ce match.</p>
             {% endif %}
         {% endfor %}
     </div>
-</div>*
+</div>

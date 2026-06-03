@@ -1,23 +1,91 @@
 <div class="match-detail-box">
     <div class="match-detail-header">
         <div>
-            <span>{{ match.playedAt|date('d/m/Y') }}</span>
+            <span>{{ match.playedAt|date('d/m/Y H:i') }}</span>
             <h3>{{ match.teamA.name }} vs {{ match.teamB.name }}</h3>
-            <p>{{ match.roster.name }} — {{ match.game }} — {{ match.mode }}</p>
+            <p>{{ match.roster.name }} - {{ match.game }} - {{ match.mode }}{% if match.mapName %} - {{ match.mapName }}{% endif %}</p>
+            {% if match.tournament %}
+                <p>Tournoi: {{ match.tournament.title }}</p>
+            {% endif %}
+            {% if match.opponents %}
+                <p>Adversaires: {{ match.opponents }}</p>
+            {% endif %}
         </div>
 
         <div class="match-detail-score">
-            <strong>{{ match.score }}</strong>
-            <em class="{{ match.result == 'Victory' ? 'is-win' : 'is-loss' }}">
-                {{ match.result == 'Victory' ? 'Victoire' : 'Défaite' }}
-            </em>
+            <strong>{{ match.score ?: '-' }}</strong>
+            {% if match.result %}
+                <em class="{{ match.result == 'Victory' ? 'is-win' : 'is-loss' }}">
+                    {{ match.result == 'Victory' ? 'Victoire' : 'Defaite' }}
+                </em>
+            {% else %}
+                <em>A venir</em>
+            {% endif %}
         </div>
     </div>
+
+    {% if match.players|length or match.substitutes|length %}
+        <div class="match-player-stats">
+            <div class="match-player-row head">
+                <span>Titulaire</span>
+                <span>Role</span>
+                <span></span>
+                <span>Remplacant</span>
+                <span>Role</span>
+            </div>
+
+            {% for player in match.players %}
+                <div class="match-player-row">
+                    <span>{{ player.pseudo }}</span>
+                    <span>{{ player.grade }}</span>
+                    <span></span>
+                    <span>-</span>
+                    <span>-</span>
+                </div>
+            {% endfor %}
+
+            {% for substitute in match.substitutes %}
+                <div class="match-player-row">
+                    <span>-</span>
+                    <span>-</span>
+                    <span></span>
+                    <span>{{ substitute.pseudo }}</span>
+                    <span>{{ substitute.grade }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') and match.players|length %}
+        <form class="match-result-form" data-endpoint="{{ path('admin_content_match_result', { id: match.id }) }}">
+            <div class="match-result-form-grid">
+                <select name="result">
+                    <option value="">A venir</option>
+                    <option value="Victory" {{ match.result == 'Victory' ? 'selected' : '' }}>Victory</option>
+                    <option value="Defeat" {{ match.result == 'Defeat' ? 'selected' : '' }}>Defeat</option>
+                </select>
+                <input name="score" placeholder="Score final" value="{{ match.score }}">
+            </div>
+
+            <div class="match-player-stats-editor">
+                {% for player in match.players %}
+                    {% set stat = statsByPlayer[player.id] ?? null %}
+                    <div class="match-stat-row" data-player-id="{{ player.id }}">
+                        <span>{{ player.pseudo }}</span>
+                        <input type="number" min="0" value="{{ stat ? stat.kills : 0 }}" data-stat="kills" aria-label="Kills {{ player.pseudo }}">
+                        <input type="number" min="0" value="{{ stat ? stat.deaths : 0 }}" data-stat="deaths" aria-label="Morts {{ player.pseudo }}">
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="match-result-submit">Enregistrer le resultat</button>
+        </form>
+    {% endif %}
 
     <div class="match-player-stats">
         <div class="match-player-row head">
             <span>Joueur</span>
-            <span>Rôle</span>
+            <span>Role</span>
             <span>Kills</span>
             <span>Deaths</span>
             <span>K/D</span>

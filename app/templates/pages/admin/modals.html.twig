@@ -1,15 +1,15 @@
 {% if is_granted('ROLE_ADMIN') %}
     <div class="admin-modal" id="add-news">
         <div class="admin-modal-box">
-            <button class="admin-modal-close">×</button>
-            <h2>Ajouter une actualité</h2>
+            <button class="admin-modal-close">x</button>
+            <h2>Ajouter une actualite</h2>
 
             <form class="admin-form" data-endpoint="{{ path('admin_content_news') }}">
                 <input name="title" placeholder="Titre" required>
                 <input name="author" placeholder="Auteur" required>
                 <input name="date" type="date" required>
                 <input name="image" placeholder="URL image" required>
-                <input name="excerpt" placeholder="Résumé" required>
+                <input name="excerpt" placeholder="Resume" required>
                 <textarea name="content" placeholder="Contenu" required></textarea>
                 <button type="submit">Ajouter</button>
             </form>
@@ -18,7 +18,7 @@
 
     <div class="admin-modal" id="add-player">
         <div class="admin-modal-box">
-            <button class="admin-modal-close">×</button>
+            <button class="admin-modal-close">x</button>
             <h2>Ajouter un joueur</h2>
 
             <form class="admin-form" data-endpoint="{{ path('admin_content_player') }}">
@@ -34,7 +34,6 @@
 
                 <input name="grade" placeholder="Grade" required>
                 <input name="game" placeholder="Jeu principal" required>
-
                 <input name="socials" placeholder='{"twitter":"pseudo"}' value="{}">
 
                 <button type="submit">Ajouter</button>
@@ -44,15 +43,15 @@
 
     <div class="admin-modal" id="add-roster">
         <div class="admin-modal-box">
-            <button class="admin-modal-close">×</button>
+            <button class="admin-modal-close">x</button>
             <h2>Ajouter un roster</h2>
 
             <form class="admin-form" data-endpoint="{{ path('admin_content_roster') }}">
                 <input name="name" placeholder="Nom" required>
                 <input name="game" placeholder="Jeu" required>
-                <input name="banner" placeholder="URL bannière" required>
+                <input name="banner" placeholder="URL banniere" required>
                 <input name="wins" type="number" placeholder="Victoires" value="0" required>
-                <input name="losses" type="number" placeholder="Défaites" value="0" required>
+                <input name="losses" type="number" placeholder="Defaites" value="0" required>
                 <input name="winrate" placeholder="Winrate" value="0%" required>
                 <button type="submit">Ajouter</button>
             </form>
@@ -61,13 +60,13 @@
 
     <div class="admin-modal" id="add-event">
         <div class="admin-modal-box">
-            <button class="admin-modal-close">×</button>
+            <button class="admin-modal-close">x</button>
             <h2>Ajouter un event</h2>
 
             <form class="admin-form" data-endpoint="{{ path('admin_content_event') }}">
                 <input name="title" placeholder="Titre" required>
 
-                <select name="type" required>
+                <select name="type" id="event-type" required>
                     <option value="training">Entrainement</option>
                     <option value="meeting">Reunion</option>
                     <option value="tournament">Tournoi</option>
@@ -77,6 +76,37 @@
                 <input name="date" type="date" required>
                 <input name="time" placeholder="19:00" required>
                 <textarea name="description" placeholder="Description" required></textarea>
+
+                <div id="event-players-fields" class="event-players-fields" style="display: none;">
+                    <div class="admin-form-group">
+                        <label>Capitaine</label>
+                        <select name="captain">
+                            <option value="">Choisir un capitaine</option>
+                            {% for player in players|default([]) %}
+                                <option value="{{ player.id }}">{{ player.pseudo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Joueurs titulaires</label>
+                        <select name="players[]" class="select-custom-multiple" multiple data-placeholder="Rechercher un joueur...">
+                            {% for player in players|default([]) %}
+                                <option value="{{ player.id }}">{{ player.pseudo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Remplacants</label>
+                        <select name="substitutes[]" class="select-custom-multiple" multiple data-placeholder="Rechercher un remplacant...">
+                            {% for player in players|default([]) %}
+                                <option value="{{ player.id }}">{{ player.pseudo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
                 <button type="submit">Ajouter</button>
             </form>
         </div>
@@ -84,10 +114,118 @@
 
     <div class="admin-modal" id="add-match">
         <div class="admin-modal-box">
-            <button class="admin-modal-close">×</button>
+            <button class="admin-modal-close">x</button>
             <h2>Ajouter un match</h2>
 
-            <p>Pour les matchs avec équipes/rosters en relation Doctrine, il faut charger les listes depuis la base. Je te conseille de faire ce formulaire en Twig Symfony avec `form_start()` ensuite.</p>
+            <form class="admin-form" data-endpoint="{{ path('admin_content_match') }}">
+                <input name="playedAt" type="date" required>
+                <input name="playedTime" placeholder="Heure du match, ex: 21:00" value="21:00" required>
+
+                <select name="teamA" required>
+                    <option value="">Equipe A</option>
+                    {% for team in teams|default([]) %}
+                        <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="teamB" required>
+                    <option value="">Equipe B</option>
+                    {% for team in teams|default([]) %}
+                        <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="roster" required>
+                    <option value="">Roster</option>
+                    {% for roster in rosters|default([]) %}
+                        <option value="{{ roster.id }}">{{ roster.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="tournament" id="match-tournament">
+                    <option value="">Aucun tournoi</option>
+                    {% for tournament in tournaments|default([]) %}
+                        <option value="{{ tournament.id }}">{{ tournament.title }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="admin-form-group">
+                    <label>Capitaine du match</label>
+                    <select name="captain" id="match-captain">
+                        <option value="">Choisir un capitaine</option>
+                        {% for player in players|default([]) %}
+                            <option value="{{ player.id }}">{{ player.pseudo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Joueurs du match</label>
+                    <select name="players[]" id="match-players" class="select-custom-multiple" multiple data-placeholder="Rechercher un joueur...">
+                        {% for player in players|default([]) %}
+                            <option value="{{ player.id }}">{{ player.pseudo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Remplacants du match</label>
+                    <select name="substitutes[]" id="match-substitutes" class="select-custom-multiple" multiple data-placeholder="Rechercher un remplacant...">
+                        {% for player in players|default([]) %}
+                            <option value="{{ player.id }}">{{ player.pseudo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="match-swap-tools">
+                    <div class="admin-form-group">
+                        <label>Passer un titulaire remplacant</label>
+                        <div class="match-swap-row">
+                            <select id="match-player-to-substitute"></select>
+                            <button type="button" class="admin-secondary-btn" data-match-swap="player-to-substitute">Passer</button>
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Passer un remplacant titulaire</label>
+                        <div class="match-swap-row">
+                            <select id="match-substitute-to-player"></select>
+                            <button type="button" class="admin-secondary-btn" data-match-swap="substitute-to-player">Passer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Joueurs adverses</label>
+                    <textarea name="opponents" placeholder="Pseudo1, Pseudo2, Pseudo3..."></textarea>
+                </div>
+
+                <select name="game" required>
+                    <option value="Warzone">Warzone</option>
+                    <option value="CDL">CDL</option>
+                    <option value="Tournament">Tournament</option>
+                </select>
+
+                <input name="mode" placeholder="Mode (ex: Hardpoint, SnD, Control)" required>
+                <input name="mapName" placeholder="Map (ex: Raid, Terminal, Highrise...)">
+
+                <select name="result">
+                    <option value="">Match pas encore termine</option>
+                    <option value="Victory">Victory</option>
+                    <option value="Defeat">Defeat</option>
+                </select>
+
+                <input name="score" placeholder="Score final (ex: 3-1)">
+
+                <div class="admin-form-group">
+                    <label>Stats des joueurs</label>
+                    <div id="match-player-stats" class="match-player-stats-editor">
+                        <p class="match-stats-empty">Selectionne les titulaires du match pour saisir les kills et morts.</p>
+                    </div>
+                </div>
+
+                <button type="submit">Ajouter</button>
+            </form>
         </div>
     </div>
 {% endif %}

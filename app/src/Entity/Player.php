@@ -31,7 +31,7 @@ class Player
     #[ORM\Column(type: 'json')]
     private array $socials = [];
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'players')]
     private ?Roster $roster = null;
 
     public function getId(): ?int

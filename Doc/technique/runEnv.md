@@ -35,6 +35,7 @@ vendor/bin/php-cs-fixer fix --dry-run --diff (en gros cette commande avant de co
 # 4. Front‑end (dans le conteneur Node)
 docker exec -it symfony_node bash
 yarn install (une fois seule)
+npm install tom-select (une fois seule)
 # En dev :
 yarn watch
 # Ou build :

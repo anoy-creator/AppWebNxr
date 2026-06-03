@@ -22,7 +22,7 @@
 
         <article class="stat-card">
             <strong class="text-red">{{ defeats }}</strong>
-            <p>Défaites</p>
+            <p>Defaites</p>
         </article>
 
         <article class="stat-card">
@@ -54,36 +54,32 @@
                     <th>Jeu</th>
                     <th>Mode</th>
                     <th>Score</th>
-                    <th>Résultat</th>
+                    <th>Resultat</th>
                 </tr>
             </thead>
 
             <tbody id="matches-table-body">
                 {% for match in games %}
                     <tr class="js-match-row" data-match-id="{{ match.id }}">
-                        <td>{{ match.playedAt ? match.playedAt|date('d/m/Y') : '-' }}</td>
-
+                        <td>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : '-' }}</td>
                         <td>
                             {{ match.teamA ? match.teamA.name : 'TBA' }}
                             vs
                             {{ match.teamB ? match.teamB.name : 'TBA' }}
                         </td>
-
                         <td>{{ match.roster ? match.roster.name : '-' }}</td>
-
                         <td>
                             <span class="pill">{{ match.game }}</span>
                         </td>
-
-                        <td>{{ match.mode }}</td>
-
-                        <td>{{ match.score }}</td>
-
+                        <td>{{ match.mapName ? match.mode ~ ' - ' ~ match.mapName : match.mode }}</td>
+                        <td>{{ match.score ?: '-' }}</td>
                         <td class="match-result-cell">
                             {% if match.result == 'Victory' %}
                                 <span class="result win">Victoire</span>
                             {% elseif match.result == 'Defeat' %}
-                                <span class="result loss">Défaite</span>
+                                <span class="result loss">Defaite</span>
+                            {% elseif match.result is empty %}
+                                <span class="result">A venir</span>
                             {% else %}
                                 <span class="result">{{ match.result }}</span>
                             {% endif %}

@@ -115,7 +115,7 @@ const loadProfileAjax = async () => {
         }
     } catch (error) {
         console.error(error);
-        $content.html('<p>Erreur réseau</p>');
+        $content.html('<p>Erreur reseau</p>');
     } finally {
         setLoading(false);
     }

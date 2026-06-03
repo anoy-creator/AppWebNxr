@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Event;
+use App\Entity\Player;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -25,13 +27,37 @@ class EventType extends AbstractType
                     'Match officiel' => 'match',
                 ],
             ])
-            ->add('date', DateType::class, ['widget' => 'single_text'])
+            ->add('date', DateType::class, [
+                'widget' => 'single_text',
+            ])
             ->add('time', TextType::class)
-            ->add('description', TextareaType::class);
+            ->add('description', TextareaType::class)
+            ->add('captain', EntityType::class, [
+                'class' => Player::class,
+                'choice_label' => 'pseudo',
+                'required' => false,
+                'placeholder' => 'Choisir un capitaine',
+            ])
+            ->add('players', EntityType::class, [
+                'class' => Player::class,
+                'choice_label' => 'pseudo',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+            ])
+            ->add('substitutes', EntityType::class, [
+                'class' => Player::class,
+                'choice_label' => 'pseudo',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Event::class]);
+        $resolver->setDefaults([
+            'data_class' => Event::class,
+        ]);
     }
 }

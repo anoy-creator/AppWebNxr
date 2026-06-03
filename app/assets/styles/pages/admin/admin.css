@@ -215,6 +215,186 @@
     box-shadow: 0 12px 30px rgba(123, 46, 255, .35);
 }
 
+.admin-secondary-btn {
+    min-width: 88px;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    border: 0;
+    border-radius: 10px !important;
+    background: rgba(123, 46, 255, .35) !important;
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.match-swap-tools {
+    display: grid;
+    gap: 12px;
+}
+
+.match-swap-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.match-player-stats-editor {
+    display: grid;
+    gap: 8px;
+}
+
+.match-stat-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 86px 86px;
+    gap: 8px;
+    align-items: center;
+}
+
+.match-stat-row span {
+    color: #fff;
+    font-weight: 800;
+}
+
+.match-stat-row input {
+    min-width: 0;
+}
+
+.match-stats-empty {
+    margin: 0;
+    color: rgba(255, 255, 255, .6);
+    font-size: .9rem;
+}
+
+.match-result-form {
+    display: grid;
+    gap: 12px;
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .04);
+}
+
+.match-result-form-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+}
+
+.match-result-form select,
+.match-result-form input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    background: #15101f;
+    color: #fff;
+}
+
+.match-result-submit {
+    width: fit-content;
+    padding: 11px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #7c2cff;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.event-players-fields {
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.admin-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-form-group label {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* =========================
+   TOM SELECT
+========================= */
+
+.admin-form .ts-wrapper {
+    width: 100%;
+}
+
+.admin-form .ts-control {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 12px 14px !important;
+    background: rgba(255, 255, 255, .06) !important;
+    border: 1px solid rgba(255, 255, 255, .12) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    color: #fff !important;
+}
+
+.admin-form .ts-control input {
+    width: auto !important;
+    min-width: 140px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+.admin-form .ts-control input::placeholder {
+    color: rgba(255, 255, 255, .45) !important;
+}
+
+.admin-form .ts-dropdown {
+    z-index: 10002;
+    background: #15101f !important;
+    border: 1px solid rgba(255, 255, 255, .12) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+    color: #fff !important;
+}
+
+.admin-form .ts-dropdown .option {
+    color: #fff !important;
+    padding: 12px 14px !important;
+}
+
+.admin-form .ts-dropdown .active {
+    background: rgba(123, 46, 255, .25) !important;
+    color: #fff !important;
+}
+
+.admin-form .ts-control .item {
+    background: transparent !important;
+    color: #fff !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.admin-form .select-custom-multiple + .ts-wrapper .item {
+    background: #7c2cff !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    padding: 4px 10px !important;
+    margin: 2px !important;
+}
+
+.admin-form .select-custom,
+.admin-form .select-custom-multiple {
+    width: 100%;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */

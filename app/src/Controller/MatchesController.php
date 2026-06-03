@@ -43,10 +43,16 @@ class MatchesController extends AbstractController
             ->setParameter('match', $match)
             ->getQuery()
             ->getResult();
+        $statsByPlayer = [];
+
+        foreach ($stats as $stat) {
+            $statsByPlayer[$stat->getPlayer()->getId()] = $stat;
+        }
 
         return $this->render('pages/matches/_match_details.html.twig', [
             'match' => $match,
             'stats' => $stats,
+            'statsByPlayer' => $statsByPlayer,
         ]);
     }
 }

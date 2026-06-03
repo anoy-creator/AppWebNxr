@@ -7,9 +7,25 @@
     <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Doc/technique/runEnv.md" beforeDir="false" afterPath="$PROJECT_DIR$/Doc/technique/runEnv.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/node_modules/.package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/assets/js/pages/admin/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/js/pages/admin/admin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/admin/admin.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/admin/admin.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Controller/Admin/AdminController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Controller/AdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/AdminController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Controller/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Controller/MatchesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/MatchesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Entity/Event.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Entity/Event.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Entity/GameMatch.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Entity/GameMatch.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Entity/Player.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Entity/Player.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Form/EventType.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Form/EventType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/Form/GameMatchType.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Form/GameMatchType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/pages/admin/modals.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/admin/modals.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/pages/matches/_match_details.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/matches/_match_details.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/pages/matches/_matches.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/matches/_matches.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/pages/schedule/_scheduleMatch_details.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/schedule/_scheduleMatch_details.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,61 +88,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000964405898272" />
-      <entry key="MS500" value="1.1573446466881072" />
-      <entry key="S2" value="1.629814989973712" />
-      <entry key="S5" value="1.8311638865815878" />
-      <entry key="S10" value="1.9137286894441625" />
-      <entry key="S30" value="2.2082943661693433" />
-      <entry key="S60" value="3.275945422066299" />
-      <entry key="M2" value="9.462048771864946" />
-      <entry key="M5" value="35.07838046823513" />
-      <entry key="M10" value="59.864824477325605" />
-      <entry key="M15" value="72.27123174237622" />
-      <entry key="M30" value="88.90033392477619" />
-      <entry key="H1" value="109.7109400479235" />
-      <entry key="H2" value="155.0498797745497" />
-      <entry key="H4" value="229.2693097893458" />
-      <entry key="D1" value="558.1762283581621" />
-      <entry key="W1" value="809.5006393711614" />
+      <entry key="MS100" value="1.619323718763999" />
+      <entry key="MS500" value="3.4139128389511204" />
+      <entry key="S2" value="6.526819315905765" />
+      <entry key="S5" value="13.496447157738695" />
+      <entry key="S10" value="20.515305242845827" />
+      <entry key="S30" value="28.907141971015605" />
+      <entry key="S60" value="31.755809113008432" />
+      <entry key="M2" value="33.38932070653398" />
+      <entry key="M5" value="39.08971743801089" />
+      <entry key="M10" value="56.738741001718935" />
+      <entry key="M15" value="71.94245195618046" />
+      <entry key="M30" value="98.64217267401432" />
+      <entry key="H1" value="127.8525363580817" />
+      <entry key="H2" value="177.65609422512696" />
+      <entry key="H4" value="254.923065675403" />
+      <entry key="D1" value="589.3214390530968" />
+      <entry key="W1" value="843.6997878319135" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="1.182307768148431E-228" />
-      <entry key="S2" value="1.0427558524464826E-57" />
-      <entry key="S5" value="1.611973115748371E-23" />
-      <entry key="S10" value="4.070627090128792E-12" />
-      <entry key="S30" value="1.9720940098109384E-4" />
-      <entry key="S60" value="0.018807922348935843" />
-      <entry key="M2" value="0.19471208512495178" />
-      <entry key="M5" value="0.885987051449298" />
-      <entry key="M10" value="1.5747598395052786" />
-      <entry key="M15" value="1.9348166957269033" />
-      <entry key="M30" value="2.3984332237331607" />
-      <entry key="H1" value="2.734367223367243" />
-      <entry key="H2" value="3.372877478564271" />
-      <entry key="H4" value="4.761955108158789" />
-      <entry key="D1" value="11.133697484198207" />
-      <entry key="W1" value="15.8234172370857" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="1.2083628576811106E-187" />
+      <entry key="S5" value="1.709872340495587E-75" />
+      <entry key="S10" value="4.1924149870571965E-38" />
+      <entry key="S30" value="4.2907044037505465E-13" />
+      <entry key="S60" value="8.772862329512917E-7" />
+      <entry key="M2" value="0.0013298208965299904" />
+      <entry key="M5" value="0.12055562335915472" />
+      <entry key="M10" value="0.580890641411766" />
+      <entry key="M15" value="0.9951606437652943" />
+      <entry key="M30" value="1.7201024504350195" />
+      <entry key="H1" value="2.3156354048143526" />
+      <entry key="H2" value="3.103896536273571" />
+      <entry key="H4" value="4.568131869258813" />
+      <entry key="D1" value="11.056855639555666" />
+      <entry key="W1" value="15.807769598663539" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="7.249867388513437E-4" />
-      <entry key="MS500" value="0.2769392877588649" />
-      <entry key="S2" value="1.1477411373708464" />
-      <entry key="S5" value="1.59266805808501" />
-      <entry key="S10" value="1.7851138719646604" />
-      <entry key="S30" value="2.1632528657795476" />
-      <entry key="S60" value="3.2714396336208247" />
-      <entry key="M2" value="9.643473317558387" />
-      <entry key="M5" value="35.95620393199114" />
-      <entry key="M10" value="61.43379315446326" />
-      <entry key="M15" value="74.20153206344261" />
-      <entry key="M30" value="91.29605455026251" />
-      <entry key="H1" value="112.44374855379668" />
-      <entry key="H2" value="158.42179343180845" />
-      <entry key="H4" value="234.03058326170594" />
-      <entry key="D1" value="569.3095924711031" />
-      <entry key="W1" value="825.3239834979336" />
+      <entry key="MS100" value="1.539449121024871" />
+      <entry key="MS500" value="3.3614000460233036" />
+      <entry key="S2" value="6.5034794832221205" />
+      <entry key="S5" value="13.478685021575538" />
+      <entry key="S10" value="20.501577571167438" />
+      <entry key="S30" value="28.90044008673156" />
+      <entry key="S60" value="31.75207910612451" />
+      <entry key="M2" value="33.38858890306446" />
+      <entry key="M5" value="39.20834687497459" />
+      <entry key="M10" value="57.31708309476795" />
+      <entry key="M15" value="72.93501370293315" />
+      <entry key="M30" value="100.3601912218592" />
+      <entry key="H1" value="130.16678236669537" />
+      <entry key="H2" value="180.7590690824573" />
+      <entry key="H4" value="259.49052628453995" />
+      <entry key="D1" value="600.3779607263289" />
+      <entry key="W1" value="859.5074839788324" />
     </decayedShown>
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
@@ -300,7 +316,7 @@
       <workItem from="1780219512094" duration="11772000" />
       <workItem from="1780256426820" duration="7539000" />
       <workItem from="1780271365118" duration="31357000" />
-      <workItem from="1780477896281" duration="2600000" />
+      <workItem from="1780477896281" duration="8573000" />
     </task>
     <servers />
   </component>

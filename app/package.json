@@ -17,6 +17,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "jquery": "^4.0.0"
+        "jquery": "^4.0.0",
+        "tom-select": "^2.6.1"
     }
 }
