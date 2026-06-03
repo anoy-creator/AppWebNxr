@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="" />
+    <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Doc/technique/runEnv.md" beforeDir="false" afterPath="$PROJECT_DIR$/Doc/technique/runEnv.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/package.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,7 +31,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="3238" />
+    <option name="cachedIndexableFilesCount" value="4195" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -50,12 +56,12 @@
     &quot;assignee&quot;: &quot;anoy-creator&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/anoy-creator/AppWebNxr&quot;,
-    &quot;accountId&quot;: &quot;a4469737-0506-461f-8993-18d601347be9&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/anoy-creator/AppWebNxr.git",
+    "accountId": "a4469737-0506-461f-8993-18d601347be9"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -66,61 +72,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="2.643569361255353E-58" />
-      <entry key="MS500" value="1.2499060538152438E-11" />
-      <entry key="S2" value="0.013679450582872295" />
-      <entry key="S5" value="1.2258740908355041" />
-      <entry key="S10" value="6.106656952646532" />
-      <entry key="S30" value="21.350438542492626" />
-      <entry key="S60" value="33.80921356468463" />
-      <entry key="M2" value="49.530665898789934" />
-      <entry key="M5" value="70.77896983002383" />
-      <entry key="M10" value="82.5286828700403" />
-      <entry key="M15" value="87.37648314416055" />
-      <entry key="M30" value="94.21475615609523" />
-      <entry key="H1" value="109.69743030529844" />
-      <entry key="H2" value="152.65283298267846" />
-      <entry key="H4" value="225.4100522952671" />
-      <entry key="D1" value="551.8615707121435" />
-      <entry key="W1" value="801.8501573679022" />
+      <entry key="MS100" value="1.0000964405898272" />
+      <entry key="MS500" value="1.1573446466881072" />
+      <entry key="S2" value="1.629814989973712" />
+      <entry key="S5" value="1.8311638865815878" />
+      <entry key="S10" value="1.9137286894441625" />
+      <entry key="S30" value="2.2082943661693433" />
+      <entry key="S60" value="3.275945422066299" />
+      <entry key="M2" value="9.462048771864946" />
+      <entry key="M5" value="35.07838046823513" />
+      <entry key="M10" value="59.864824477325605" />
+      <entry key="M15" value="72.27123174237622" />
+      <entry key="M30" value="88.90033392477619" />
+      <entry key="H1" value="109.7109400479235" />
+      <entry key="H2" value="155.0498797745497" />
+      <entry key="H4" value="229.2693097893458" />
+      <entry key="D1" value="558.1762283581621" />
+      <entry key="W1" value="809.5006393711614" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0000000005319465" />
-      <entry key="S5" value="1.0001951403849743" />
-      <entry key="S10" value="1.0139692657278099" />
-      <entry key="S30" value="1.2408390090645136" />
-      <entry key="S60" value="1.491882897018509" />
-      <entry key="M2" value="1.7341627912507591" />
-      <entry key="M5" value="2.1247417773747435" />
-      <entry key="M10" value="2.4386738527417022" />
-      <entry key="M15" value="2.589799168603726" />
-      <entry key="M30" value="2.7748579896500694" />
-      <entry key="H1" value="2.941124471908216" />
-      <entry key="H2" value="3.4980728368680305" />
-      <entry key="H4" value="4.849527631818042" />
-      <entry key="D1" value="11.167563751651317" />
-      <entry key="W1" value="15.830284199929702" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="1.182307768148431E-228" />
+      <entry key="S2" value="1.0427558524464826E-57" />
+      <entry key="S5" value="1.611973115748371E-23" />
+      <entry key="S10" value="4.070627090128792E-12" />
+      <entry key="S30" value="1.9720940098109384E-4" />
+      <entry key="S60" value="0.018807922348935843" />
+      <entry key="M2" value="0.19471208512495178" />
+      <entry key="M5" value="0.885987051449298" />
+      <entry key="M10" value="1.5747598395052786" />
+      <entry key="M15" value="1.9348166957269033" />
+      <entry key="M30" value="2.3984332237331607" />
+      <entry key="H1" value="2.734367223367243" />
+      <entry key="H2" value="3.372877478564271" />
+      <entry key="H4" value="4.761955108158789" />
+      <entry key="D1" value="11.133697484198207" />
+      <entry key="W1" value="15.8234172370857" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="6.31031655584713E-4" />
-      <entry key="MS500" value="0.22909216118118492" />
-      <entry key="S2" value="0.7054762496241983" />
-      <entry key="S5" value="2.0876223577120174" />
-      <entry key="S10" value="7.044961899557615" />
-      <entry key="S30" value="22.55661350924419" />
-      <entry key="S60" value="35.27918119440023" />
-      <entry key="M2" value="51.25122289456549" />
-      <entry key="M5" value="72.89583058211558" />
-      <entry key="M10" value="84.96225432501343" />
-      <entry key="M15" value="89.96248677935804" />
-      <entry key="M30" value="96.98745903323449" />
-      <entry key="H1" value="112.63733805866619" />
-      <entry key="H2" value="156.15012863656358" />
-      <entry key="H4" value="230.25899513411568" />
-      <entry key="D1" value="563.0288180583765" />
-      <entry key="W1" value="817.6803709882812" />
+      <entry key="MS100" value="7.249867388513437E-4" />
+      <entry key="MS500" value="0.2769392877588649" />
+      <entry key="S2" value="1.1477411373708464" />
+      <entry key="S5" value="1.59266805808501" />
+      <entry key="S10" value="1.7851138719646604" />
+      <entry key="S30" value="2.1632528657795476" />
+      <entry key="S60" value="3.2714396336208247" />
+      <entry key="M2" value="9.643473317558387" />
+      <entry key="M5" value="35.95620393199114" />
+      <entry key="M10" value="61.43379315446326" />
+      <entry key="M15" value="74.20153206344261" />
+      <entry key="M30" value="91.29605455026251" />
+      <entry key="H1" value="112.44374855379668" />
+      <entry key="H2" value="158.42179343180845" />
+      <entry key="H4" value="234.03058326170594" />
+      <entry key="D1" value="569.3095924711031" />
+      <entry key="W1" value="825.3239834979336" />
     </decayedShown>
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
@@ -233,37 +239,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "copilot.sensitive.folder.allow.file_read.C:/Users/elli/IdeaProjects/AppWebNxr/bot": "true",
-    "disable.download.node.interpreter.editor.notification": "true",
-    "git-widget-placeholder": "main",
-    "git.auto.fetch.suggestion.counter": "1",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Selli/IdeaProjects/AppWebNxr/bot",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "php.add.doc.comment.for.fields.panel.add.php.doc.for.all.properties": "true",
-    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;copilot.sensitive.folder.allow.file_read.C:/Users/elli/IdeaProjects/AppWebNxr/bot&quot;: &quot;true&quot;,
+    &quot;disable.download.node.interpreter.editor.notification&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Selli/IdeaProjects/AppWebNxr/bot&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;php.add.doc.comment.for.fields.panel.add.php.doc.for.all.properties&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mariadb"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mariadb&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Selli\IdeaProjects\AppWebNxr\bot" />
@@ -294,6 +300,7 @@
       <workItem from="1780219512094" duration="11772000" />
       <workItem from="1780256426820" duration="7539000" />
       <workItem from="1780271365118" duration="31357000" />
+      <workItem from="1780477896281" duration="2600000" />
     </task>
     <servers />
   </component>

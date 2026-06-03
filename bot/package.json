@@ -1,5 +1,5 @@
 {
-  "name": "energiewarappweb",
+  "name": "NxrBot",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.17.0",
     "discord.js": "^14.21.0",
     "dotenv": "^17.2.1",
     "mysql2": "^3.14.3",

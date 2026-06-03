@@ -3,6 +3,12 @@
 
 # 1 conteneur du bot
 docker exec -it discord_bot bash
+
+npm install axios
+npm start
+
+# 2 cmd bot
+
 # APPWEB
 # 1. Récupérer la branche principale et créer la branche locale
 git checkout main
