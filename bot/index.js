@@ -9,7 +9,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.TOKEN;
-const PREFIX = process.env.PREFIX || '!nxr';
 
 if (!TOKEN || TOKEN === '#') {
     console.error('TOKEN manquant ou invalide dans le .env');
@@ -19,9 +18,6 @@ if (!TOKEN || TOKEN === '#') {
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
     ],
 });
 
@@ -37,7 +33,7 @@ for (const file of commandFiles) {
     const commandPath = path.join(commandsPath, file);
     const { default: command } = await import(pathToFileURL(commandPath).href);
 
-    if (!command?.name || !command?.execute) {
+    if (!command?.name || (!command.execute && !command.executeInteraction)) {
         console.warn(`Commande ignoree : ${file}`);
         continue;
     }
@@ -55,7 +51,7 @@ for (const file of commandFiles) {
 
 client.once('ready', () => {
     console.log(`Bot connecte : ${client.user.tag}`);
-    console.log(`Prefixe : ${PREFIX}`);
+    console.log('Mode commandes slash uniquement');
     startSiteWebhookServer();
 });
 
@@ -132,27 +128,6 @@ function startSiteWebhookServer() {
         console.error('Impossible de demarrer le webhook site:', error.message);
     });
 }
-
-client.on('messageCreate', async message => {
-    if (message.author.bot) return;
-    if (!message.guild) return;
-    if (!message.content.startsWith(PREFIX)) return;
-
-    const args = message.content.slice(PREFIX.length).trim().split(/ +/);
-    const commandName = args.shift()?.toLowerCase();
-
-    if (!commandName) return;
-
-    const command = client.commands.get(commandName);
-    if (!command) return;
-
-    try {
-        await command.execute(message, args, client);
-    } catch (error) {
-        console.error(error);
-        await message.reply('Une erreur est survenue.');
-    }
-});
 
 client.on('interactionCreate', async interaction => {
     try {

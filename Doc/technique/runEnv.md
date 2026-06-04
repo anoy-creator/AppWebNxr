@@ -1,74 +1,120 @@
-﻿# Commandes rapides — workflow pour les contributeurs
-# BOTDISCORD
+﻿# 🚀 Guide rapide pour les contributeurs
 
-# 1 conteneur du bot
-docker exec -it discord_bot bash
+## 1. Récupérer le projet
 
-npm install axios
-npm start
+```bash
+git clone <url-du-repo>
+cd <nom-du-projet>
 
-# 2 cmd bot
-
-# APPWEB
-# 1. Récupérer la branche principale et créer la branche locale
 git checkout main
 git pull origin main
+```
 
-git checkout -b feature/nom-feature
+## 2. Démarrer l'environnement Docker
 
-# 2. Démarrer les conteneurs Docker (env recommandé)
+Construire et lancer tous les conteneurs :
+
+```bash
 docker compose down
 docker compose up -d --build
+```
 
-# 3. Back‑end (dans le conteneur PHP)
+## 3. Créer sa branche de travail
+
+```bash
+git checkout -b feature/nom-feature
+```
+
+---
+
+## 4. Initialiser le Back-end
+
+```bash
 docker exec -it symfony_php bash
-# Installer dépendances PHP (une seule fois ou après  , mettre a jour la bdd , load les données de test)
+
 composer install
-php bin/console do:sc:up --force
+
+php bin/console doctrine:database:create --if-not-exists
+php bin/console doctrine:schema:update --force
 php bin/console doctrine:fixtures:load
+```
 
-# Vérifier et afficher les corrections de style (dry-run)
-docker exec -it symfony_php bash
-vendor/bin/php-cs-fixer fix --dry-run --diff (en gros cette commande avant de commit)
-# (Optionnel) Appliquer automatiquement : vendor/bin/php-cs-fixer fix
+---
 
-# 4. Front‑end (dans le conteneur Node)
+## 5. Initialiser le Front-end
+
+```bash
 docker exec -it symfony_node bash
-yarn install (une fois seule)
-npm install tom-select (une fois seule)
-# En dev :
+
+yarn install
+npm install tom-select
+```
+
+---
+
+## 6. Développement
+
+### Front
+
+```bash
+docker exec -it symfony_node bash
 yarn watch
-# Ou build :
-yarn build
+```
 
-# 5. Symfony CLI (optionnel, local sans Docker)
-# depuis le dossier app
-cd app
-symfony server:start
-# arrêter : symfony server:stop
-cd ..
+### Back
 
-# 6. Base de données (migrations)
+Le conteneur PHP est déjà prêt à recevoir les modifications Symfony.
+
+# 🤖 BOTDISCORD
+
+## Accéder au conteneur
+
+```bash
+docker exec -it discord_bot bash
+```
+
+```
+docker exec discord_bot npm run deploy:commands
+docker compose restart discord_bot
+docker exec symfony_php php bin/console cache:clear
+```
+
+---
+
+## 7. Vérification du code
+
+Avant chaque commit :
+
+```bash
 docker exec -it symfony_php bash
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate -n
-exit
 
-# 7. Tests
-# (dans conteneur PHP)
+vendor/bin/php-cs-fixer fix --dry-run --diff
+```
+
+---
+
+## 8. Tests
+
+```bash
 docker exec -it symfony_php bash
+
 vendor/bin/phpunit --testdox
+```
 
-exit
+---
 
-# 8. Git : commit & push
+## 9. Commit & Push
+
+```bash
 git add .
 git commit -m "feat: description courte"
 git push --set-upstream origin feature/nom-feature
+```
 
-# 9. Ouvrir PR via GitHub (compare feature/nom-feature → main)
+---
 
-# Notes
-- Docker = environnement recommandé pour cohérence entre contributeurs.
-- Symfony CLI utile pour tests rapides locaux mais pas pour CI.
-- Ne pas committer /vendor ni /node_modules.
+## 10. Créer une Pull Request
+
+```text
+feature/nom-feature → main
+```

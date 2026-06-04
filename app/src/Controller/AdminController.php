@@ -123,13 +123,13 @@ class AdminController extends AbstractController
     public function editData(string $type, int $id, EntityManagerInterface $em): JsonResponse
     {
         if (!in_array($type, self::EditableTypes, true)) {
-            throw $this->createNotFoundException('Type introuvable');
+            return $this->json(['message' => 'Element introuvable ou non modifiable'], 404);
         }
 
         $entity = $this->findEditableEntity($em, $type, $id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Element introuvable');
+            return $this->json(['message' => 'Element introuvable ou non modifiable'], 404);
         }
 
         $values = $this->normalizeEditableEntity($entity);
@@ -161,7 +161,7 @@ class AdminController extends AbstractController
     public function editSave(string $type, int $id, Request $request, EntityManagerInterface $em): JsonResponse
     {
         if (!in_array($type, self::EditableTypes, true)) {
-            throw $this->createNotFoundException('Type introuvable');
+            return $this->json(['message' => 'Element introuvable ou non modifiable'], 404);
         }
 
         $data = $this->decodeJsonPayload($request);
@@ -173,7 +173,7 @@ class AdminController extends AbstractController
         $entity = $this->findEditableEntity($em, $type, $id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Element introuvable');
+            return $this->json(['message' => 'Element introuvable ou non modifiable'], 404);
         }
 
         if ($entity instanceof News) {
@@ -472,6 +472,8 @@ class AdminController extends AbstractController
         foreach ($this->findPlayers($em, $data['substitutes'] ?? []) as $player) {
             $event->addSubstitute($player);
         }
+
+        $event->setRosterEntries([]);
     }
 
     /**
@@ -515,7 +517,7 @@ class AdminController extends AbstractController
 
         $payload = [
             'siteEventId' => $event->getId(),
-            'botTournoiId' => $this->extractBotTournoiId($event),
+            'botTournoiId' => $event->getDiscordExternalId() ?? $this->extractBotTournoiId($event),
             'title' => $event->getTitle(),
             'date' => $event->getDate()?->format('d/m/Y'),
             'heure' => $event->getTime(),

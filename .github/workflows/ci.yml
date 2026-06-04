@@ -11,9 +11,32 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: symfony_test
+          MARIADB_USER: symfony
+          MARIADB_PASSWORD: symfony
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -usymfony -psymfony"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
     defaults:
       run:
         working-directory: app
+
+    env:
+      APP_ENV: test
+      API_KEY: test-api-key
+      DATABASE_URL: mysql://symfony:symfony@127.0.0.1:3306/symfony_test?serverVersion=11&charset=utf8mb4
+      PANTHER_CHROME_ARGUMENTS: --no-sandbox --disable-dev-shm-usage
+      RUN_PANTHER: "1"
 
     steps:
       - name: Checkout repository
@@ -34,31 +57,53 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
       - name: Validate composer.json
         run: composer validate --no-check-publish
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
       - name: Check coding standards
         run: |
           if [ -f vendor/bin/php-cs-fixer ]; then
             vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
           else
-            echo "php-cs-fixer non installé, étape ignorée."
+            echo "php-cs-fixer non installe, etape ignoree."
           fi
 
       - name: Run PHPStan
         run: |
           if [ -f vendor/bin/phpstan ]; then
-            vendor/bin/phpstan analyse src --no-progress || true
+            vendor/bin/phpstan analyse src --no-progress --memory-limit=512M || true
           else
-            echo "PHPStan non installé, étape ignorée."
+            echo "PHPStan non installe, etape ignoree."
           fi
 
       - name: Prepare test environment
         run: |
-          cp .env.test .env.test.local || true
+          php bin/console doctrine:schema:update --force --env=test
+          php bin/console lint:yaml config
+          php bin/console lint:twig templates
+          php bin/console lint:container
 
       - name: Run PHPUnit
         run: |

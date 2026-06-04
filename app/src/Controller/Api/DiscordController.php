@@ -91,16 +91,16 @@ class DiscordController extends AbstractController
         }
 
         $tournois = $this->normalizeTournoisPayload($payload);
-        $createdEvents = [];
+        $syncedEvents = [];
 
         foreach ($tournois as $tournoiData) {
             if (($tournoiData['status'] ?? 'active') === 'cancelled') {
                 continue;
             }
 
-            $event = new Event();
             try {
-                $date = $this->buildTournamentDate($tournoiData);
+                $event = $this->findTournamentEvent($entityManager, $tournoiData) ?? new Event();
+                $this->syncTournamentEvent($event, $tournoiData, $discordAccountLinker);
             } catch (\InvalidArgumentException $exception) {
                 return $this->json([
                     'success' => false,
@@ -108,48 +108,8 @@ class DiscordController extends AbstractController
                 ], 400);
             }
 
-            $time = (string) ($tournoiData['heure'] ?? $date->format('H:i'));
-            $format = $this->normalizeTournamentFormat($tournoiData['format'] ?? null);
-
-            if (null === $format) {
-                return $this->json([
-                    'success' => false,
-                    'message' => sprintf('Format de tournoi invalide. Formats autorises: %s', implode(', ', Event::TournamentFormats)),
-                ], 400);
-            }
-
-            $event
-                ->setType(Event::Tournoi)
-                ->setTitle(sprintf('Tournoi %s', $format))
-                ->setTournamentFormat($format)
-                ->setDescription(sprintf('Tournoi importe depuis Discord. ID bot: %s', $tournoiData['id'] ?? 'inconnu'))
-                ->setDate($date)
-                ->setTime($time);
-
-            if (!empty($tournoiData['captain'])) {
-                $event->setCaptain(
-                    $discordAccountLinker->findOrCreatePlayerByDiscordId((string) $tournoiData['captain'])
-                );
-            }
-
-            foreach ($tournoiData['players'] ?? [] as $discordId) {
-                if ($discordId) {
-                    $event->addPlayer(
-                        $discordAccountLinker->findOrCreatePlayerByDiscordId((string) $discordId)
-                    );
-                }
-            }
-
-            foreach ($tournoiData['substitutes'] ?? [] as $discordId) {
-                if ($discordId) {
-                    $event->addSubstitute(
-                        $discordAccountLinker->findOrCreatePlayerByDiscordId((string) $discordId)
-                    );
-                }
-            }
-
             $entityManager->persist($event);
-            $createdEvents[] = $event;
+            $syncedEvents[] = $event;
         }
 
         $entityManager->flush();
@@ -164,9 +124,60 @@ class DiscordController extends AbstractController
                     'format' => $event->getTournamentFormat(),
                     'date' => $event->getDate()?->format('Y-m-d'),
                     'time' => $event->getTime(),
+                    'checkins' => $event->getCheckins(),
                 ],
-                $createdEvents
+                $syncedEvents
             ),
+        ]);
+    }
+
+    #[Route('/tournoi-checkin', name: 'api_discord_tournoi_checkin', methods: ['POST'])]
+    public function tournoiCheckin(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        if (!$this->isValidApiKey($request)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'API key invalide',
+            ], 401);
+        }
+
+        $data = $this->decodeJsonRequest($request);
+        if (null === $data) {
+            return $this->json([
+                'success' => false,
+                'message' => 'JSON invalide',
+            ], 400);
+        }
+
+        $discordId = trim((string) ($data['discordId'] ?? ''));
+        $status = trim((string) ($data['status'] ?? ''));
+
+        if ('' === $discordId || !in_array($status, ['available', 'unavailable'], true)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'discordId et status valide sont obligatoires',
+            ], 400);
+        }
+
+        $event = $this->findTournamentEvent($entityManager, $data);
+
+        if (!$event) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Tournoi site introuvable',
+            ], 404);
+        }
+
+        $event->setCheckin($discordId, $status);
+        $entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => 'Presence tournoi synchronisee',
+            'event' => [
+                'id' => $event->getId(),
+                'checkins' => $event->getCheckins(),
+            ],
         ]);
     }
 
@@ -312,6 +323,255 @@ class DiscordController extends AbstractController
         }
 
         return [$payload];
+    }
+
+    /**
+     * @param array<string, mixed> $tournoiData
+     */
+    private function findTournamentEvent(EntityManagerInterface $entityManager, array $tournoiData): ?Event
+    {
+        $siteEventId = $tournoiData['siteEventId'] ?? $tournoiData['eventId'] ?? null;
+
+        if ($siteEventId) {
+            $event = $entityManager->getRepository(Event::class)->find((int) $siteEventId);
+
+            if ($event instanceof Event) {
+                return $event;
+            }
+        }
+
+        $botTournoiId = trim((string) ($tournoiData['botTournoiId'] ?? $tournoiData['id'] ?? ''));
+
+        if ('' === $botTournoiId) {
+            return null;
+        }
+
+        $event = $entityManager->getRepository(Event::class)
+            ->findOneBy(['discordExternalId' => $botTournoiId]);
+
+        if ($event instanceof Event) {
+            return $event;
+        }
+
+        return $entityManager->getRepository(Event::class)
+            ->createQueryBuilder('event')
+            ->andWhere('event.type = :type')
+            ->andWhere('event.description LIKE :botId')
+            ->setParameter('type', Event::Tournoi)
+            ->setParameter('botId', sprintf('%%ID bot: %s%%', $botTournoiId))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @param array<string, mixed> $tournoiData
+     */
+    private function syncTournamentEvent(
+        Event $event,
+        array $tournoiData,
+        DiscordAccountLinker $discordAccountLinker,
+    ): void {
+        $date = $this->buildTournamentDate($tournoiData);
+        $time = (string) ($tournoiData['heure'] ?? $date->format('H:i'));
+        $format = $this->normalizeTournamentFormat($tournoiData['format'] ?? null);
+
+        if (null === $format) {
+            throw new \InvalidArgumentException(sprintf('Format de tournoi invalide. Formats autorises: %s', implode(', ', Event::TournamentFormats)));
+        }
+
+        $botTournoiId = trim((string) ($tournoiData['botTournoiId'] ?? $tournoiData['id'] ?? 'inconnu'));
+        $title = trim((string) ($tournoiData['title'] ?? ''));
+
+        $event
+            ->setType(Event::Tournoi)
+            ->setTitle('' !== $title ? $title : sprintf('Tournoi %s', $format))
+            ->setTournamentFormat($format)
+            ->setDiscordExternalId($botTournoiId)
+            ->setDescription('Tournoi importe depuis Discord.')
+            ->setDate($date)
+            ->setTime($time);
+
+        $captainDiscordId = trim((string) ($tournoiData['captain'] ?? ''));
+        $event->setCaptain(null);
+
+        if ('' !== $captainDiscordId) {
+            $event->setCaptain($this->findOrCreateTournamentPlayer($discordAccountLinker, $captainDiscordId, $tournoiData));
+        }
+
+        $players = array_values(array_filter(
+            $this->normalizeDiscordIds($tournoiData['players'] ?? [], true),
+            fn (string $discordId) => $discordId !== $captainDiscordId,
+        ));
+        $substitutes = array_values(array_filter(
+            $this->normalizeDiscordIds($tournoiData['substitutes'] ?? [], true),
+            fn (string $discordId) => $discordId !== $captainDiscordId && !in_array($discordId, $players, true),
+        ));
+
+        foreach ($event->getPlayers()->toArray() as $player) {
+            $event->removePlayer($player);
+        }
+
+        foreach ($event->getSubstitutes()->toArray() as $substitute) {
+            $event->removeSubstitute($substitute);
+        }
+
+        foreach ($players as $discordId) {
+            $event->addPlayer($this->findOrCreateTournamentPlayer($discordAccountLinker, $discordId, $tournoiData));
+        }
+
+        foreach ($substitutes as $discordId) {
+            $event->addSubstitute($this->findOrCreateTournamentPlayer($discordAccountLinker, $discordId, $tournoiData));
+        }
+
+        if (isset($tournoiData['checkins']) && is_array($tournoiData['checkins'])) {
+            $event->setCheckins($this->normalizeCheckins($tournoiData['checkins']));
+        }
+
+        $event->setRosterEntries($this->buildTournamentRosterEntries($discordAccountLinker, $tournoiData, $captainDiscordId));
+    }
+
+    /**
+     * @param array<string, mixed> $tournoiData
+     */
+    private function findOrCreateTournamentPlayer(
+        DiscordAccountLinker $discordAccountLinker,
+        string $discordId,
+        array $tournoiData,
+    ): \App\Entity\Player {
+        $profile = $this->findDiscordMemberProfile($tournoiData, $discordId);
+
+        return $discordAccountLinker->findOrCreatePlayerByDiscordId(
+            $discordId,
+            $profile['displayName'] ?? $profile['username'] ?? $discordId,
+            $profile['avatar'] ?? null,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $tournoiData
+     *
+     * @return array<string, string>
+     */
+    private function findDiscordMemberProfile(array $tournoiData, string $discordId): array
+    {
+        $members = $tournoiData['members'] ?? [];
+
+        if (is_array($members) && isset($members[$discordId]) && is_array($members[$discordId])) {
+            return array_filter([
+                'username' => isset($members[$discordId]['username']) ? (string) $members[$discordId]['username'] : null,
+                'displayName' => isset($members[$discordId]['displayName']) ? (string) $members[$discordId]['displayName'] : null,
+                'avatar' => isset($members[$discordId]['avatar']) ? (string) $members[$discordId]['avatar'] : null,
+            ], static fn (?string $value) => null !== $value && '' !== $value);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<string, mixed> $tournoiData
+     *
+     * @return list<array<string, string>>
+     */
+    private function buildTournamentRosterEntries(
+        DiscordAccountLinker $discordAccountLinker,
+        array $tournoiData,
+        string $captainDiscordId,
+    ): array {
+        $entries = [];
+
+        if ('' !== $captainDiscordId) {
+            $entries[] = $this->buildTournamentRosterEntry(
+                $discordAccountLinker,
+                $tournoiData,
+                $captainDiscordId,
+                'Capitaine',
+            );
+        }
+
+        foreach ($this->normalizeDiscordIds($tournoiData['players'] ?? [], false) as $discordId) {
+            $entries[] = $this->buildTournamentRosterEntry(
+                $discordAccountLinker,
+                $tournoiData,
+                $discordId,
+                'Titulaire',
+            );
+        }
+
+        foreach ($this->normalizeDiscordIds($tournoiData['substitutes'] ?? [], false) as $discordId) {
+            $entries[] = $this->buildTournamentRosterEntry(
+                $discordAccountLinker,
+                $tournoiData,
+                $discordId,
+                'Remplacant',
+            );
+        }
+
+        return $entries;
+    }
+
+    /**
+     * @param array<string, mixed> $tournoiData
+     *
+     * @return array<string, string>
+     */
+    private function buildTournamentRosterEntry(
+        DiscordAccountLinker $discordAccountLinker,
+        array $tournoiData,
+        string $discordId,
+        string $role,
+    ): array {
+        $player = $this->findOrCreateTournamentPlayer($discordAccountLinker, $discordId, $tournoiData);
+
+        return [
+            'discordId' => $discordId,
+            'pseudo' => $player->getPseudo(),
+            'grade' => $player->getGrade(),
+            'role' => $role,
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function normalizeDiscordIds(mixed $ids, bool $unique = true): array
+    {
+        if (!is_array($ids)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($ids as $id) {
+            $id = trim((string) $id);
+
+            if ('' !== $id) {
+                $normalized[] = $id;
+            }
+        }
+
+        return $unique ? array_values(array_unique($normalized)) : $normalized;
+    }
+
+    /**
+     * @param array<string, mixed> $checkins
+     *
+     * @return array<string, string>
+     */
+    private function normalizeCheckins(array $checkins): array
+    {
+        $normalized = [];
+
+        foreach ($checkins as $discordId => $status) {
+            $discordId = trim((string) $discordId);
+            $status = trim((string) $status);
+
+            if ('' !== $discordId && in_array($status, ['available', 'unavailable'], true)) {
+                $normalized[$discordId] = $status;
+            }
+        }
+
+        return $normalized;
     }
 
     /**

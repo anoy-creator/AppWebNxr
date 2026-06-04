@@ -8,6 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DiscordAccountLinker
 {
+    private const DefaultDiscordAdminRoleId = '1511390117384949996';
+
+    /**
+     * @var array<string, Player>
+     */
+    private array $playersByDiscordId = [];
+
     public function __construct(private EntityManagerInterface $entityManager)
     {
     }
@@ -18,6 +25,8 @@ class DiscordAccountLinker
         $username = $this->readString($data, 'username') ?? $discordId;
         $displayName = $this->readString($data, 'displayName') ?? $username;
         $avatar = $this->readString($data, 'avatar');
+        $email = $this->readString($data, 'email');
+        $discriminator = $this->readString($data, 'discriminator');
 
         $userRepository = $this->entityManager->getRepository(User::class);
         $user = $userRepository->findOneBy(['discordId' => $discordId]) ?? new User();
@@ -26,8 +35,12 @@ class DiscordAccountLinker
             ->setDiscordId($discordId)
             ->setDiscordName($displayName)
             ->setUsername($username)
-            ->setAvatar($avatar)
+            ->setDiscriminator($discriminator)
+            ->setEmail($email ?? $user->getEmail())
+            ->setAvatar($avatar ?? $user->getAvatar())
             ->setLastLoginAt(new \DateTimeImmutable());
+
+        $this->syncRolesFromDiscord($user, $data);
 
         $player = $this->findOrCreatePlayer($discordId, $displayName, $avatar);
         $user->setPlayer($player);
@@ -60,6 +73,10 @@ class DiscordAccountLinker
 
     private function findOrCreatePlayer(string $discordId, string $pseudo, ?string $avatar): Player
     {
+        if (isset($this->playersByDiscordId[$discordId])) {
+            return $this->playersByDiscordId[$discordId];
+        }
+
         $playerRepository = $this->entityManager->getRepository(Player::class);
         $player = $playerRepository->findOneBy(['discordId' => $discordId]);
 
@@ -83,12 +100,29 @@ class DiscordAccountLinker
         $socials = $player->getSocials();
         $socials['discord'] = $discordId;
 
+        if (!$isNewPlayer && $this->shouldRefreshPseudoFromDiscord($player, $discordId, $pseudo)) {
+            $player->setPseudo($pseudo);
+        }
+
         $player
             ->setDiscordId($discordId)
-            ->setAvatar($isNewPlayer ? ($avatar ?? '') : ($player->getAvatar() ?: ($avatar ?? '')))
+            ->setAvatar($isNewPlayer ? ($avatar ?? '') : ($avatar ?? $player->getAvatar()))
             ->setSocials($socials);
 
+        $this->playersByDiscordId[$discordId] = $player;
+
         return $player;
+    }
+
+    private function shouldRefreshPseudoFromDiscord(Player $player, string $discordId, string $pseudo): bool
+    {
+        if ('' === trim($pseudo) || $pseudo === $discordId) {
+            return false;
+        }
+
+        $currentPseudo = $player->getPseudo();
+
+        return $currentPseudo === $discordId || 1 === preg_match('/^\d{15,22}$/', $currentPseudo);
     }
 
     private function findPlayerBySocialDiscordId(string $discordId): ?Player
@@ -100,6 +134,61 @@ class DiscordAccountLinker
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function syncRolesFromDiscord(User $user, array $data): void
+    {
+        if (!$this->hasDiscordAdminRole($data)) {
+            return;
+        }
+
+        $roles = $user->getRoles();
+        $roles[] = 'ROLE_ADMIN';
+
+        $user->setRoles(array_values(array_unique($roles)));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function hasDiscordAdminRole(array $data): bool
+    {
+        if (true === ($data['isAdmin'] ?? false)) {
+            return true;
+        }
+
+        $adminRoleId = $this->readEnv('DISCORD_ADMIN_ROLE_ID') ?? self::DefaultDiscordAdminRoleId;
+        $roles = $data['roles'] ?? [];
+
+        if (!is_array($roles)) {
+            return false;
+        }
+
+        foreach ($roles as $role) {
+            if (is_array($role) && $adminRoleId === (string) ($role['id'] ?? '')) {
+                return true;
+            }
+
+            if (!is_array($role) && $adminRoleId === (string) $role) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function readEnv(string $name): ?string
+    {
+        $value = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name);
+
+        if (false === $value || null === $value || '' === $value) {
+            return null;
+        }
+
+        return trim((string) $value);
     }
 
     private function readRequiredString(array $data, string $key): string

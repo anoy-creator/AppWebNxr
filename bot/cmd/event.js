@@ -34,7 +34,20 @@ function parseDateTime(date, heure) {
 
 function hasCaptainRole(interaction) {
     const roleName = process.env.CAPITAINE_ROLE_NAME || 'Capitaine';
-    return interaction.member.roles.cache.some(role => role.name === roleName);
+    const roleId = process.env.CAPITAINE_ROLE_ID;
+    const roles = interaction.member?.roles;
+
+    if (roles?.cache) {
+        return roles.cache.some(role =>
+            role.name === roleName || (roleId && role.id === roleId),
+        );
+    }
+
+    if (Array.isArray(roles)) {
+        return Boolean(roleId && roles.includes(roleId));
+    }
+
+    return false;
 }
 
 async function checkCommandChannel(interaction) {

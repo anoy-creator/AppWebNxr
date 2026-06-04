@@ -19,7 +19,7 @@
             {% if event.tournamentFormat %}
                 <p>Format: {{ event.tournamentFormat }}</p>
             {% endif %}
-            <p>{{ event.description }}</p>
+            <p>{{ event.publicDescription }}</p>
         </div>
 
         <div class="schedule-detail-date">
@@ -46,47 +46,113 @@
 
         <span>
             <strong>Participants</strong>
-            {% if event.players|length %}
-                {{ event.players|length }} joueur(s)
+            {% set relationParticipantsCount = (event.captain ? 1 : 0) + event.players|length + event.substitutes|length %}
+            {% set participantsCount = event.rosterEntries|length ? event.rosterEntries|length : relationParticipantsCount %}
+            {% if participantsCount %}
+                {{ participantsCount }} joueur(s)
             {% else %}
                 Staff / joueurs concernes
             {% endif %}
         </span>
     </div>
 
-    {% if event.captain or event.players|length or event.substitutes|length %}
+    {% if event.rosterEntries|length or event.captain or event.players|length or event.substitutes|length %}
         <h4>Composition</h4>
 
         <div class="schedule-player-list">
+            {% if event.rosterEntries|length %}
+                {% for entry in event.rosterEntries %}
+                    {% set checkin = event.checkins[entry.discordId]|default(null) %}
+                    <div class="schedule-player-row">
+                        <span>{{ entry.pseudo }}</span>
+                        <span>{{ entry.grade|default('Membre') }}</span>
+                        <span>{{ entry.role }}</span>
+                        <span>Presence</span>
+                        <span
+                            class="schedule-checkin schedule-checkin--{{ checkin ?: 'pending' }}"
+                            title="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                            aria-label="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                        >
+                            {% if checkin == 'available' %}
+                                ✓
+                            {% elseif checkin == 'unavailable' %}
+                                ✕
+                            {% else %}
+                                ?
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endfor %}
+            {% else %}
             {% if event.captain %}
+                {% set checkin = event.checkinForPlayer(event.captain) %}
                 <div class="schedule-player-row">
                     <span>{{ event.captain.pseudo }}</span>
                     <span>{{ event.captain.grade }}</span>
                     <span>Capitaine</span>
-                    <span>-</span>
-                    <span>-</span>
+                    <span>Presence</span>
+                    <span
+                        class="schedule-checkin schedule-checkin--{{ checkin ?: 'pending' }}"
+                        title="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                        aria-label="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                    >
+                        {% if checkin == 'available' %}
+                            ✓
+                        {% elseif checkin == 'unavailable' %}
+                            ✕
+                        {% else %}
+                            ?
+                        {% endif %}
+                    </span>
                 </div>
             {% endif %}
 
             {% for player in event.players %}
+                {% set checkin = event.checkinForPlayer(player) %}
                 <div class="schedule-player-row">
                     <span>{{ player.pseudo }}</span>
                     <span>{{ player.grade }}</span>
                     <span>Titulaire</span>
-                    <span>-</span>
-                    <span>-</span>
+                    <span>Presence</span>
+                    <span
+                        class="schedule-checkin schedule-checkin--{{ checkin ?: 'pending' }}"
+                        title="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                        aria-label="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                    >
+                        {% if checkin == 'available' %}
+                            ✓
+                        {% elseif checkin == 'unavailable' %}
+                            ✕
+                        {% else %}
+                            ?
+                        {% endif %}
+                    </span>
                 </div>
             {% endfor %}
 
             {% for substitute in event.substitutes %}
+                {% set checkin = event.checkinForPlayer(substitute) %}
                 <div class="schedule-player-row">
                     <span>{{ substitute.pseudo }}</span>
                     <span>{{ substitute.grade }}</span>
                     <span>Remplacant</span>
-                    <span>-</span>
-                    <span>-</span>
+                    <span>Presence</span>
+                    <span
+                        class="schedule-checkin schedule-checkin--{{ checkin ?: 'pending' }}"
+                        title="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                        aria-label="{% if checkin == 'available' %}Confirme{% elseif checkin == 'unavailable' %}Indisponible{% else %}En attente{% endif %}"
+                    >
+                        {% if checkin == 'available' %}
+                            ✓
+                        {% elseif checkin == 'unavailable' %}
+                            ✕
+                        {% else %}
+                            ?
+                        {% endif %}
+                    </span>
                 </div>
             {% endfor %}
+            {% endif %}
         </div>
     {% endif %}
 
@@ -109,6 +175,6 @@
     <h4>Description</h4>
 
     <div class="schedule-detail-description">
-        {{ event.description|nl2br }}
+        {{ event.publicDescription|nl2br }}
     </div>
 </div>

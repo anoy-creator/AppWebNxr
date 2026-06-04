@@ -1,3 +1,8 @@
 knpu_oauth2_client:
     clients:
-        # configure your clients as described here: https://github.com/knpuniversity/oauth2-client-bundle#configuration
+        discord:
+            type: discord
+            client_id: '%env(OAUTH_DISCORD_CLIENT_ID)%'
+            client_secret: '%env(OAUTH_DISCORD_CLIENT_SECRET)%'
+            redirect_route: connect_discord_check
+            redirect_params: {}

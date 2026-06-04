@@ -115,7 +115,20 @@ function extractMentionIds(input) {
     return [...input.matchAll(/<@!?(\d+)>/g)].map(match => match[1]);
 }
 
+function uniqueIds(ids) {
+    return [...new Set((ids || []).filter(Boolean).map(String))];
+}
+
+function normalizeTournamentRoster(tournoi) {
+    tournoi.players = (tournoi.players || []).filter(Boolean).map(String);
+    tournoi.substitutes = (tournoi.substitutes || []).filter(Boolean).map(String);
+
+    return tournoi;
+}
+
 function getAllTournamentUsers(tournoi) {
+    normalizeTournamentRoster(tournoi);
+
     return [...new Set([
         tournoi.captain,
         ...(tournoi.players || []),
@@ -125,6 +138,7 @@ function getAllTournamentUsers(tournoi) {
 
 function getStatusForUser(tournoi, userId) {
     if (tournoi.captain === userId) return 'Capitaine';
+    if ((tournoi.players || []).includes(userId)) return 'Titulaire';
     if ((tournoi.substitutes || []).includes(userId)) return 'Remplacant';
     return 'Joueur';
 }
@@ -132,10 +146,10 @@ function getStatusForUser(tournoi, userId) {
 function getCheckinIcon(tournoi, userId) {
     const status = tournoi.checkins?.[userId];
 
-    if (status === 'available') return 'OK';
-    if (status === 'unavailable') return 'NON';
+    if (status === 'available') return '✓';
+    if (status === 'unavailable') return '✕';
 
-    return '...';
+    return '?';
 }
 
 function buildCheckinButtons(tournoiId) {
@@ -153,7 +167,20 @@ function buildCheckinButtons(tournoiId) {
 
 function hasCaptainRole(interaction) {
     const roleName = process.env.CAPITAINE_ROLE_NAME || 'Capitaine';
-    return interaction.member.roles.cache.some(role => role.name === roleName);
+    const roleId = process.env.CAPITAINE_ROLE_ID;
+    const roles = interaction.member?.roles;
+
+    if (roles?.cache) {
+        return roles.cache.some(role =>
+            role.name === roleName || (roleId && role.id === roleId),
+        );
+    }
+
+    if (Array.isArray(roles)) {
+        return Boolean(roleId && roles.includes(roleId));
+    }
+
+    return false;
 }
 
 function hasCaptainRoleMessage(message) {
@@ -211,7 +238,40 @@ async function sendLog(client, message) {
     await channel.send(message).catch(() => null);
 }
 
-async function syncTournamentWithSite(tournoi) {
+async function getDiscordMemberDetails(client, tournoi) {
+    const details = {};
+    const guildId = process.env.GUILD_ID || process.env.DISCORD_GUILD_ID || process.env.SERVER_ID;
+    const guild = guildId
+        ? await client.guilds.fetch(guildId).catch(() => null)
+        : client.guilds.cache.first();
+
+    for (const userId of getAllTournamentUsers(tournoi)) {
+        const member = guild ? await guild.members.fetch(userId).catch(() => null) : null;
+        const user = member?.user || await client.users.fetch(userId).catch(() => null);
+        const displayName = member?.displayName || user?.globalName || user?.username || userId;
+
+        details[userId] = {
+            discordId: userId,
+            username: user?.username || displayName,
+            displayName,
+            avatar: user?.displayAvatarURL({ size: 256 }) || member?.displayAvatarURL?.({ size: 256 }) || null,
+        };
+    }
+
+    return details;
+}
+
+async function buildTournamentSitePayload(tournoi, client) {
+    normalizeTournamentRoster(tournoi);
+
+    return {
+        ...tournoi,
+        botTournoiId: tournoi.id,
+        members: await getDiscordMemberDetails(client, tournoi),
+    };
+}
+
+async function syncTournamentWithSite(tournoi, client) {
     if (!process.env.ROUTE_API || process.env.ROUTE_API === '#' || !process.env.API_KEY || process.env.API_KEY === '#') {
         return {
             success: false,
@@ -222,7 +282,7 @@ async function syncTournamentWithSite(tournoi) {
     try {
         const response = await axios.post(
             `${process.env.ROUTE_API}/discord/add-tournois`,
-            tournoi,
+            await buildTournamentSitePayload(tournoi, client),
             {
                 headers: {
                     'x-api-key': process.env.API_KEY,
@@ -237,6 +297,44 @@ async function syncTournamentWithSite(tournoi) {
         };
     } catch (error) {
         console.error('Erreur synchronisation site :', error.response?.data || error.message);
+
+        return {
+            success: false,
+            message: error.response?.data?.message || error.message,
+        };
+    }
+}
+
+async function syncTournamentCheckinWithSite(tournoi, userId, status) {
+    if (!process.env.ROUTE_API || process.env.ROUTE_API === '#' || !process.env.API_KEY || process.env.API_KEY === '#') {
+        return {
+            success: false,
+            message: 'API du site non configuree',
+        };
+    }
+
+    try {
+        const response = await axios.post(
+            `${process.env.ROUTE_API}/discord/tournoi-checkin`,
+            {
+                siteEventId: tournoi.siteEventId || null,
+                botTournoiId: tournoi.id,
+                discordId: userId,
+                status,
+            },
+            {
+                headers: {
+                    'x-api-key': process.env.API_KEY,
+                },
+            },
+        );
+
+        return {
+            success: true,
+            message: response.data?.message || 'Presence synchronisee',
+        };
+    } catch (error) {
+        console.error('Erreur synchronisation presence site :', error.response?.data || error.message);
 
         return {
             success: false,
@@ -277,6 +375,7 @@ async function handleSiteTournamentUpdate(client, payload) {
     tournoi.captain = payload.captain || tournoi.captain || null;
     tournoi.players = Array.isArray(payload.players) ? payload.players.filter(Boolean).map(String) : (tournoi.players || []);
     tournoi.substitutes = Array.isArray(payload.substitutes) ? payload.substitutes.filter(Boolean).map(String) : (tournoi.substitutes || []);
+    normalizeTournamentRoster(tournoi);
     tournoi.checkins = tournoi.checkins || {};
     tournoi.reminder24hSent = false;
     tournoi.reminder2hSent = false;
@@ -329,7 +428,7 @@ function buildRosterEmbed(tournois) {
         '**ANNONCE ROSTER - TOURNOIS NxR**\n\n' +
         'Les rosters pour les tournois sont desormais confirmes.\n' +
         'Merci aux joueurs selectionnes d etre presents et prets avant le debut de la rencontre.\n\n' +
-        'OK = confirme | NON = indisponible | ... = en attente\n\n';
+        '✓ = confirme | ✕ = indisponible | ? = en attente\n\n';
 
     if (activeTournois.length === 0) {
         description += 'Aucun tournoi prevu pour le moment.\n';
@@ -343,7 +442,7 @@ function buildRosterEmbed(tournois) {
             '------------------------------\n\n' +
             `**Tournoi prevu ${jour} a ${heure} en ${tournoi.format || 'format non precise'}**\n\n` +
             '**Capitaine :**\n' +
-            `${getCheckinIcon(tournoi, tournoi.captain)} <@${tournoi.captain}>\n\n` +
+            `${tournoi.captain ? `${getCheckinIcon(tournoi, tournoi.captain)} <@${tournoi.captain}>` : 'Aucun'}\n\n` +
             '**Joueurs titulaires :**\n' +
             `${tournoi.players?.length
                 ? tournoi.players.map(id => `${getCheckinIcon(tournoi, id)} <@${id}>`).join('\n')
@@ -351,8 +450,7 @@ function buildRosterEmbed(tournois) {
             '**Remplacant(e)s :**\n' +
             `${tournoi.substitutes?.length
                 ? tournoi.substitutes.map(id => `${getCheckinIcon(tournoi, id)} <@${id}>`).join('\n')
-                : 'Aucun'}\n\n` +
-            `ID tournoi : \`${tournoi.id}\`\n\n`;
+                : 'Aucun'}\n\n`;
     }
 
     description +=
@@ -428,6 +526,7 @@ async function handleCheckin(interaction, client) {
 
     saveTournois(tournois);
     await updateRosterBoard(client, tournois);
+    const siteSync = await syncTournamentCheckinWithSite(tournoi, userId, status);
 
     if (status === 'unavailable') {
         await sendLog(
@@ -441,10 +540,21 @@ async function handleCheckin(interaction, client) {
         );
     }
 
+    if (!siteSync.success) {
+        await sendLog(
+            client,
+            '**Presence non synchronisee avec le site**\n' +
+            `Tournoi : \`${tournoi.id}\`\n` +
+            `Joueur : <@${userId}>\n` +
+            `Statut : **${status}**\n` +
+            `Erreur : ${siteSync.message}`,
+        );
+    }
+
     await interaction.reply({
         content: status === 'available'
-            ? 'Presence confirmee.'
-            : 'Indisponibilite enregistree. Un capitaine sera prevenu.',
+            ? `Presence confirmee.${siteSync.success ? '' : ' Synchronisation site en erreur, un log a ete envoye.'}`
+            : `Indisponibilite enregistree. Un capitaine sera prevenu.${siteSync.success ? '' : ' Synchronisation site en erreur, un log a ete envoye.'}`,
         ephemeral: true,
     });
 
@@ -540,12 +650,13 @@ async function executeAddMessage(message, args, client) {
         reminder24hSent: false,
         reminder2hSent: false,
     };
+    normalizeTournamentRoster(tournoi);
 
     const tournois = loadTournois();
     tournois.push(tournoi);
     saveTournois(tournois);
     await updateRosterBoard(client, tournois);
-    const siteSync = await syncTournamentWithSite(tournoi);
+    const siteSync = await syncTournamentWithSite(tournoi, client);
 
     if (siteSync.success && siteSync.event?.id) {
         tournoi.siteEventId = String(siteSync.event.id);
@@ -569,7 +680,7 @@ async function executeAddMessage(message, args, client) {
             [buildCheckinButtons(tournoi.id)],
         );
 
-        dmResults.push(`${success ? 'OK' : 'NON'} <@${userId}>`);
+        dmResults.push(`${success ? '✓' : '✕'} <@${userId}>`);
     }
 
     await sendLog(
@@ -588,8 +699,8 @@ async function executeAddMessage(message, args, client) {
         `Date : **${formatDateFR(tournoi.timestamp)}**\n` +
         `Format : **${tournoi.format}**\n` +
         `Capitaine : <@${tournoi.captain}>\n` +
-        `Joueurs : ${playerIds.map(id => `<@${id}>`).join(', ')}\n` +
-        `Remplacants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
+        `Joueurs : ${tournoi.players.length ? tournoi.players.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n` +
+        `Remplacants : ${tournoi.substitutes.length ? tournoi.substitutes.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
         `Site : ${siteSync.success ? `event cree (${siteSync.event?.title || `Tournoi ${format}`})` : `non synchronise - ${siteSync.message}`}\n` +
         `MP envoyes : ${dmResults.join(', ')}`,
     );
@@ -701,9 +812,11 @@ async function executeModifyMessage(message, args, client) {
     tournoi.reminder2hSent = false;
     tournoi.updatedBy = message.author.id;
     tournoi.updatedAt = Date.now();
+    normalizeTournamentRoster(tournoi);
 
     saveTournois(tournois);
     await updateRosterBoard(client, tournois);
+    const siteSync = await syncTournamentWithSite(tournoi, client);
 
     return message.reply(
         '**Tournoi modifie**\n\n' +
@@ -712,7 +825,8 @@ async function executeModifyMessage(message, args, client) {
         `Format : **${tournoi.format || 'Non precise'}**\n` +
         `Capitaine : <@${tournoi.captain}>\n` +
         `Joueurs : ${(tournoi.players || []).map(userId => `<@${userId}>`).join(', ')}\n` +
-        `Remplacants : ${tournoi.substitutes?.length ? tournoi.substitutes.map(userId => `<@${userId}>`).join(', ') : 'Aucun'}`,
+        `Remplacants : ${tournoi.substitutes?.length ? tournoi.substitutes.map(userId => `<@${userId}>`).join(', ') : 'Aucun'}\n` +
+        `Site : ${siteSync.success ? 'synchronise' : `non synchronise - ${siteSync.message}`}`,
     );
 }
 
@@ -803,11 +917,12 @@ async function executeInteraction(interaction, client) {
             reminder24hSent: false,
             reminder2hSent: false,
         };
+        normalizeTournamentRoster(tournoi);
 
         tournois.push(tournoi);
         saveTournois(tournois);
         await updateRosterBoard(client, tournois);
-        const siteSync = await syncTournamentWithSite(tournoi);
+        const siteSync = await syncTournamentWithSite(tournoi, client);
 
         if (siteSync.success && siteSync.event?.id) {
             tournoi.siteEventId = String(siteSync.event.id);
@@ -831,7 +946,7 @@ async function executeInteraction(interaction, client) {
                 [buildCheckinButtons(tournoi.id)],
             );
 
-            dmResults.push(`${success ? 'OK' : 'NON'} <@${userId}>`);
+            dmResults.push(`${success ? '✓' : '✕'} <@${userId}>`);
         }
 
         await sendLog(
@@ -851,8 +966,8 @@ async function executeInteraction(interaction, client) {
                 `Date : **${formatDateFR(tournoi.timestamp)}**\n` +
                 `Format : **${tournoi.format}**\n` +
                 `Capitaine : <@${tournoi.captain}>\n` +
-                `Joueurs : ${playerIds.map(id => `<@${id}>`).join(', ')}\n` +
-                `Remplacants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
+                `Joueurs : ${tournoi.players.length ? tournoi.players.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n` +
+                `Remplacants : ${tournoi.substitutes.length ? tournoi.substitutes.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
                 `Site : ${siteSync.success ? `event cree (${siteSync.event?.title || 'Tournoi'})` : `non synchronise - ${siteSync.message}`}\n` +
                 `MP envoyes : ${dmResults.join(', ')}`,
         });
@@ -907,7 +1022,7 @@ async function executeInteraction(interaction, client) {
                 'Ceci est un message automatique du Colonel Moutarde.',
             );
 
-            dmResults.push(`${success ? 'OK' : 'NON'} <@${userId}>`);
+            dmResults.push(`${success ? '✓' : '✕'} <@${userId}>`);
         }
 
         await sendLog(
@@ -980,9 +1095,11 @@ async function executeInteraction(interaction, client) {
         tournoi.reminder2hSent = false;
         tournoi.updatedBy = interaction.user.id;
         tournoi.updatedAt = Date.now();
+        normalizeTournamentRoster(tournoi);
 
         saveTournois(tournois);
         await updateRosterBoard(client, tournois);
+        const siteSync = await syncTournamentWithSite(tournoi, client);
 
         const dmResults = [];
 
@@ -1002,7 +1119,7 @@ async function executeInteraction(interaction, client) {
                 [buildCheckinButtons(tournoi.id)],
             );
 
-            dmResults.push(`${success ? 'OK' : 'NON'} <@${userId}>`);
+            dmResults.push(`${success ? '✓' : '✕'} <@${userId}>`);
         }
 
         await sendLog(
@@ -1024,6 +1141,7 @@ async function executeInteraction(interaction, client) {
                 `Capitaine : <@${tournoi.captain}>\n` +
                 `Joueurs : ${(tournoi.players || []).map(id => `<@${id}>`).join(', ')}\n` +
                 `Remplacants : ${tournoi.substitutes?.length ? tournoi.substitutes.map(id => `<@${id}>`).join(', ') : 'Aucun'}\n\n` +
+                `Site : ${siteSync.success ? 'synchronise' : `non synchronise - ${siteSync.message}`}\n` +
                 `MP envoyes : ${dmResults.join(', ')}`,
         });
     }

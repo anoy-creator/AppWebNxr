@@ -320,6 +320,37 @@
     font-weight: 700;
 }
 
+.schedule-checkin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 28px;
+    min-width: 34px;
+    padding: 4px 10px;
+
+    border-radius: 999px;
+
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.schedule-checkin--available {
+    background: rgba(48, 209, 88, .16);
+    color: #6dff95;
+}
+
+.schedule-checkin--unavailable {
+    background: rgba(255, 69, 58, .16);
+    color: #ff8c86;
+}
+
+.schedule-checkin--pending {
+    background: rgba(255, 255, 255, .08);
+    color: #aeb3c4;
+}
+
 /* ==========================================
    INLINE LOADER
 ========================================== */

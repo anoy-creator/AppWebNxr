@@ -9,6 +9,29 @@ const escapeHtml = (value) => String(value)
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 
+const stripHtml = (value) => String(value)
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const readResponsePayload = async (response) => {
+    const text = await response.text();
+
+    if (!text) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        return {
+            message: stripHtml(text),
+        };
+    }
+};
+
 const getTomSelectItems = (selector) => {
     const el = document.querySelector(selector);
     return el?.tomselect ? [...el.tomselect.items] : [];
@@ -347,13 +370,17 @@ const populateForm = (form, values) => {
 };
 
 const openEditModal = async (type, id) => {
+    if (!type || !id) {
+        throw new Error('Element introuvable ou non modifiable');
+    }
+
     const response = await fetch(`/admin/content/edit/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
         },
     });
 
-    const result = await response.json();
+    const result = await readResponsePayload(response);
 
     if (!response.ok) {
         throw new Error(result.message || 'Impossible de charger l element');
@@ -483,7 +510,7 @@ $(document).on('click', '[data-admin-edit]', async function (event) {
         await openEditModal(this.dataset.adminEdit, this.dataset.adminEditId);
     } catch (error) {
         console.error(error);
-        alert('Impossible de charger la modification');
+        alert(error.message || 'Impossible de charger la modification');
     }
 });
 
@@ -555,7 +582,7 @@ $(document).on('submit', '.admin-form', async function (e) {
             body: JSON.stringify(data),
         });
 
-        const result = await response.json();
+        const result = await readResponsePayload(response);
 
         if (!response.ok) {
             alert(result.message || 'Erreur');
@@ -598,7 +625,7 @@ $(document).on('submit', '.match-result-form', async function (e) {
             body: JSON.stringify(data),
         });
 
-        const result = await response.json();
+        const result = await readResponsePayload(response);
 
         if (!response.ok) {
             alert(result.message || 'Erreur');

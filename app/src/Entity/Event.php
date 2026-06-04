@@ -63,6 +63,15 @@ class Event
     #[ORM\Column(length: 3, nullable: true)]
     private ?string $tournamentFormat = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $discordExternalId = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $checkins = [];
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $rosterEntries = [];
+
     #[ORM\ManyToOne(targetEntity: Player::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Player $captain = null;
@@ -159,6 +168,14 @@ class Event
         return $this;
     }
 
+    public function getPublicDescription(): string
+    {
+        $description = trim((string) $this->description);
+        $description = preg_replace('/\s*ID bot:\s*\S+/i', '', $description) ?? $description;
+
+        return trim($description);
+    }
+
     public function getTournamentFormat(): ?string
     {
         return $this->tournamentFormat;
@@ -167,6 +184,75 @@ class Event
     public function setTournamentFormat(?string $tournamentFormat): self
     {
         $this->tournamentFormat = $tournamentFormat;
+
+        return $this;
+    }
+
+    public function getDiscordExternalId(): ?string
+    {
+        return $this->discordExternalId;
+    }
+
+    public function setDiscordExternalId(?string $discordExternalId): self
+    {
+        $discordExternalId = trim((string) ($discordExternalId ?? ''));
+        $this->discordExternalId = '' === $discordExternalId ? null : $discordExternalId;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getCheckins(): array
+    {
+        return $this->checkins ?? [];
+    }
+
+    /**
+     * @param array<string, string> $checkins
+     */
+    public function setCheckins(array $checkins): self
+    {
+        $this->checkins = $checkins;
+
+        return $this;
+    }
+
+    public function setCheckin(string $discordId, string $status): self
+    {
+        $checkins = $this->getCheckins();
+        $checkins[$discordId] = $status;
+        $this->checkins = $checkins;
+
+        return $this;
+    }
+
+    public function getCheckinForPlayer(?Player $player): ?string
+    {
+        $discordId = $player?->getDiscordId();
+
+        if (!$discordId) {
+            return null;
+        }
+
+        return $this->getCheckins()[$discordId] ?? null;
+    }
+
+    /**
+     * @return list<array<string, string>>
+     */
+    public function getRosterEntries(): array
+    {
+        return $this->rosterEntries ?? [];
+    }
+
+    /**
+     * @param list<array<string, string>> $rosterEntries
+     */
+    public function setRosterEntries(array $rosterEntries): self
+    {
+        $this->rosterEntries = $rosterEntries;
 
         return $this;
     }

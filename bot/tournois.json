@@ -171,5 +171,46 @@
     "cancelledBy": "200810925853376513",
     "cancelReason": "Aucune raison précisée",
     "cancelledAt": 1780481806500
+  },
+  {
+    "id": "1780585627517",
+    "status": "active",
+    "createdBy": "374571291539144727",
+    "captain": "374571291539144727",
+    "date": "01/01/2027",
+    "heure": "12:30",
+    "format": "3v3",
+    "timestamp": 1798806600000,
+    "players": [
+      "374571291539144727",
+      "374571291539144727"
+    ],
+    "substitutes": [],
+    "checkins": {
+      "374571291539144727": "available"
+    },
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "siteEventId": "25"
+  },
+  {
+    "id": "1780594866846",
+    "status": "active",
+    "createdBy": "374571291539144727",
+    "captain": "374571291539144727",
+    "date": "12/12/2028",
+    "heure": "12:30",
+    "format": "1v1",
+    "timestamp": 1860237000000,
+    "players": [
+      "374571291539144727"
+    ],
+    "substitutes": [],
+    "checkins": {
+      "374571291539144727": "available"
+    },
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "siteEventId": "26"
   }
 ]

@@ -51,6 +51,7 @@ services:
     working_dir: /bot
     volumes:
       - ./bot:/bot
+    command: npm start
     tty: true
 
 volumes:
