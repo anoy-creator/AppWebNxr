@@ -21,7 +21,7 @@ class DiscordController extends AbstractController
             ->redirect(['identify', 'email', 'guilds.members.read']);
     }
 
-    #[Route('/connect/discord/check', name: 'connect_discord_check')]
+    #[Route('/auth/discord/callback', name: 'connect_discord_check')]
     public function connectCheck(
         ClientRegistry $clientRegistry,
         DiscordAccountLinker $discordAccountLinker,
