@@ -108,6 +108,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
+    public function getMaskedEmail(): ?string
+    {
+        $email = trim((string) $this->email);
+
+        if ('' === $email) {
+            return null;
+        }
+
+        $atPosition = strpos($email, '@');
+        $localPart = false === $atPosition ? $email : substr($email, 0, $atPosition);
+        $domainPart = false === $atPosition ? $email : substr($email, $atPosition + 1);
+        $extensionPosition = strrpos($domainPart, '.');
+        $extension = false === $extensionPosition ? '' : substr($domainPart, $extensionPosition);
+        $visibleStart = substr($localPart, 0, 2);
+
+        return $visibleStart.'*****'.$extension;
+    }
+
     public function setEmail(?string $email): self
     {
         $this->email = $email;

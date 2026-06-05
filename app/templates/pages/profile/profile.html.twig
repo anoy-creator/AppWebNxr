@@ -1,25 +1,30 @@
 <div class="profile-container">
     <h1>Mon Profil</h1>
-    
+    {% set discordRoles = discordRoles|default([]) %}
+
     <div class="profile-card">
         {% if user.avatar %}
             <img src="{{ user.avatar }}" alt="{{ user.username }}" class="profile-avatar-large">
         {% else %}
             <div class="profile-avatar-large no-avatar">{{ user.username|first|upper }}</div>
         {% endif %}
-        
+
         <div class="profile-info">
             <h2>{{ user.username }}</h2>
             {% if user.email %}
-                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Email:</strong> {{ user.maskedEmail }}</p>
             {% endif %}
-            <p><strong>Rôles:</strong> 
-                {% for role in user.roles %}
-                    <span class="badge">{{ role }}</span>
-                {% endfor %}
+            <p class="profile-roles"><strong>Roles Discord:</strong>
+                {% if discordRoles is not empty %}
+                    {% for role in discordRoles %}
+                        <span class="badge">{{ role }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="profile-muted">Aucun role Discord detecte</span>
+                {% endif %}
             </p>
             {% if user.lastLoginAt %}
-                <p><strong>Dernière connexion:</strong> {{ user.lastLoginAt|date('d/m/Y H:i') }}</p>
+                <p><strong>Derniere connexion:</strong> {{ user.lastLoginAt|date('d/m/Y H:i') }}</p>
             {% endif %}
         </div>
     </div>
@@ -76,6 +81,13 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
+.profile-roles {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
 .badge {
     display: inline-block;
     background: rgba(102, 126, 234, 0.2);
@@ -83,6 +95,10 @@
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
-    margin-right: 5px;
+}
+
+.profile-muted {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
 }
 </style>

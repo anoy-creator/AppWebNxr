@@ -1,5 +1,10 @@
 import $ from 'jquery';
 
+const eventNamespace = '.nxrMatches';
+const isInteractiveClick = (event) => (
+    $(event.target).closest('[data-admin-edit], button, a, input, select, textarea, label').length > 0
+);
+
 let isFiltering = false;
 let isLoadingDetails = false;
 let openedMatchId = null;
@@ -16,7 +21,9 @@ const closeOpenedMatch = () => {
     openedMatchId = null;
 };
 
-$(document).on('click', '.match-filter', function () {
+$(document).off(eventNamespace);
+
+$(document).on(`click${eventNamespace}`, '.match-filter', function () {
     if (isFiltering) return;
 
     const $filter = $(this);
@@ -62,14 +69,18 @@ $(document).on('click', '.match-filter', function () {
     });
 });
 
-$(document).on('keydown', '.match-filter', function (e) {
+$(document).on(`keydown${eventNamespace}`, '.match-filter', function (e) {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         $(this).trigger('click');
     }
 });
 
-$(document).on('click', '.js-match-row', function () {
+$(document).on(`click${eventNamespace}`, '.js-match-row', function (event) {
+    if (isInteractiveClick(event)) {
+        return;
+    }
+
     if (isLoadingDetails) return;
 
     const $row = $(this);

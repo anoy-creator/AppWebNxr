@@ -280,10 +280,31 @@ class AdminController extends AbstractController
      */
     private function normalizeFormData(object $entity, array &$data): void
     {
-        if ($entity instanceof Player && isset($data['socials']) && is_string($data['socials'])) {
-            $decodedSocials = json_decode($data['socials'], true);
-            $data['socials'] = is_array($decodedSocials) ? $decodedSocials : [];
+        if ($entity instanceof Player) {
+            $socials = $this->normalizeSocialsPayload($data['socials'] ?? []);
+            $entity->setSocials($socials);
+            $data['socials'] = is_string($data['socials'] ?? null)
+                ? $data['socials']
+                : (json_encode($socials, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}');
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeSocialsPayload(mixed $socials): array
+    {
+        if (is_array($socials)) {
+            return $socials;
+        }
+
+        if (!is_string($socials) || '' === trim($socials)) {
+            return [];
+        }
+
+        $decodedSocials = json_decode($socials, true);
+
+        return is_array($decodedSocials) ? $decodedSocials : [];
     }
 
     /**
@@ -411,12 +432,7 @@ class AdminController extends AbstractController
      */
     private function updatePlayer(EntityManagerInterface $em, Player $player, array $data): void
     {
-        $socials = $data['socials'] ?? $player->getSocials();
-
-        if (is_string($socials)) {
-            $decodedSocials = json_decode($socials, true);
-            $socials = is_array($decodedSocials) ? $decodedSocials : [];
-        }
+        $socials = $this->normalizeSocialsPayload($data['socials'] ?? $player->getSocials());
 
         $player
             ->setPseudo((string) ($data['pseudo'] ?? $player->getPseudo()))

@@ -52,7 +52,82 @@ class DiscordGuildRoleResolver
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return list<string>
+     */
+    public function resolveMemberRoleNames(string $discordId): array
+    {
+        $discordId = trim($discordId);
+        $guildId = $this->readEnv('DISCORD_GUILD_ID');
+        $botToken = $this->normalizeBotToken((string) (
+            $this->readEnv('DISCORD_BOT_TOKEN')
+            ?? $this->readEnv('DISCORD_TOKEN')
+            ?? $this->readEnv('TOKEN')
+        ));
+
+        if ('' === $discordId || '' === $guildId || '' === $botToken) {
+            return [];
+        }
+
+        $member = $this->requestJson(
+            sprintf(
+                '%s/guilds/%s/members/%s',
+                self::DiscordApiBaseUrl,
+                rawurlencode($guildId),
+                rawurlencode($discordId),
+            ),
+            'Bot '.$botToken,
+        );
+
+        if (!$member || !isset($member['roles']) || !is_array($member['roles'])) {
+            return [];
+        }
+
+        $memberRoleIds = array_values(array_unique(array_map('strval', $member['roles'])));
+
+        if ([] === $memberRoleIds) {
+            return [];
+        }
+
+        $guildRoles = $this->requestJson(
+            sprintf('%s/guilds/%s/roles', self::DiscordApiBaseUrl, rawurlencode($guildId)),
+            'Bot '.$botToken,
+        );
+
+        if (!is_array($guildRoles)) {
+            return [];
+        }
+
+        $rolesById = [];
+        foreach ($guildRoles as $role) {
+            if (!is_array($role) || !isset($role['id'], $role['name'])) {
+                continue;
+            }
+
+            $rolesById[(string) $role['id']] = [
+                'name' => (string) $role['name'],
+                'position' => (int) ($role['position'] ?? 0),
+            ];
+        }
+
+        $memberRoles = [];
+        foreach ($memberRoleIds as $roleId) {
+            if (!isset($rolesById[$roleId])) {
+                continue;
+            }
+
+            $memberRoles[] = $rolesById[$roleId];
+        }
+
+        usort(
+            $memberRoles,
+            static fn (array $left, array $right): int => $right['position'] <=> $left['position'],
+        );
+
+        return array_values(array_map(static fn (array $role): string => $role['name'], $memberRoles));
+    }
+
+    /**
+     * @return array<mixed>|null
      */
     private function requestJson(string $url, string $authorization): ?array
     {

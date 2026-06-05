@@ -53,8 +53,6 @@
                             <button class="dropdown-item" data-modal="add-match">Match</button>
                         </div>
                     </div>
-
-                    {{ encore_entry_script_tags('admin') }}
                 {% endif %}
 
                 {% if app.user %}
@@ -133,6 +131,14 @@
 
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
+        {{ encore_entry_script_tags('news') }}
+        {{ encore_entry_script_tags('joueur') }}
+        {{ encore_entry_script_tags('roster') }}
+        {{ encore_entry_script_tags('schedule') }}
+        {{ encore_entry_script_tags('matches') }}
+        {% if is_granted('ROLE_ADMIN') %}
+            {{ encore_entry_script_tags('admin') }}
+        {% endif %}
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"
                 integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
                 crossorigin="anonymous"></script>

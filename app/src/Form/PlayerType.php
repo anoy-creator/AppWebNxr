@@ -37,11 +37,17 @@ class PlayerType extends AbstractType
                 'choice_label' => 'name',
                 'required' => false,
             ])
-            ->add('socials', TextareaType::class);
+            ->add('socials', TextareaType::class, [
+                'mapped' => false,
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Player::class]);
+        $resolver->setDefaults([
+            'data_class' => Player::class,
+            'csrf_protection' => false,
+        ]);
     }
 }

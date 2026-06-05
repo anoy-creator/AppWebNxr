@@ -2,6 +2,9 @@ import $ from 'jquery';
 import TomSelect from 'tom-select';
 import 'tom-select/dist/css/tom-select.css';
 
+const eventNamespace = '.nxrAdmin';
+const modalLoadPromises = new Map();
+
 const escapeHtml = (value) => String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -35,6 +38,13 @@ const readResponsePayload = async (response) => {
 const getTomSelectItems = (selector) => {
     const el = document.querySelector(selector);
     return el?.tomselect ? [...el.tomselect.items] : [];
+};
+
+const setAdminLoading = (isLoading) => {
+    $('body').toggleClass('is-ajax-loading', isLoading);
+    $('.ajax-loader').attr('aria-hidden', isLoading ? 'false' : 'true');
+    $('[data-modal], [data-admin-edit], .admin-form button[type="submit"], .match-result-form button[type="submit"]')
+        .prop('disabled', isLoading);
 };
 
 const getPlayerLabel = (id) => {
@@ -222,35 +232,61 @@ const ensureModalLoaded = async (modalId) => {
         return modal;
     }
 
-    const root = document.querySelector('#admin-modal-root') || document.body;
-    const response = await fetch(`/admin/content/modal/${encodeURIComponent(modalId)}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Impossible de charger la modale ${modalId}`);
+    if (modalLoadPromises.has(modalId)) {
+        return modalLoadPromises.get(modalId);
     }
 
-    root.insertAdjacentHTML('beforeend', await response.text());
-    modal = document.getElementById(modalId);
+    const loadPromise = (async () => {
+        const root = document.querySelector('#admin-modal-root') || document.body;
+        const response = await fetch(`/admin/content/modal/${encodeURIComponent(modalId)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
 
-    initSelectCustom();
-    toggleEventPlayersFields();
-    syncExclusivePlayerSelects();
+        if (!response.ok) {
+            throw new Error(`Impossible de charger la modale ${modalId}`);
+        }
 
-    return modal;
+        root.insertAdjacentHTML('beforeend', await response.text());
+        modal = document.getElementById(modalId);
+
+        initSelectCustom();
+        toggleEventPlayersFields();
+        syncExclusivePlayerSelects();
+
+        return modal;
+    })();
+
+    modalLoadPromises.set(modalId, loadPromise);
+
+    try {
+        return await loadPromise;
+    } finally {
+        modalLoadPromises.delete(modalId);
+    }
 };
 
-const openModal = async (modalId) => {
-    const modal = await ensureModalLoaded(modalId);
+const openModal = async (modalId, { showLoader = true } = {}) => {
+    if (showLoader) {
+        setAdminLoading(true);
+    }
 
-    $(`#${modalId}`).addClass('is-open');
+    try {
+        const modal = await ensureModalLoaded(modalId);
 
-    toggleEventPlayersFields();
-    refreshVisibleSelects(modal || document);
-    syncExclusivePlayerSelects();
+        $(`#${modalId}`).addClass('is-open');
+
+        toggleEventPlayersFields();
+        refreshVisibleSelects(modal || document);
+        syncExclusivePlayerSelects();
+
+        return modal;
+    } finally {
+        if (showLoader) {
+            setAdminLoading(false);
+        }
+    }
 };
 
 const modalByType = {
@@ -374,41 +410,45 @@ const openEditModal = async (type, id) => {
         throw new Error('Element introuvable ou non modifiable');
     }
 
-    const response = await fetch(`/admin/content/edit/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-    });
+    setAdminLoading(true);
 
-    const result = await readResponsePayload(response);
+    try {
+        const response = await fetch(`/admin/content/edit/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
 
-    if (!response.ok) {
-        throw new Error(result.message || 'Impossible de charger l element');
+        const result = await readResponsePayload(response);
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Impossible de charger l element');
+        }
+
+        const modalId = result.modal || modalByType[type];
+        const modal = await openModal(modalId, { showLoader: false });
+        const form = modal?.querySelector('.admin-form');
+
+        if (!form) return;
+
+        form.dataset.createEndpoint ??= form.dataset.endpoint;
+        form.dataset.endpoint = result.endpoint;
+        form.dataset.method = 'PATCH';
+
+        const title = modal.querySelector('h2');
+        if (title) {
+            title.dataset.createTitle ??= title.textContent;
+            title.textContent = modalTitles[type] || 'Modifier';
+        }
+
+        const submit = form.querySelector('[type="submit"]');
+        if (submit) submit.textContent = 'Modifier';
+
+        populateForm(form, result.values || {});
+        refreshVisibleSelects(modal);
+    } finally {
+        setAdminLoading(false);
     }
-
-    const modalId = result.modal || modalByType[type];
-    await openModal(modalId);
-
-    const modal = document.getElementById(modalId);
-    const form = modal?.querySelector('.admin-form');
-
-    if (!form) return;
-
-    form.dataset.createEndpoint ??= form.dataset.endpoint;
-    form.dataset.endpoint = result.endpoint;
-    form.dataset.method = 'PATCH';
-
-    const title = modal.querySelector('h2');
-    if (title) {
-        title.dataset.createTitle ??= title.textContent;
-        title.textContent = modalTitles[type] || 'Modifier';
-    }
-
-    const submit = form.querySelector('[type="submit"]');
-    if (submit) submit.textContent = 'Modifier';
-
-    populateForm(form, result.values || {});
-    refreshVisibleSelects(modal);
 };
 
 const loadTournamentPlayers = async (tournamentId) => {
@@ -475,20 +515,26 @@ const serializeForm = (form) => {
     return data;
 };
 
-$(document).on('click', '#adminMenuBtn', function (e) {
+$(document).off(eventNamespace);
+
+$(document).on(`click${eventNamespace}`, '#adminMenuBtn', function (e) {
     e.preventDefault();
     e.stopPropagation();
 
     $('#adminMenu').toggleClass('show');
 });
 
-$(document).on('click', function (e) {
+$(document).on(`click${eventNamespace}`, function (e) {
     if (!$(e.target).closest('.admin-dropdown').length) {
         $('#adminMenu').removeClass('show');
     }
 });
 
-$(document).on('click', '.dropdown-item[data-modal]', async function () {
+$(document).on(`click${eventNamespace}`, '.dropdown-item[data-modal]', async function () {
+    if (this.disabled) {
+        return;
+    }
+
     const modalId = $(this).data('modal');
 
     $('#adminMenu').removeClass('show');
@@ -502,9 +548,14 @@ $(document).on('click', '.dropdown-item[data-modal]', async function () {
     }
 });
 
-$(document).on('click', '[data-admin-edit]', async function (event) {
+$(document).on(`click${eventNamespace}`, '[data-admin-edit]', async function (event) {
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    if (this.disabled) {
+        return;
+    }
 
     try {
         await openEditModal(this.dataset.adminEdit, this.dataset.adminEditId);
@@ -514,30 +565,30 @@ $(document).on('click', '[data-admin-edit]', async function (event) {
     }
 });
 
-$(document).on('click', '.admin-modal-close', function () {
+$(document).on(`click${eventNamespace}`, '.admin-modal-close', function () {
     closeModal($(this).closest('.admin-modal'));
 });
 
-$(document).on('click', '.admin-modal', function (e) {
+$(document).on(`click${eventNamespace}`, '.admin-modal', function (e) {
     if ($(e.target).hasClass('admin-modal')) {
         closeModal($(this));
     }
 });
 
-$(document).on('keyup', function (e) {
+$(document).on(`keyup${eventNamespace}`, function (e) {
     if (e.key === 'Escape') {
         $('.admin-modal.is-open').removeClass('is-open');
         $('#adminMenu').removeClass('show');
     }
 });
 
-$(document).on('change', '#event-type', toggleEventPlayersFields);
+$(document).on(`change${eventNamespace}`, '#event-type', toggleEventPlayersFields);
 
-$(document).on('change', '#match-tournament', function () {
+$(document).on(`change${eventNamespace}`, '#match-tournament', function () {
     loadTournamentPlayers(this.value);
 });
 
-$(document).on('click', '[data-match-swap]', function () {
+$(document).on(`click${eventNamespace}`, '[data-match-swap]', function () {
     if (this.dataset.matchSwap === 'player-to-substitute') {
         moveMatchPlayer(
             '#match-players',
@@ -555,11 +606,11 @@ $(document).on('click', '[data-match-swap]', function () {
     }
 });
 
-$(document).on('submit', '.admin-form', async function (e) {
+$(document).on(`submit${eventNamespace}`, '.admin-form', async function (e) {
     e.preventDefault();
 
     const $form = $(this);
-    const endpoint = $form.data('endpoint');
+    const endpoint = this.dataset.endpoint;
 
     if (!endpoint) {
         console.error('data-endpoint manquant');
@@ -567,10 +618,13 @@ $(document).on('submit', '.admin-form', async function (e) {
     }
 
     const data = serializeForm(this);
+    const isEdit = Boolean(this.dataset.method);
 
     if (this.querySelector('#match-player-stats')) {
         data.stats = collectStats(this);
     }
+
+    setAdminLoading(true);
 
     try {
         const response = await fetch(endpoint, {
@@ -589,7 +643,7 @@ $(document).on('submit', '.admin-form', async function (e) {
             return;
         }
 
-        alert(this.dataset.method ? 'Modification effectuee' : 'Ajout effectue');
+        alert(isEdit ? 'Modification effectuee' : 'Ajout effectue');
         this.reset();
 
         this.querySelectorAll('.select-custom-multiple').forEach((el) => {
@@ -602,10 +656,12 @@ $(document).on('submit', '.admin-form', async function (e) {
     } catch (error) {
         console.error(error);
         alert('Erreur reseau');
+    } finally {
+        setAdminLoading(false);
     }
 });
 
-$(document).on('submit', '.match-result-form', async function (e) {
+$(document).on(`submit${eventNamespace}`, '.match-result-form', async function (e) {
     e.preventDefault();
 
     const endpoint = this.dataset.endpoint;
@@ -614,6 +670,8 @@ $(document).on('submit', '.match-result-form', async function (e) {
 
     const data = serializeForm(this);
     data.stats = collectStats(this);
+
+    setAdminLoading(true);
 
     try {
         const response = await fetch(endpoint, {
@@ -637,6 +695,8 @@ $(document).on('submit', '.match-result-form', async function (e) {
     } catch (error) {
         console.error(error);
         alert('Erreur reseau');
+    } finally {
+        setAdminLoading(false);
     }
 });
 

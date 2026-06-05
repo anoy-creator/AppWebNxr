@@ -1,5 +1,10 @@
 import $ from 'jquery';
 
+const eventNamespace = '.nxrPlayers';
+const isInteractiveClick = (event) => (
+    $(event.target).closest('[data-admin-edit], button, a, input, select, textarea, label').length > 0
+);
+
 let isFiltering = false;
 let isModalLoading = false;
 
@@ -18,7 +23,9 @@ const closePlayerModal = () => {
     $('#playerModalContent').empty();
 };
 
-$(document).on('click', '.player-filter', function () {
+$(document).off(eventNamespace);
+
+$(document).on(`click${eventNamespace}`, '.player-filter', function () {
     if (isFiltering) return;
 
     const $filter = $(this);
@@ -58,14 +65,18 @@ $(document).on('click', '.player-filter', function () {
     });
 });
 
-$(document).on('keydown', '.player-filter', function (e) {
+$(document).on(`keydown${eventNamespace}`, '.player-filter', function (e) {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         $(this).trigger('click');
     }
 });
 
-$(document).on('click', '.js-player-card', function () {
+$(document).on(`click${eventNamespace}`, '.js-player-card', function (event) {
+    if (isInteractiveClick(event)) {
+        return;
+    }
+
     if (isModalLoading) return;
 
     const playerId = $(this).data('player-id');
@@ -95,11 +106,11 @@ $(document).on('click', '.js-player-card', function () {
     });
 });
 
-$(document).on('click', '.js-close-player-modal', function () {
+$(document).on(`click${eventNamespace}`, '.js-close-player-modal', function () {
     closePlayerModal();
 });
 
-$(document).on('keyup', function (e) {
+$(document).on(`keyup${eventNamespace}`, function (e) {
     if (e.key === 'Escape') {
         closePlayerModal();
     }

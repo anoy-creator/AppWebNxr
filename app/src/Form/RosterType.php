@@ -24,6 +24,9 @@ class RosterType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Roster::class]);
+        $resolver->setDefaults([
+            'data_class' => Roster::class,
+            'csrf_protection' => false,
+        ]);
     }
 }

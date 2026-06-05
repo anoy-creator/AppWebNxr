@@ -1,5 +1,10 @@
 import $ from 'jquery';
 
+const eventNamespace = '.nxrRosters';
+const isInteractiveClick = (event) => (
+    $(event.target).closest('[data-admin-edit], button, a, input, select, textarea, label').length > 0
+);
+
 let isRosterModalLoading = false;
 
 const setRosterLoading = (isLoading) => {
@@ -16,7 +21,13 @@ const closeRosterModal = () => {
     $('#rosterModalContent').empty();
 };
 
-$(document).on('click', '.js-roster-card', function () {
+$(document).off(eventNamespace);
+
+$(document).on(`click${eventNamespace}`, '.js-roster-card', function (event) {
+    if (isInteractiveClick(event)) {
+        return;
+    }
+
     if (isRosterModalLoading) {
         return;
     }
@@ -48,11 +59,11 @@ $(document).on('click', '.js-roster-card', function () {
     });
 });
 
-$(document).on('click', '.js-close-roster-modal', function () {
+$(document).on(`click${eventNamespace}`, '.js-close-roster-modal', function () {
     closeRosterModal();
 });
 
-$(document).on('keyup', function (e) {
+$(document).on(`keyup${eventNamespace}`, function (e) {
     if (e.key === 'Escape') {
         closeRosterModal();
     }

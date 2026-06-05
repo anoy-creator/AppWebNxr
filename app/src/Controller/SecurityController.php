@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Service\DiscordGuildRoleResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,15 +36,20 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/ajax/profile', name: 'ajax_profile')]
-    public function profileAjax(): Response
+    public function profileAjax(DiscordGuildRoleResolver $discordGuildRoleResolver): Response
     {
         $user = $this->getUser();
         if (!$user) {
             return $this->json(['error' => 'Not authenticated'], 401);
         }
 
+        $discordRoles = $user instanceof User
+            ? $discordGuildRoleResolver->resolveMemberRoleNames((string) $user->getDiscordId())
+            : [];
+
         return $this->render('pages/profile/profile.html.twig', [
             'user' => $user,
+            'discordRoles' => $discordRoles,
         ]);
     }
 }

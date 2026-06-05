@@ -1,5 +1,10 @@
 import $ from 'jquery';
 
+const eventNamespace = '.nxrNews';
+const isInteractiveClick = (event) => (
+    $(event.target).closest('[data-admin-edit], button, a, input, select, textarea, label').length > 0
+);
+
 let isNewsModalLoading = false;
 
 const setNewsLoading = (isLoading) => {
@@ -16,7 +21,13 @@ const closeNewsModal = () => {
     $('#newsModalContent').empty();
 };
 
-$(document).on('click', '.js-news-card', function () {
+$(document).off(eventNamespace);
+
+$(document).on(`click${eventNamespace}`, '.js-news-card', function (event) {
+    if (isInteractiveClick(event)) {
+        return;
+    }
+
     if (isNewsModalLoading) {
         return;
     }
@@ -48,11 +59,11 @@ $(document).on('click', '.js-news-card', function () {
     });
 });
 
-$(document).on('click', '.js-close-news-modal', function () {
+$(document).on(`click${eventNamespace}`, '.js-close-news-modal', function () {
     closeNewsModal();
 });
 
-$(document).on('keyup', function (e) {
+$(document).on(`keyup${eventNamespace}`, function (e) {
     if (e.key === 'Escape') {
         closeNewsModal();
     }

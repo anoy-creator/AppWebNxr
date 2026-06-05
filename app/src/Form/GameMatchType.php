@@ -89,6 +89,7 @@ class GameMatchType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => GameMatch::class,
+            'csrf_protection' => false,
         ]);
     }
 }

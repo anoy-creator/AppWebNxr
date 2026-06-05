@@ -55,4 +55,13 @@ class UserTest extends TestCase
 
         $this->assertContains('ROLE_USER', $user->getRoles());
     }
+
+    public function testMaskedEmailKeepsOnlyStartAndExtension(): void
+    {
+        $user = new User();
+
+        $user->setEmail('shadowx@example.com');
+
+        $this->assertSame('sh*****.com', $user->getMaskedEmail());
+    }
 }

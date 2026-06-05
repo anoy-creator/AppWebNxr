@@ -1,5 +1,10 @@
 import $ from 'jquery';
 
+const eventNamespace = '.nxrSchedule';
+const isInteractiveClick = (event) => (
+    $(event.target).closest('[data-admin-edit], button, a, input, select, textarea, label').length > 0
+);
+
 let isFiltering = false;
 let isDetailLoading = false;
 let openedItemId = null;
@@ -16,7 +21,9 @@ const closeScheduleDetail = () => {
     openedItemId = null;
 };
 
-$(document).on('change', '.schedule-filter input', function () {
+$(document).off(eventNamespace);
+
+$(document).on(`change${eventNamespace}`, '.schedule-filter input', function () {
     if (isFiltering) {
         return;
     }
@@ -63,7 +70,11 @@ $(document).on('change', '.schedule-filter input', function () {
     });
 });
 
-$(document).on('click', '.js-schedule-item', function () {
+$(document).on(`click${eventNamespace}`, '.js-schedule-item', function (event) {
+    if (isInteractiveClick(event)) {
+        return;
+    }
+
     if (isDetailLoading) {
         return;
     }
