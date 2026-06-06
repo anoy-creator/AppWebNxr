@@ -33,6 +33,9 @@ class Roster
     #[ORM\Column(length: 10)]
     private string $winrate;
 
+    /**
+     * @var Collection<int, Player>
+     */
     #[ORM\OneToMany(mappedBy: 'roster', targetEntity: Player::class)]
     private Collection $players;
 
@@ -118,6 +121,9 @@ class Roster
         return $this;
     }
 
+    /**
+     * @return Collection<int, Player>
+     */
     public function getPlayers(): Collection
     {
         return $this->players;

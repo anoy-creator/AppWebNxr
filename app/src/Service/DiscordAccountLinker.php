@@ -19,6 +19,9 @@ class DiscordAccountLinker
     {
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function syncUserFromDiscord(array $data, bool $flush = true): User
     {
         $discordId = $this->readRequiredString($data, 'discordId');
@@ -182,15 +185,30 @@ class DiscordAccountLinker
 
     private function readEnv(string $name): ?string
     {
-        $value = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name);
+        $values = [
+            $_ENV[$name] ?? null,
+            $_SERVER[$name] ?? null,
+            getenv($name),
+        ];
 
-        if (false === $value || null === $value || '' === $value) {
-            return null;
+        foreach ($values as $value) {
+            if (!is_scalar($value) && !$value instanceof \Stringable) {
+                continue;
+            }
+
+            $value = trim((string) $value);
+
+            if ('' !== $value) {
+                return $value;
+            }
         }
 
-        return trim((string) $value);
+        return null;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function readRequiredString(array $data, string $key): string
     {
         $value = $this->readString($data, $key);
@@ -202,6 +220,9 @@ class DiscordAccountLinker
         return $value;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function readString(array $data, string $key): ?string
     {
         $value = $data[$key] ?? null;

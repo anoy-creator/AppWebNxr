@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait PageRenderTrait
 {
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function renderPage(Request $request, string $page, string $title, array $parameters = []): Response
     {
         $template = '1' === $request->headers->get('X-Naxera-Ajax')

@@ -66,9 +66,15 @@ class Event
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $discordExternalId = null;
 
+    /**
+     * @var array<array-key, string>|null
+     */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $checkins = [];
 
+    /**
+     * @var list<array<string, string>>|null
+     */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $rosterEntries = [];
 
@@ -202,7 +208,7 @@ class Event
     }
 
     /**
-     * @return array<string, string>
+     * @return array<array-key, string>
      */
     public function getCheckins(): array
     {
@@ -210,7 +216,7 @@ class Event
     }
 
     /**
-     * @param array<string, string> $checkins
+     * @param array<array-key, string> $checkins
      */
     public function setCheckins(array $checkins): self
     {

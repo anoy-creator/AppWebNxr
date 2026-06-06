@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Client, GatewayIntentBits, Collection, Events } from 'discord.js';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
@@ -49,7 +49,7 @@ for (const file of commandFiles) {
     }
 }
 
-client.once('ready', () => {
+client.once(Events.ClientReady, () => {
     console.log(`Bot connecte : ${client.user.tag}`);
     console.log('Mode commandes slash uniquement');
     startSiteWebhookServer();

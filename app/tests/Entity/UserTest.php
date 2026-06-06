@@ -33,7 +33,7 @@ class UserTest extends TestCase
         $this->assertSame('shadowx@example.com', $user->getEmail());
         $this->assertContains('ROLE_ADMIN', $user->getRoles());
         $this->assertContains('ROLE_USER', $user->getRoles());
-        $this->assertSame('123456789', $user->getUserIdentifier());
+        $this->assertSame('ShadowX', $user->getUserIdentifier());
         $this->assertSame($createdAt, $user->getCreatedAt());
         $this->assertSame($lastLoginAt, $user->getLastLoginAt());
     }

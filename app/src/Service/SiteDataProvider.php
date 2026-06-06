@@ -4,6 +4,9 @@ namespace App\Service;
 
 final class SiteDataProvider
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function getData(): array
     {
         return [

@@ -34,6 +34,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
+    /**
+     * @var list<string>
+     */
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
@@ -133,23 +136,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getRoles(): array
     {
-        return array_unique([...$this->roles, 'ROLE_USER']);
+        return array_values(array_unique([...$this->roles, 'ROLE_USER']));
     }
 
+    /**
+     * @param list<string> $roles
+     */
     public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
+        $this->roles = array_values(array_unique($roles));
 
         return $this;
     }
 
     public function getUserIdentifier(): string
     {
-        return $this->discordId;
+        return $this->username;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

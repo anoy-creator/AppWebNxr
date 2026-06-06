@@ -1,4 +1,6 @@
 {
+    "name": "naxeria/app-web-nxr",
+    "description": "Symfony web application for Naxeria.",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",

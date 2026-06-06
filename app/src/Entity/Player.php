@@ -28,6 +28,9 @@ class Player
     #[ORM\Column(length: 100)]
     private string $game;
 
+    /**
+     * @var array<string, mixed>
+     */
     #[ORM\Column(type: 'json')]
     private array $socials = [];
 
@@ -105,11 +108,17 @@ class Player
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSocials(): array
     {
         return $this->socials;
     }
 
+    /**
+     * @param array<string, mixed> $socials
+     */
     public function setSocials(array $socials): self
     {
         $this->socials = $socials;

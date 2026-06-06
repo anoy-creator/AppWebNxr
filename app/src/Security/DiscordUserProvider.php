@@ -3,49 +3,25 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Service\DiscordAccountLinker;
 use Doctrine\ORM\EntityManagerInterface;
-use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class DiscordUserProvider implements OAuthAwareUserProviderInterface, UserProviderInterface
+/**
+ * @implements UserProviderInterface<User>
+ */
+class DiscordUserProvider implements UserProviderInterface
 {
-    private EntityManagerInterface $em;
-    private LoggerInterface $logger;
-    private DiscordAccountLinker $discordAccountLinker;
-
-    public function __construct(
-        EntityManagerInterface $em,
-        LoggerInterface $logger,
-        DiscordAccountLinker $discordAccountLinker,
-    ) {
-        $this->em = $em;
-        $this->logger = $logger;
-        $this->discordAccountLinker = $discordAccountLinker;
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
     }
 
-    public function loadUserByOAuthUserResponse(UserResponseInterface $response): UserInterface
+    public function loadUserByIdentifier(string $identifier): User
     {
-        $data = $response->getData();
-        $discordId = $response->getUserIdentifier();
-        $username = $data['username'] ?? $discordId;
-        $avatar = $data['avatar'] ?? null;
-
-        return $this->discordAccountLinker->syncUserFromDiscord([
-            'discordId' => $discordId,
-            'username' => $username,
-            'displayName' => $data['global_name'] ?? $data['displayName'] ?? $username,
-            'avatar' => $avatar,
-        ]);
-    }
-
-    public function loadUserByIdentifier(string $identifier): UserInterface
-    {
-        $user = $this->em->getRepository(User::class)->findOneBy(['discordId' => $identifier]);
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['discordId' => $identifier])
+            ?? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $identifier]);
 
         if (!$user) {
             throw new UserNotFoundException(sprintf('User with identifier "%s" not found.', $identifier));
@@ -56,11 +32,15 @@ class DiscordUserProvider implements OAuthAwareUserProviderInterface, UserProvid
 
     public function refreshUser(UserInterface $user): UserInterface
     {
+        if (!$user instanceof User) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
+        }
+
         return $user;
     }
 
     public function supportsClass(string $class): bool
     {
-        return User::class === $class;
+        return User::class === $class || is_subclass_of($class, User::class);
     }
 }

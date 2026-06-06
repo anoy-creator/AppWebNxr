@@ -6,6 +6,7 @@ use App\Entity\Player;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,18 +34,33 @@ class CreateAdminCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $helper = $this->getHelper('question');
-
-        $username = $input->getArgument('username');
-        if (!$username) {
-            $question = new Question('Nom d\'utilisateur: ');
-            $username = $helper->ask($input, $output, $question);
+        if (!$helper instanceof QuestionHelper) {
+            throw new \LogicException('Question helper is not available.');
         }
 
-        $password = $input->getArgument('password');
-        if (!$password) {
+        $username = $this->readNonEmptyString($input->getArgument('username'));
+        if (null === $username) {
+            $question = new Question('Nom d\'utilisateur: ');
+            $username = $this->readNonEmptyString($helper->ask($input, $output, $question));
+        }
+
+        if (null === $username) {
+            $output->writeln('<error>Le nom d\'utilisateur est obligatoire.</error>');
+
+            return Command::FAILURE;
+        }
+
+        $password = $this->readNonEmptyString($input->getArgument('password'), false);
+        if (null === $password) {
             $question = new Question('Mot de passe: ');
             $question->setHidden(true);
-            $password = $helper->ask($input, $output, $question);
+            $password = $this->readNonEmptyString($helper->ask($input, $output, $question), false);
+        }
+
+        if (null === $password) {
+            $output->writeln('<error>Le mot de passe est obligatoire.</error>');
+
+            return Command::FAILURE;
         }
 
         $discordId = 'admin-'.uniqid();
@@ -78,5 +94,20 @@ class CreateAdminCommand extends Command
         $output->writeln("Username: <fg=cyan>$username</>");
 
         return Command::SUCCESS;
+    }
+
+    private function readNonEmptyString(mixed $value, bool $trim = true): ?string
+    {
+        if (!is_scalar($value) && !$value instanceof \Stringable) {
+            return null;
+        }
+
+        $value = (string) $value;
+
+        if ($trim) {
+            $value = trim($value);
+        }
+
+        return '' === $value ? null : $value;
     }
 }

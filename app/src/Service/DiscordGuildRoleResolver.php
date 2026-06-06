@@ -168,13 +168,25 @@ class DiscordGuildRoleResolver
 
     private function readEnv(string $name): ?string
     {
-        $value = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name);
+        $values = [
+            $_ENV[$name] ?? null,
+            $_SERVER[$name] ?? null,
+            getenv($name),
+        ];
 
-        if (false === $value || null === $value || '' === $value) {
-            return null;
+        foreach ($values as $value) {
+            if (!is_scalar($value) && !$value instanceof \Stringable) {
+                continue;
+            }
+
+            $value = trim((string) $value);
+
+            if ('' !== $value) {
+                return $value;
+            }
         }
 
-        return trim((string) $value);
+        return null;
     }
 
     private function normalizeBotToken(string $token): string

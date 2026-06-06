@@ -9,6 +9,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DiscordController extends AbstractController
@@ -18,7 +19,7 @@ class DiscordController extends AbstractController
     {
         return $clientRegistry
             ->getClient('discord')
-            ->redirect(['identify', 'email', 'guilds.members.read']);
+            ->redirect(['identify', 'email', 'guilds.members.read'], []);
     }
 
     #[Route('/auth/discord/callback', name: 'connect_discord_check')]
@@ -27,7 +28,7 @@ class DiscordController extends AbstractController
         DiscordAccountLinker $discordAccountLinker,
         DiscordGuildRoleResolver $discordGuildRoleResolver,
         Security $security,
-    ): RedirectResponse {
+    ): Response {
         try {
             $client = $clientRegistry->getClient('discord');
             $accessToken = $client->getAccessToken();
