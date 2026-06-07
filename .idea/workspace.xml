@@ -4,56 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/tests/Functional/AdminLoginTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Doc/technique/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Doc/technique/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Doc/technique/runEnv.md" beforeDir="false" afterPath="$PROJECT_DIR$/Doc/technique/runEnv.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/js/pages/admin/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/js/pages/admin/admin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/js/pages/matches/matches.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/js/pages/matches/matches.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/js/pages/news/news.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/js/pages/news/news.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/js/pages/schedule/schedule.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/js/pages/schedule/schedule.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/common.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/common.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/admin/admin.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/admin/admin.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/index/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/index/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/login/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/login/login.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/matches/matches.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/matches/matches.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/news/news.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/news/news.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/players/players.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/players/players.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/assets/styles/pages/schedule/schedule.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/assets/styles/pages/schedule/schedule.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/puml/index.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/puml/index.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/puml/index.puml" beforeDir="false" afterPath="$PROJECT_DIR$/app/puml/index.puml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Command/CreateAdminCommand.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Command/CreateAdminCommand.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/AdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/AdminController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/AdminLoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/AdminLoginController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/IndexController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/MatchesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/MatchesController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/ScheduleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/ScheduleController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Controller/SecurityController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Controller/SecurityController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/DataFixtures/AppFixtures.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/DataFixtures/AppFixtures.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Entity/GameMatch.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Entity/GameMatch.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Form/EventType.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Form/EventType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Form/GameMatchType.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Form/GameMatchType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Service/DiscordAccountLinker.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Service/DiscordAccountLinker.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/Service/SiteDataProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/Service/SiteDataProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/admin/admin_bar.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/admin/admin_bar.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/admin/login.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/admin/login.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/admin/modals.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/admin/modals.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/index/_index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/index/_index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/login/_login.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/login/_login.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/matches/_matches.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/matches/_matches.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/players/_player_modal_content.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/players/_player_modal_content.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/players/_players.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/players/_players.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/profile/profile.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/profile/profile.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/pages/schedule/_schedule.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/pages/schedule/_schedule.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/tests/Entity/GameMatchTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/tests/Entity/GameMatchTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/tests/Entity/PlayerMatchStatTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/tests/Entity/PlayerMatchStatTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/tests/Entity/PlayerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/tests/Entity/PlayerTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/tournois.json" beforeDir="false" afterPath="$PROJECT_DIR$/bot/tournois.json" afterDir="false" />
-    </list>
+    <list default="true" id="5e8f665b-49dd-4839-ba6a-a6d9ca41b4bd" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -353,7 +304,7 @@
       <workItem from="1780698741408" duration="6607000" />
       <workItem from="1780819366325" duration="31000" />
       <workItem from="1780819408367" duration="2000" />
-      <workItem from="1780821417302" duration="1101000" />
+      <workItem from="1780821417302" duration="1777000" />
     </task>
     <servers />
   </component>

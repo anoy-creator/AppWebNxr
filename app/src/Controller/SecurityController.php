@@ -25,16 +25,6 @@ class SecurityController extends AbstractController
         // Symfony gère tout seul
     }
 
-    #[Route('/dashboard', name: 'app_dashboard')]
-    public function dashboard(): Response
-    {
-        $user = $this->getUser();
-
-        return $this->render('page/accueil.html.twig', [
-            'user' => $user,
-        ]);
-    }
-
     #[Route('/connect/failure', name: 'connect_failure')]
     public function failure(): RedirectResponse
     {
