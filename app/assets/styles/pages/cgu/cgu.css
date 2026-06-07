@@ -1,0 +1,54 @@
+.legal-page {
+    max-width: 920px;
+}
+
+.legal-intro,
+.legal-content section {
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .05);
+}
+
+.legal-intro {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.legal-intro p {
+    margin: 0;
+    color: rgba(255, 255, 255, .82);
+    line-height: 1.7;
+}
+
+.legal-intro small {
+    color: rgba(255, 255, 255, .55);
+    font-weight: 700;
+}
+
+.legal-content {
+    display: grid;
+    gap: 14px;
+}
+
+.legal-content section {
+    padding: 20px;
+}
+
+.legal-content h2 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 1.08rem;
+    font-weight: 900;
+}
+
+.legal-content p {
+    margin: 0;
+    color: rgba(255, 255, 255, .75);
+    line-height: 1.65;
+}
+
+.legal-content p + p {
+    margin-top: 10px;
+}

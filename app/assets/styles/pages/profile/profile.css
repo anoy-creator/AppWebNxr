@@ -1,0 +1,241 @@
+.profile-container {
+    display: grid;
+    gap: 18px;
+    width: min(760px, 100%);
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-container h1 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 900;
+}
+
+.profile-card,
+.profile-social-card,
+.profile-danger-card {
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .05);
+}
+
+.profile-card {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.profile-avatar-large.no-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.profile-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile-info h2,
+.profile-social-card h2 {
+    margin: 0;
+    color: white;
+    font-weight: 900;
+}
+
+.profile-info p {
+    margin: 8px 0;
+    color: rgba(255, 255, 255, .8);
+}
+
+.profile-roles {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(102, 126, 234, .2);
+    color: #667eea;
+    font-size: 12px;
+}
+
+.profile-muted {
+    margin: 0;
+    color: rgba(255, 255, 255, .55);
+    font-size: 13px;
+}
+
+.profile-social-card {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+}
+
+.profile-danger-card {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-color: rgba(255, 107, 107, .3);
+    background: rgba(255, 107, 107, .06);
+}
+
+.profile-danger-card h2 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.profile-danger-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, .7);
+    font-size: .9rem;
+}
+
+.profile-delete-form {
+    display: grid;
+    min-width: min(100%, 230px);
+    gap: 8px;
+    justify-items: end;
+}
+
+.profile-delete-form button {
+    width: 100%;
+    padding: 11px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #d93d4a;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.profile-delete-form button:hover {
+    background: #ef5460;
+}
+
+.profile-delete-form button:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
+.profile-social-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.profile-social-form {
+    display: grid;
+    gap: 14px;
+}
+
+.profile-social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.profile-social-grid label {
+    display: grid;
+    gap: 6px;
+    color: rgba(255, 255, 255, .8);
+    font-size: .88rem;
+    font-weight: 800;
+}
+
+.profile-social-grid input {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+    font: inherit;
+}
+
+.profile-social-grid input::placeholder {
+    color: rgba(255, 255, 255, .4);
+}
+
+.profile-social-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.profile-social-actions button {
+    min-width: 128px;
+    padding: 11px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #7c2cff;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.profile-social-actions button:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
+.profile-social-feedback {
+    min-height: 18px;
+    color: rgba(255, 255, 255, .65);
+    font-size: .88rem;
+    font-weight: 700;
+}
+
+.profile-social-feedback.is-error {
+    color: #ff6b6b;
+}
+
+.profile-social-feedback.is-success {
+    color: #8ff0b1;
+}
+
+@media (max-width: 640px) {
+    .profile-card,
+    .profile-social-heading,
+    .profile-social-actions,
+    .profile-danger-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .profile-social-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-delete-form {
+        width: 100%;
+        justify-items: stretch;
+    }
+}
