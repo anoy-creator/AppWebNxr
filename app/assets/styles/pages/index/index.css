@@ -258,6 +258,62 @@
 }
 
 /* =========================
+   HOME MATCHES
+========================= */
+
+.home-match-list {
+    display: grid;
+    gap: 14px;
+}
+
+.home-match-card {
+    position: relative;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: linear-gradient(
+        145deg,
+        rgba(38, 24, 55, .82),
+        rgba(15, 12, 22, .96)
+    );
+    cursor: pointer;
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.home-match-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(123, 46, 255, .35);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .3);
+}
+
+.home-match-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #aeb3c4;
+    font-size: .88rem;
+    font-weight: 800;
+}
+
+.home-match-card h3 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.home-match-card p {
+    margin: 0 0 14px;
+    color: var(--muted);
+}
+
+/* =========================
    RESPONSIVE
 ========================= */
 

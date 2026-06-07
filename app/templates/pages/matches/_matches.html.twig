@@ -32,7 +32,7 @@
     </div>
 
     <div class="filter-row match-filter-row">
-        {% for filter in ['Tous', 'CDL', 'Warzone', 'Tournament'] %}
+        {% for filter in matchFilters|default(['Tous', 'CDL', 'Warzone', 'Tournament', 'Hardcore']) %}
             <span
                 role="button"
                 tabindex="0"
@@ -44,67 +44,140 @@
         {% endfor %}
     </div>
 
-    <div id="matches-table-wrapper" class="table-card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Match</th>
-                    <th>Roster</th>
-                    <th>Jeu</th>
-                    <th>Mode</th>
-                    <th>Score</th>
-                    <th>Resultat</th>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <th>Action</th>
-                    {% endif %}
-                </tr>
-            </thead>
+    <div id="matches-content">
+        {% if isTournamentView|default(false) %}
+            <div class="tournament-group-list">
+                {% for group in tournamentGroups|default([]) %}
+                    {% set tournament = group.tournament %}
+                    <article
+                        class="tournament-card js-tournament-card"
+                        data-tournament-id="{{ tournament.id }}"
+                        role="button"
+                        tabindex="0"
+                    >
+                        <div>
+                            <span>{{ tournament.date ? tournament.date|date('d/m/Y') : 'TBD' }}</span>
+                            <h2>{{ tournament.title }}</h2>
+                            <p>{{ group.matches|length }} match{{ group.matches|length > 1 ? 's' : '' }} lie{{ group.matches|length > 1 ? 's' : '' }} au tournoi</p>
+                        </div>
 
-            <tbody id="matches-table-body">
-                {% for match in games %}
-                    <tr class="js-match-row" data-match-id="{{ match.id }}">
-                        <td>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : '-' }}</td>
-                        <td>
-                            {{ match.teamA ? match.teamA.name : 'TBA' }}
-                            vs
-                            {{ match.teamB ? match.teamB.name : 'TBA' }}
-                        </td>
-                        <td>{{ match.roster ? match.roster.name : '-' }}</td>
-                        <td>
-                            <span class="pill">{{ match.game }}</span>
-                        </td>
-                        <td>{{ match.mapName ? match.mode ~ ' - ' ~ match.mapName : match.mode }}</td>
-                        <td>{{ match.score ?: '-' }}</td>
-                        <td class="match-result-cell">
-                            {% if match.result == 'Victory' %}
-                                <span class="result win">Victoire</span>
-                            {% elseif match.result == 'Defeat' %}
-                                <span class="result loss">Defaite</span>
-                            {% elseif match.result is empty %}
-                                <span class="result">A venir</span>
-                            {% else %}
-                                <span class="result">{{ match.result }}</span>
-                            {% endif %}
-                        </td>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <td>
-                                <button type="button" class="admin-edit-inline-btn" data-admin-edit="match" data-admin-edit-id="{{ match.id }}">Modifier</button>
-                            </td>
-                        {% endif %}
-                    </tr>
+                        <strong>{{ tournament.tournamentFormat ?: 'Format libre' }}</strong>
+                    </article>
 
-                    <tr class="match-details-row" id="match-details-{{ match.id }}">
-                        <td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}">
-                            <div class="match-details-content"></div>
-                        </td>
-                    </tr>
+                    <div class="tournament-match-panel" id="tournament-matches-{{ tournament.id }}">
+                        <div class="table-card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Match</th>
+                                        <th>Jeu</th>
+                                        <th>Mode</th>
+                                        <th>Score</th>
+                                        <th>Resultat</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for match in group.matches %}
+                                        <tr class="js-match-row" data-match-id="{{ match.id }}">
+                                            <td>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : '-' }}</td>
+                                            <td>
+                                                {{ match.teamA ? match.teamA.name : 'TBA' }}
+                                                vs
+                                                {{ match.teamB ? match.teamB.name : 'TBA' }}
+                                            </td>
+                                            <td><span class="pill">{{ match.game }}</span></td>
+                                            <td>{{ match.mapName ? match.mode ~ ' - ' ~ match.mapName : match.mode }}</td>
+                                            <td>{{ match.score ?: '-' }}</td>
+                                            <td class="match-result-cell">
+                                                {% if match.result == 'Victory' %}
+                                                    <span class="result win">Victoire</span>
+                                                {% elseif match.result == 'Defeat' %}
+                                                    <span class="result loss">Defaite</span>
+                                                {% elseif match.result is empty %}
+                                                    <span class="result">A venir</span>
+                                                {% else %}
+                                                    <span class="result">{{ match.result }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 {% else %}
-                <tr>
-                        <td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}">Aucun match disponible.</td>
-                    </tr>
+                    <p>Aucun tournoi avec match lie.</p>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+        {% else %}
+            <div id="matches-table-wrapper" class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Match</th>
+                            <th>Roster</th>
+                            <th>Jeu</th>
+                            <th>Mode</th>
+                            <th>Score</th>
+                            <th>Resultat</th>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <th>Action</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+
+                    <tbody id="matches-table-body">
+                        {% for match in games %}
+                            <tr class="js-match-row" data-match-id="{{ match.id }}">
+                                <td>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : '-' }}</td>
+                                <td>
+                                    {{ match.teamA ? match.teamA.name : 'TBA' }}
+                                    vs
+                                    {{ match.teamB ? match.teamB.name : 'TBA' }}
+                                </td>
+                                <td>{{ match.roster ? match.roster.name : '-' }}</td>
+                                <td>
+                                    <span class="pill">{{ match.game }}</span>
+                                </td>
+                                <td>{{ match.mapName ? match.mode ~ ' - ' ~ match.mapName : match.mode }}</td>
+                                <td>{{ match.score ?: '-' }}</td>
+                                <td class="match-result-cell">
+                                    {% if match.result == 'Victory' %}
+                                        <span class="result win">Victoire</span>
+                                    {% elseif match.result == 'Defeat' %}
+                                        <span class="result loss">Defaite</span>
+                                    {% elseif match.result is empty %}
+                                        <span class="result">A venir</span>
+                                    {% else %}
+                                        <span class="result">{{ match.result }}</span>
+                                    {% endif %}
+                                </td>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <td>
+                                        <button type="button" class="admin-edit-inline-btn" data-admin-edit="match" data-admin-edit-id="{{ match.id }}">Modifier</button>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}">Aucun match disponible.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
     </div>
 </section>
+
+<div class="match-modal" id="matchModal" aria-hidden="true">
+    <div class="match-modal-overlay js-close-match-modal"></div>
+
+    <div class="match-modal-box">
+        <button type="button" class="match-modal-close js-close-match-modal">x</button>
+        <div id="matchModalContent"></div>
+    </div>
+</div>

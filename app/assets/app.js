@@ -21,6 +21,10 @@ const isInternalPageLink = ($link) => {
 
     const url = new URL($link.attr('href'), window.location.href);
 
+    if (url.pathname === '/logout') {
+        return false;
+    }
+
     return (
         url.origin === window.location.origin &&
         !url.hash &&
@@ -38,6 +42,36 @@ const updateActiveNavigation = (pathname) => {
         const url = new URL($(this).attr('href'), window.location.href);
         $(this).toggleClass('is-active', url.pathname === pathname);
     });
+};
+
+const readJsonPayload = async (response) => {
+    const text = await response.text();
+
+    if (!text) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        return { message: text };
+    }
+};
+
+const serializeProfileSocials = (form) => {
+    const socials = {};
+
+    new FormData(form).forEach((value, key) => {
+        const match = key.match(/^socials\[([^\]]+)]$/);
+
+        if (!match || String(value).trim() === '') {
+            return;
+        }
+
+        socials[match[1]] = value;
+    });
+
+    return { socials };
 };
 
 const loadPage = async (url, pushState = true) => {
@@ -132,6 +166,10 @@ $(document).on('click', 'a', function (event) {
     loadPage(new URL($link.attr('href'), window.location.href));
 });
 
+$(document).on('click', '[data-logout-link]', function () {
+    setLoading(true);
+});
+
 $(window).on('popstate', () => {
     loadPage(new URL(window.location.href), false);
 });
@@ -149,6 +187,111 @@ $(document).on('click', '[data-load-profile]', async function (e) {
 
     $('#profileMenu').removeClass('show');
     await loadProfileAjax();
+});
+
+$(document).on('submit', '[data-profile-socials-form]', async function (e) {
+    e.preventDefault();
+
+    const form = this;
+    const button = form.querySelector('button[type="submit"]');
+    const feedback = form.querySelector('[data-profile-socials-feedback]');
+
+    if (feedback) {
+        feedback.textContent = '';
+        feedback.classList.remove('is-error', 'is-success');
+    }
+
+    if (button) {
+        button.disabled = true;
+    }
+
+    try {
+        const response = await fetch('/ajax/profile/socials', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify(serializeProfileSocials(form)),
+        });
+        const payload = await readJsonPayload(response);
+
+        if (!response.ok) {
+            throw new Error(payload.message || 'Impossible d enregistrer les liens');
+        }
+
+        if (feedback) {
+            feedback.textContent = payload.message || 'Liens enregistres';
+            feedback.classList.add('is-success');
+        }
+
+        window.setTimeout(loadProfileAjax, 450);
+    } catch (error) {
+        if (feedback) {
+            feedback.textContent = error.message || 'Erreur reseau';
+            feedback.classList.add('is-error');
+        }
+    } finally {
+        if (button) {
+            button.disabled = false;
+        }
+    }
+});
+
+$(document).on('submit', '[data-profile-delete-form]', async function (e) {
+    e.preventDefault();
+
+    const form = this;
+    const button = form.querySelector('button[type="submit"]');
+    const feedback = form.querySelector('[data-profile-delete-feedback]');
+
+    if (!window.confirm('Supprimer ton profil et tes donnees personnelles ? Cette action est definitive.')) {
+        return;
+    }
+
+    if (feedback) {
+        feedback.textContent = '';
+        feedback.classList.remove('is-error', 'is-success');
+    }
+
+    if (button) {
+        button.disabled = true;
+    }
+
+    try {
+        const response = await fetch('/ajax/profile/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({
+                _token: form.dataset.token || '',
+            }),
+        });
+        const payload = await readJsonPayload(response);
+
+        if (!response.ok) {
+            throw new Error(payload.message || 'Impossible de supprimer le profil');
+        }
+
+        if (feedback) {
+            feedback.textContent = payload.message || 'Profil supprime';
+            feedback.classList.add('is-success');
+        }
+
+        window.sessionStorage?.clear();
+        window.location.href = payload.redirect || '/';
+    } catch (error) {
+        if (feedback) {
+            feedback.textContent = error.message || 'Erreur reseau';
+            feedback.classList.add('is-error');
+        }
+
+        if (button) {
+            button.disabled = false;
+        }
+    }
 });
 
 $(document).on('click', function (e) {

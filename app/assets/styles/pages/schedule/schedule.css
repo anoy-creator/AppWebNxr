@@ -10,6 +10,7 @@
     flex-wrap: wrap;
     gap: 14px;
     margin-bottom: 32px;
+    float: right;
 }
 
 .schedule-filter {
@@ -25,6 +26,7 @@
     align-items: center;
     gap: 8px;
 
+    min-width: 150px;
     padding: 10px 16px;
 
     border: 1px solid var(--line);
@@ -36,6 +38,10 @@
     font-weight: 800;
 
     transition: .25s ease;
+}
+
+.schedule-filter.is-loading span {
+    cursor: wait;
 }
 
 .schedule-filter:hover span {
@@ -356,12 +362,17 @@
 ========================================== */
 
 .schedule-inline-loader {
-    display: inline-block;
+    position: absolute;
+    top: 30px;
+    right: 24px;
+    z-index: 3;
+
+    display: block;
     width: 16px;
     height: 16px;
 
     padding: 0 !important;
-    margin-left: 8px;
+    margin: 0;
 
     border: 2px solid rgba(255, 255, 255, .25) !important;
     border-top-color: #8b3dff !important;
@@ -417,6 +428,11 @@
 
     .event-card {
         padding: 18px;
+    }
+
+    .schedule-inline-loader {
+        top: 24px;
+        right: 18px;
     }
 
     .event-card h3 {

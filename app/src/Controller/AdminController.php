@@ -13,8 +13,11 @@ use App\Form\EventType;
 use App\Form\NewsType;
 use App\Form\PlayerType;
 use App\Form\RosterType;
+use App\Service\PlayerSocialLinks;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +30,20 @@ class AdminController extends AbstractController
 {
     private const AllowedModals = ['add-news', 'add-player', 'add-roster', 'add-event', 'add-match'];
     private const EditableTypes = ['news', 'player', 'roster', 'event', 'match'];
+    private const NewsUploadDirectory = 'uploads/news';
+    private const NewsImageMimeTypes = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        'image/gif' => 'gif',
+    ];
+
+    public function __construct(
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
+        private readonly PlayerSocialLinks $playerSocialLinks,
+    ) {
+    }
 
     #[Route('/modal/{modal}', name: 'admin_content_modal', methods: ['GET'])]
     public function modal(string $modal, EntityManagerInterface $em): Response
@@ -40,6 +57,10 @@ class AdminController extends AbstractController
             'players' => $em->getRepository(Player::class)->findBy([], ['pseudo' => 'ASC']),
             'teams' => $em->getRepository(Team::class)->findBy([], ['name' => 'ASC']),
             'rosters' => $em->getRepository(Roster::class)->findBy([], ['name' => 'ASC']),
+            'matchGames' => GameMatch::Games,
+            'matchModes' => GameMatch::Modes,
+            'socialNetworks' => $this->playerSocialLinks->allowedNetworks(),
+            'socialLabels' => $this->playerSocialLinks->labels(),
             'tournaments' => $em->getRepository(Event::class)->findBy([
                 'type' => Event::Tournoi,
             ], [
@@ -75,7 +96,7 @@ class AdminController extends AbstractController
     #[Route('/match', name: 'admin_content_match', methods: ['POST'])]
     public function match(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $data = $this->decodeJsonPayload($request);
+        $data = $this->decodePayload($request);
 
         if (null === $data) {
             return $this->json(['message' => 'Donnees invalides'], 400);
@@ -89,10 +110,21 @@ class AdminController extends AbstractController
 
         $teamA = $this->findEntity($em, Team::class, $data['teamA'] ?? null);
         $teamB = $this->findEntity($em, Team::class, $data['teamB'] ?? null);
-        $roster = $this->findEntity($em, Roster::class, $data['roster'] ?? null);
+        $roster = $this->findRosterForMatch($em, $data);
 
-        if (!$teamA || !$teamB || !$roster) {
-            return $this->json(['message' => 'Equipe A, equipe B et roster sont obligatoires'], 400);
+        if (!$teamA || !$teamB) {
+            return $this->json(['message' => 'Equipe A et equipe B sont obligatoires'], 400);
+        }
+
+        if (!$roster) {
+            return $this->json(['message' => 'Aucun roster disponible pour rattacher le match'], 400);
+        }
+
+        try {
+            $game = $this->resolveChoice($data['game'] ?? GameMatch::GameCdl, GameMatch::Games, 'Jeu');
+            $mode = $this->resolveChoice($data['mode'] ?? null, GameMatch::Modes, 'Mode');
+        } catch (\InvalidArgumentException $exception) {
+            return $this->json(['message' => $exception->getMessage()], 400);
         }
 
         $match = new GameMatch();
@@ -104,8 +136,8 @@ class AdminController extends AbstractController
             ->setTournament($this->findEntity($em, Event::class, $data['tournament'] ?? null))
             ->setCaptain($this->findEntity($em, Player::class, $data['captain'] ?? null))
             ->setOpponents($this->normalizeNullableText($data['opponents'] ?? null))
-            ->setGame((string) ($data['game'] ?? 'CDL'))
-            ->setMode((string) ($data['mode'] ?? ''))
+            ->setGame($game)
+            ->setMode($mode)
             ->setMapName($this->normalizeNullableText($data['mapName'] ?? null))
             ->setResult($this->normalizeNullableText($data['result'] ?? null))
             ->setScore($this->normalizeNullableText($data['score'] ?? null));
@@ -164,7 +196,7 @@ class AdminController extends AbstractController
             return $this->json(['message' => 'Element introuvable ou non modifiable'], 404);
         }
 
-        $data = $this->decodeJsonPayload($request);
+        $data = $this->decodePayload($request);
 
         if (null === $data) {
             return $this->json(['message' => 'Donnees invalides'], 400);
@@ -177,9 +209,17 @@ class AdminController extends AbstractController
         }
 
         if ($entity instanceof News) {
-            $this->updateNews($entity, $data);
+            try {
+                $this->updateNews($entity, $data, $request);
+            } catch (\RuntimeException $exception) {
+                return $this->json(['message' => $exception->getMessage()], 400);
+            }
         } elseif ($entity instanceof Player) {
-            $this->updatePlayer($em, $entity, $data);
+            try {
+                $this->updatePlayer($em, $entity, $data);
+            } catch (\RuntimeException $exception) {
+                return $this->json(['message' => $exception->getMessage()], 400);
+            }
         } elseif ($entity instanceof Roster) {
             $this->updateRoster($entity, $data);
         } elseif ($entity instanceof Event) {
@@ -193,7 +233,11 @@ class AdminController extends AbstractController
 
             return $this->json(['message' => 'Event modifie avec succes']);
         } elseif ($entity instanceof GameMatch) {
-            $this->updateMatch($em, $entity, $data);
+            try {
+                $this->updateMatch($em, $entity, $data);
+            } catch (\InvalidArgumentException $exception) {
+                return $this->json(['message' => $exception->getMessage()], 400);
+            }
             $this->persistMatchStats($em, $entity, $data['stats'] ?? []);
         }
 
@@ -205,7 +249,7 @@ class AdminController extends AbstractController
     #[Route('/match/{id}/result', name: 'admin_content_match_result', methods: ['POST'])]
     public function matchResult(GameMatch $match, Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $data = $this->decodeJsonPayload($request);
+        $data = $this->decodePayload($request);
 
         if (null === $data) {
             return $this->json(['message' => 'Donnees invalides'], 400);
@@ -245,13 +289,17 @@ class AdminController extends AbstractController
 
     private function handleForm(Request $request, EntityManagerInterface $em, object $entity, string $formClass): JsonResponse
     {
-        $data = $this->decodeJsonPayload($request);
+        $data = $this->decodePayload($request);
 
         if (null === $data) {
             return $this->json(['message' => 'Donnees invalides'], 400);
         }
 
-        $this->normalizeFormData($entity, $data);
+        try {
+            $this->normalizeFormData($entity, $data, $request);
+        } catch (\RuntimeException $exception) {
+            return $this->json(['message' => $exception->getMessage()], 400);
+        }
 
         $form = $this->createForm($formClass, $entity);
         $form->submit($data);
@@ -278,40 +326,36 @@ class AdminController extends AbstractController
     /**
      * @param array<string, mixed> $data
      */
-    private function normalizeFormData(object $entity, array &$data): void
+    private function normalizeFormData(object $entity, array &$data, Request $request): void
     {
+        if ($entity instanceof News) {
+            $uploadedImage = $this->uploadNewsImage($request);
+
+            if (null !== $uploadedImage) {
+                $data['image'] = $uploadedImage;
+            }
+
+            if ('' === trim((string) ($data['image'] ?? ''))) {
+                throw new \RuntimeException('Image obligatoire');
+            }
+        }
+
         if ($entity instanceof Player) {
-            $socials = $this->normalizeSocialsPayload($data['socials'] ?? []);
+            $socials = $this->playerSocialLinks->normalize($data['socials'] ?? []);
             $entity->setSocials($socials);
-            $data['socials'] = is_string($data['socials'] ?? null)
-                ? $data['socials']
-                : (json_encode($socials, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}');
+            $data['socials'] = json_encode($socials, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}';
         }
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function normalizeSocialsPayload(mixed $socials): array
-    {
-        if (is_array($socials)) {
-            return $socials;
-        }
-
-        if (!is_string($socials) || '' === trim($socials)) {
-            return [];
-        }
-
-        $decodedSocials = json_decode($socials, true);
-
-        return is_array($decodedSocials) ? $decodedSocials : [];
     }
 
     /**
      * @return array<string, mixed>|null
      */
-    private function decodeJsonPayload(Request $request): ?array
+    private function decodePayload(Request $request): ?array
     {
+        if ([] !== $request->request->all()) {
+            return $request->request->all();
+        }
+
         $data = json_decode($request->getContent(), true);
 
         return is_array($data) ? $data : null;
@@ -361,7 +405,7 @@ class AdminController extends AbstractController
                 'grade' => $entity->getGrade(),
                 'game' => $entity->getGame(),
                 'roster' => $entity->getRoster()?->getId(),
-                'socials' => json_encode($entity->getSocials(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                'socials' => $this->playerSocialLinks->normalize($entity->getSocials(), false),
             ];
         }
 
@@ -416,13 +460,15 @@ class AdminController extends AbstractController
     /**
      * @param array<string, mixed> $data
      */
-    private function updateNews(News $news, array $data): void
+    private function updateNews(News $news, array $data, Request $request): void
     {
+        $uploadedImage = $this->uploadNewsImage($request);
+
         $news
             ->setTitle((string) ($data['title'] ?? $news->getTitle()))
             ->setAuthor((string) ($data['author'] ?? $news->getAuthor()))
             ->setDate(new \DateTimeImmutable((string) ($data['date'] ?? $news->getDate()->format('Y-m-d'))))
-            ->setImage((string) ($data['image'] ?? $news->getImage()))
+            ->setImage((string) ($uploadedImage ?? $data['image'] ?? $news->getImage()))
             ->setExcerpt((string) ($data['excerpt'] ?? $news->getExcerpt()))
             ->setContent((string) ($data['content'] ?? $news->getContent()));
     }
@@ -432,7 +478,11 @@ class AdminController extends AbstractController
      */
     private function updatePlayer(EntityManagerInterface $em, Player $player, array $data): void
     {
-        $socials = $this->normalizeSocialsPayload($data['socials'] ?? $player->getSocials());
+        $hasSocialsPayload = array_key_exists('socials', $data);
+        $socials = $this->playerSocialLinks->normalize(
+            $hasSocialsPayload ? $data['socials'] : $player->getSocials(),
+            $hasSocialsPayload
+        );
 
         $player
             ->setPseudo((string) ($data['pseudo'] ?? $player->getPseudo()))
@@ -501,12 +551,12 @@ class AdminController extends AbstractController
             ->setPlayedAt($this->createPlayedAt((string) ($data['playedAt'] ?? $match->getPlayedAt()?->format('Y-m-d')), $data['playedTime'] ?? $match->getPlayedAt()?->format('H:i')))
             ->setTeamA($this->findEntity($em, Team::class, $data['teamA'] ?? null))
             ->setTeamB($this->findEntity($em, Team::class, $data['teamB'] ?? null))
-            ->setRoster($this->findEntity($em, Roster::class, $data['roster'] ?? null))
+            ->setRoster($this->findRosterForMatch($em, $data, $match->getRoster()))
             ->setTournament($this->findEntity($em, Event::class, $data['tournament'] ?? null))
             ->setCaptain($this->findEntity($em, Player::class, $data['captain'] ?? null))
             ->setOpponents($this->normalizeNullableText($data['opponents'] ?? null))
-            ->setGame((string) ($data['game'] ?? $match->getGame()))
-            ->setMode((string) ($data['mode'] ?? $match->getMode()))
+            ->setGame($this->resolveChoice($data['game'] ?? $match->getGame(), GameMatch::Games, 'Jeu'))
+            ->setMode($this->resolveChoice($data['mode'] ?? $match->getMode(), GameMatch::Modes, 'Mode'))
             ->setMapName($this->normalizeNullableText($data['mapName'] ?? null))
             ->setResult($this->normalizeNullableText($data['result'] ?? null))
             ->setScore($this->normalizeNullableText($data['score'] ?? null));
@@ -576,6 +626,55 @@ class AdminController extends AbstractController
         return '' === $value ? null : $value;
     }
 
+    private function resolveChoice(mixed $value, array $choices, string $label): string
+    {
+        $value = trim((string) ($value ?? ''));
+
+        if ('' === $value || !in_array($value, $choices, true)) {
+            throw new \InvalidArgumentException($label.' invalide');
+        }
+
+        return $value;
+    }
+
+    private function uploadNewsImage(Request $request): ?string
+    {
+        $file = $request->files->get('imageFile');
+
+        if (!$file instanceof UploadedFile || UPLOAD_ERR_NO_FILE === $file->getError()) {
+            return null;
+        }
+
+        if (!$file->isValid()) {
+            throw new \RuntimeException('Image invalide');
+        }
+
+        $mimeType = $file->getClientMimeType();
+
+        if (!is_string($mimeType) || !array_key_exists($mimeType, self::NewsImageMimeTypes)) {
+            throw new \RuntimeException('Format image non autorise');
+        }
+
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeName = strtolower((string) preg_replace('/[^a-zA-Z0-9_-]+/', '-', $originalName));
+        $safeName = trim($safeName, '-') ?: 'actualite';
+        $filename = sprintf(
+            '%s-%s.%s',
+            $safeName,
+            bin2hex(random_bytes(6)),
+            self::NewsImageMimeTypes[$mimeType]
+        );
+        $targetDirectory = $this->projectDir.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.self::NewsUploadDirectory;
+
+        if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0775, true) && !is_dir($targetDirectory)) {
+            throw new \RuntimeException('Impossible de creer le dossier upload');
+        }
+
+        $file->move($targetDirectory, $filename);
+
+        return '/'.self::NewsUploadDirectory.'/'.$filename;
+    }
+
     /**
      * @template T of object
      *
@@ -590,6 +689,38 @@ class AdminController extends AbstractController
         }
 
         return $em->getRepository($class)->find((int) $id);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function findRosterForMatch(EntityManagerInterface $em, array $data, ?Roster $fallback = null): ?Roster
+    {
+        $explicitRoster = $this->findEntity($em, Roster::class, $data['roster'] ?? null);
+
+        if ($explicitRoster instanceof Roster) {
+            return $explicitRoster;
+        }
+
+        if ($fallback instanceof Roster) {
+            return $fallback;
+        }
+
+        $captain = $this->findEntity($em, Player::class, $data['captain'] ?? null);
+
+        if ($captain instanceof Player && $captain->getRoster() instanceof Roster) {
+            return $captain->getRoster();
+        }
+
+        foreach (['players', 'substitutes'] as $key) {
+            foreach ($this->findPlayers($em, $data[$key] ?? []) as $player) {
+                if ($player->getRoster() instanceof Roster) {
+                    return $player->getRoster();
+                }
+            }
+        }
+
+        return $em->getRepository(Roster::class)->findOneBy([], ['name' => 'ASC']);
     }
 
     /**

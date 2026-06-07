@@ -6,11 +6,12 @@
             <button class="admin-modal-close">x</button>
             <h2>Ajouter une actualite</h2>
 
-            <form class="admin-form" data-endpoint="{{ path('admin_content_news') }}">
+            <form class="admin-form" data-endpoint="{{ path('admin_content_news') }}" enctype="multipart/form-data">
                 <input name="title" placeholder="Titre" required>
                 <input name="author" placeholder="Auteur" required>
                 <input name="date" type="date" required>
-                <input name="image" placeholder="URL image" required>
+                <input name="image" type="hidden">
+                <input name="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-create-required="true" required>
                 <input name="excerpt" placeholder="Resume" required>
                 <textarea name="content" placeholder="Contenu" required></textarea>
                 <button type="submit">Ajouter</button>
@@ -27,7 +28,7 @@
 
             <form class="admin-form" data-endpoint="{{ path('admin_content_player') }}">
                 <input name="pseudo" placeholder="Pseudo" required>
-                <input name="discordId" placeholder="ID Discord">
+                <input name="discordId" type="hidden">
                 <input name="avatar" placeholder="URL avatar" required>
 
                 <select name="role" required>
@@ -47,7 +48,19 @@
                     {% endfor %}
                 </select>
 
-                <input name="socials" placeholder='{"twitter":"pseudo"}' value="{}">
+                <div class="admin-form-group">
+                    <label>Liens reseaux sociaux</label>
+                    <div class="admin-social-grid">
+                        {% for network in socialNetworks|default(['tiktok', 'youtube', 'discord', 'insta', 'twitter']) %}
+                            <input
+                                name="socials[{{ network }}]"
+                                type="url"
+                                inputmode="url"
+                                placeholder="{{ socialLabels[network]|default(network|capitalize) }} - https://..."
+                            >
+                        {% endfor %}
+                    </div>
+                </div>
 
                 <button type="submit">Ajouter</button>
             </form>
@@ -90,21 +103,24 @@
                     <option value="match">Match officiel</option>
                 </select>
 
-                <select name="tournamentFormat">
-                    <option value="">Format du tournoi</option>
-                    <option value="1v1">1v1</option>
-                    <option value="2v2">2v2</option>
-                    <option value="3v3">3v3</option>
-                    <option value="4v4">4v4</option>
-                    <option value="5v5">5v5</option>
-                    <option value="6v6">6v6</option>
-                </select>
+                <div class="admin-form-group" id="event-format-field">
+                    <label>Format</label>
+                    <select name="tournamentFormat">
+                        <option value="">Format</option>
+                        <option value="1v1">1v1</option>
+                        <option value="2v2">2v2</option>
+                        <option value="3v3">3v3</option>
+                        <option value="4v4">4v4</option>
+                        <option value="5v5">5v5</option>
+                        <option value="6v6">6v6</option>
+                    </select>
+                </div>
 
                 <input name="date" type="date" required>
                 <input name="time" placeholder="19:00" required>
                 <textarea name="description" placeholder="Description" required></textarea>
 
-                <div id="event-players-fields" class="event-players-fields" style="display: none;">
+                <div id="event-players-fields" class="event-players-fields">
                     <div class="admin-form-group">
                         <label>Capitaine</label>
                         <select name="captain">
@@ -164,12 +180,7 @@
                     {% endfor %}
                 </select>
 
-                <select name="roster" required>
-                    <option value="">Roster</option>
-                    {% for roster in rosters|default([]) %}
-                        <option value="{{ roster.id }}">{{ roster.name }}</option>
-                    {% endfor %}
-                </select>
+                <input name="roster" type="hidden">
 
                 <select name="tournament" id="match-tournament">
                     <option value="">Aucun tournoi</option>
@@ -230,12 +241,17 @@
                 </div>
 
                 <select name="game" required>
-                    <option value="Warzone">Warzone</option>
-                    <option value="CDL">CDL</option>
-                    <option value="Tournament">Tournament</option>
+                    {% for game in matchGames|default(['CDL', 'Warzone', 'Tournament', 'Hardcore']) %}
+                        <option value="{{ game }}">{{ game }}</option>
+                    {% endfor %}
                 </select>
 
-                <input name="mode" placeholder="Mode (ex: Hardpoint, SnD, Control)" required>
+                <select name="mode" required>
+                    <option value="">Mode</option>
+                    {% for mode in matchModes|default([]) %}
+                        <option value="{{ mode }}">{{ mode }}</option>
+                    {% endfor %}
+                </select>
                 <input name="mapName" placeholder="Map (ex: Raid, Terminal, Highrise...)">
 
                 <select name="result">

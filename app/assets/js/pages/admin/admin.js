@@ -4,6 +4,7 @@ import 'tom-select/dist/css/tom-select.css';
 
 const eventNamespace = '.nxrAdmin';
 const modalLoadPromises = new Map();
+let isSyncingExclusivePlayerSelects = false;
 
 const escapeHtml = (value) => String(value)
     .replace(/&/g, '&amp;')
@@ -75,6 +76,18 @@ const collectStats = (container) => [...container.querySelectorAll('.match-stat-
     deaths: row.querySelector('[data-stat="deaths"]')?.value || 0,
 }));
 
+const usesMultipart = (form) => (
+    form.enctype === 'multipart/form-data' ||
+    form.querySelector('input[type="file"]') !== null
+);
+
+const setFileInputsForMode = (form, isEdit) => {
+    form.querySelectorAll('input[type="file"][data-create-required="true"]').forEach((input) => {
+        input.required = !isEdit;
+        input.value = '';
+    });
+};
+
 const renderMatchStats = (players) => {
     const container = document.querySelector('#match-player-stats');
     if (!container) return;
@@ -125,42 +138,52 @@ const updateMatchCompositionTools = () => {
 };
 
 const syncExclusivePlayerSelects = (changedSelect = null) => {
+    if (isSyncingExclusivePlayerSelects) {
+        return;
+    }
+
+    isSyncingExclusivePlayerSelects = true;
+
     const pairs = [
         ['#event-players', '#event-substitutes'],
         ['#match-players', '#match-substitutes'],
     ];
 
-    pairs.forEach(([playersSelector, substitutesSelector]) => {
-        const players = document.querySelector(playersSelector)?.tomselect;
-        const substitutes = document.querySelector(substitutesSelector)?.tomselect;
+    try {
+        pairs.forEach(([playersSelector, substitutesSelector]) => {
+            const players = document.querySelector(playersSelector)?.tomselect;
+            const substitutes = document.querySelector(substitutesSelector)?.tomselect;
 
-        if (!players || !substitutes) return;
+            if (!players || !substitutes) return;
 
-        const playersItems = [...players.items].map(String);
-        const substitutesItems = [...substitutes.items].map(String);
-        const duplicates = playersItems.filter((id) => substitutesItems.includes(id));
+            const playersItems = [...players.items].map(String);
+            const substitutesItems = [...substitutes.items].map(String);
+            const duplicates = playersItems.filter((id) => substitutesItems.includes(id));
 
-        duplicates.forEach((id) => {
-            if (changedSelect === players) {
+            duplicates.forEach((id) => {
+                if (changedSelect === players) {
+                    substitutes.removeItem(id, true);
+                    return;
+                }
+
+                if (changedSelect === substitutes) {
+                    players.removeItem(id, true);
+                    return;
+                }
+
                 substitutes.removeItem(id, true);
-                return;
-            }
+            });
 
-            if (changedSelect === substitutes) {
-                players.removeItem(id, true);
-                return;
-            }
-
-            substitutes.removeItem(id, true);
+            players.refreshOptions(false);
+            substitutes.refreshOptions(false);
+            players.refreshItems();
+            substitutes.refreshItems();
         });
 
-        players.refreshOptions(false);
-        substitutes.refreshOptions(false);
-        players.refreshItems();
-        substitutes.refreshItems();
-    });
-
-    updateMatchCompositionTools();
+        updateMatchCompositionTools();
+    } finally {
+        isSyncingExclusivePlayerSelects = false;
+    }
 };
 
 const initSelectCustom = () => {
@@ -195,6 +218,10 @@ const initSelectCustom = () => {
             },
 
             onChange() {
+                if (isSyncingExclusivePlayerSelects) {
+                    return;
+                }
+
                 syncExclusivePlayerSelects(this);
             },
         });
@@ -213,12 +240,24 @@ const refreshVisibleSelects = (container = document) => {
 const toggleEventPlayersFields = () => {
     const eventTypeSelect = document.querySelector('#event-type');
     const eventPlayersFields = document.querySelector('#event-players-fields');
+    const eventFormatField = document.querySelector('#event-format-field');
+    const eventFormatSelect = eventFormatField?.querySelector('[name="tournamentFormat"]');
 
     if (!eventTypeSelect || !eventPlayersFields) return;
 
     const shouldShow = ['training', 'tournament', 'match'].includes(eventTypeSelect.value);
+    const shouldShowFormat = eventTypeSelect.value === 'tournament';
 
-    eventPlayersFields.style.display = shouldShow ? 'flex' : 'none';
+    eventPlayersFields.classList.toggle('is-visible', shouldShow);
+
+    if (eventFormatField && eventFormatSelect) {
+        eventFormatField.classList.toggle('is-hidden', !shouldShowFormat);
+        eventFormatSelect.disabled = !shouldShowFormat;
+
+        if (!shouldShowFormat) {
+            eventFormatSelect.value = '';
+        }
+    }
 
     if (shouldShow) {
         refreshVisibleSelects(eventPlayersFields);
@@ -351,6 +390,15 @@ const setMultiFieldValues = (form, key, values) => {
     });
 };
 
+const setSocialFieldValues = (form, socials) => {
+    form.querySelectorAll('[name^="socials["]').forEach((field) => {
+        const match = field.name.match(/^socials\[([^\]]+)]$/);
+        const network = match?.[1];
+
+        field.value = network ? (socials?.[network] || '') : '';
+    });
+};
+
 const resetModalFormMode = (modal) => {
     const form = modal?.querySelector('.admin-form');
     if (!form) return;
@@ -361,6 +409,7 @@ const resetModalFormMode = (modal) => {
 
     delete form.dataset.method;
     form.reset();
+    setFileInputsForMode(form, false);
 
     form.querySelectorAll('.select-custom-multiple').forEach((el) => {
         el.tomselect?.clear(true);
@@ -381,6 +430,11 @@ const populateForm = (form, values) => {
 
     Object.entries(values || {}).forEach(([key, value]) => {
         if (key === 'stats') return;
+
+        if (key === 'socials' && value && typeof value === 'object') {
+            setSocialFieldValues(form, value);
+            return;
+        }
 
         if (Array.isArray(value)) {
             setMultiFieldValues(form, key, value);
@@ -434,6 +488,7 @@ const openEditModal = async (type, id) => {
         form.dataset.createEndpoint ??= form.dataset.endpoint;
         form.dataset.endpoint = result.endpoint;
         form.dataset.method = 'PATCH';
+        setFileInputsForMode(form, true);
 
         const title = modal.querySelector('h2');
         if (title) {
@@ -502,6 +557,18 @@ const serializeForm = (form) => {
     const data = {};
 
     formData.forEach((value, key) => {
+        const socialMatch = key.match(/^socials\[([^\]]+)]$/);
+
+        if (socialMatch) {
+            data.socials ??= {};
+
+            if (String(value).trim() !== '') {
+                data.socials[socialMatch[1]] = value;
+            }
+
+            return;
+        }
+
         if (key.endsWith('[]')) {
             const cleanKey = key.replace('[]', '');
             data[cleanKey] ??= [];
@@ -619,6 +686,7 @@ $(document).on(`submit${eventNamespace}`, '.admin-form', async function (e) {
 
     const data = serializeForm(this);
     const isEdit = Boolean(this.dataset.method);
+    const isMultipart = usesMultipart(this);
 
     if (this.querySelector('#match-player-stats')) {
         data.stats = collectStats(this);
@@ -627,13 +695,22 @@ $(document).on(`submit${eventNamespace}`, '.admin-form', async function (e) {
     setAdminLoading(true);
 
     try {
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+        };
+        let body;
+
+        if (isMultipart) {
+            body = new FormData(this);
+        } else {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify(data);
+        }
+
         const response = await fetch(endpoint, {
-            method: this.dataset.method || 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify(data),
+            method: isMultipart ? 'POST' : (this.dataset.method || 'POST'),
+            headers,
+            body,
         });
 
         const result = await readResponsePayload(response);

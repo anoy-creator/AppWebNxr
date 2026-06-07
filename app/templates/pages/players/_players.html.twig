@@ -22,8 +22,6 @@
                 <div class="player-photo">
                     <img src="{{ player.avatar ?: '/images/default-avatar.png' }}" alt="{{ player.pseudo }}">
 
-                    <span>{{ player.roster ? player.roster.name : 'Sans roster' }}</span>
-
                     <div>
                         <h2>{{ player.pseudo }}</h2>
                         <p>{{ player.grade }}</p>
@@ -40,13 +38,10 @@
                     <strong>{{ player.game }}</strong>
                 </div>
 
-                {% if player.socials is not empty %}
-                    <div class="social-links">
-                        {% for network, account in player.socials %}
-                            <span>{{ network }} : {{ account }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                {% include 'components/_social_links.html.twig' with {
+                    socials: player.socials,
+                    class_name: 'social-links'
+                } only %}
             </article>
         {% else %}
             <p>Aucun joueur trouvé.</p>

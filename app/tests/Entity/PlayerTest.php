@@ -18,7 +18,7 @@ class PlayerTest extends TestCase
             ->setRole('Joueur')
             ->setGrade('Captain')
             ->setGame('COD')
-            ->setSocials(['twitter' => 'shadowx']);
+            ->setSocials(['twitter' => 'https://twitter.com/shadowx']);
 
         $this->assertNull($player->getId());
         $this->assertSame('ShadowX', $player->getPseudo());
@@ -27,6 +27,6 @@ class PlayerTest extends TestCase
         $this->assertSame('Joueur', $player->getRole());
         $this->assertSame('Captain', $player->getGrade());
         $this->assertSame('COD', $player->getGame());
-        $this->assertSame(['twitter' => 'shadowx'], $player->getSocials());
+        $this->assertSame(['twitter' => 'https://twitter.com/shadowx'], $player->getSocials());
     }
 }

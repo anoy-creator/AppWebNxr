@@ -67,13 +67,11 @@ class GameMatchType extends AbstractType
             ])
             ->add('opponents', TextareaType::class, ['required' => false])
             ->add('game', ChoiceType::class, [
-                'choices' => [
-                    'Warzone' => 'Warzone',
-                    'CDL' => 'CDL',
-                    'Tournament' => 'Tournament',
-                ],
+                'choices' => array_combine(GameMatch::Games, GameMatch::Games),
             ])
-            ->add('mode', TextType::class)
+            ->add('mode', ChoiceType::class, [
+                'choices' => array_combine(GameMatch::Modes, GameMatch::Modes),
+            ])
             ->add('mapName', TextType::class, ['required' => false])
             ->add('result', ChoiceType::class, [
                 'required' => false,

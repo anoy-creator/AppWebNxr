@@ -137,6 +137,7 @@ td {
 .match-result-loader {
     width: 16px;
     height: 16px;
+    flex: 0 0 auto;
     border: 2px solid rgba(255, 255, 255, .25);
     border-top-color: #8b3dff;
     border-radius: 50%;
@@ -147,6 +148,131 @@ td {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.match-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: none;
+}
+
+.match-modal.is-open {
+    display: block;
+}
+
+.match-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .82);
+    backdrop-filter: blur(8px);
+}
+
+.match-modal-box {
+    position: relative;
+    z-index: 1;
+    width: min(920px, calc(100% - 32px));
+    max-height: calc(100vh - 70px);
+    margin: 35px auto;
+    overflow: auto;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    background: #15101f;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
+}
+
+.match-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: #7c2cff;
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.match-modal .match-detail-box {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+}
+
+/* =========================
+   TOURNAMENTS
+========================= */
+
+.tournament-group-list {
+    display: grid;
+    gap: 14px;
+}
+
+.tournament-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: linear-gradient(
+        145deg,
+        rgba(38, 24, 55, .82),
+        rgba(15, 12, 22, .96)
+    );
+    cursor: pointer;
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.tournament-card:hover,
+.tournament-card.is-open {
+    transform: translateY(-2px);
+    border-color: rgba(123, 46, 255, .38);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .3);
+}
+
+.tournament-card span {
+    color: #8b3dff;
+    font-size: .86rem;
+    font-weight: 900;
+}
+
+.tournament-card h2 {
+    margin: 6px 0;
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+.tournament-card p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.tournament-card strong {
+    flex: 0 0 auto;
+    color: #fff;
+    font-weight: 900;
+}
+
+.tournament-match-panel {
+    display: none;
+}
+
+.tournament-match-panel.is-open {
+    display: block;
 }
 
 /* =========================
@@ -267,6 +393,17 @@ td {
 }
 
 @media (max-width: 800px) {
+    .match-modal-box {
+        width: calc(100% - 20px);
+        margin: 10px auto;
+        max-height: calc(100vh - 20px);
+    }
+
+    .tournament-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .match-detail-header {
         display: grid;
         grid-template-columns: 1fr;

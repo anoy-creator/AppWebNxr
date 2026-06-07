@@ -1,125 +1,80 @@
-﻿# 🚀 AppWebNxr
+# AppWebNxr - Documentation technique
 
-Application web basée sur Symfony, conteneurisée avec Docker pour garantir un environnement de développement et de production identique.
-
----
-
-## 📋 Présentation
-
-AppWebNxr est une application développée avec Symfony et exécutée dans un environnement Docker composé de :
-
-* PHP 8.3 (FPM)
-* Symfony
-* Nginx
-* MariaDB 11
-* Composer
-* Docker & Docker Compose
-
-L'objectif est de fournir une plateforme simple à déployer, maintenable et compatible avec les environnements Debian 13.5.
+Application web Symfony pour la team Naxera eSport. Le projet regroupe le site public, une administration de contenu, une connexion Discord, une API de synchronisation Discord et un bot Discord.
 
 ---
 
-# 🏗️ Architecture
+## 1. Stack technique
 
-```text
-┌─────────────┐
-│   Nginx     │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Symfony     │
-│ PHP 8.3 FPM │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ MariaDB 11  │
-└─────────────┘
-```
+| Bloc | Technologie |
+| --- | --- |
+| Backend | Symfony 7.4, PHP 8.3 FPM |
+| Frontend | Twig, Webpack Encore, jQuery, Tom Select |
+| Base de donnees | MariaDB 11 |
+| Serveur web | Nginx |
+| Bot Discord | Node.js 22, discord.js |
+| Conteneurs | Docker Compose |
+
+Le code Symfony est dans `app/`. Le bot principal est dans `bot/`.
 
 ---
 
-# 📂 Structure du projet
+## 2. Services Docker
 
-```text
-AppWebNxr/
-│
-├── app/                    # Application Symfony
-│
-├── docker/
-│   ├── nginx/
-│   │   └── default.conf
-│   │
-│   └── php/
-│
-├── Dockerfile
-├── docker-compose.yml
-├── .env
-└── README.md
-```
+Le fichier racine `docker-compose.yml` lance les services suivants :
 
----
+| Service | Container | Role |
+| --- | --- | --- |
+| `php` | `symfony_php` | PHP FPM, Composer, console Symfony |
+| `nginx` | `symfony_nginx` | Serve l'application sur `http://localhost:8080` |
+| `db` | `symfony_db` | MariaDB 11 |
+| `node` | `symfony_node` | Build/watch des assets Encore |
+| `discord_bot` | `discord_bot` | Bot Discord Node.js |
 
-# ⚙️ Prérequis
-
-Avant de commencer, assurez-vous d'avoir installé :
-
-* Docker Desktop
-* Docker Compose
-
-Téléchargement :
-
-https://www.docker.com/products/docker-desktop/
-
----
-
-# 🚀 Installation
-
-## 1. Cloner le dépôt
-
-```bash
-git clone <repo-url>
-cd AppWebNxr
-```
-
-## 2. Construire et démarrer l'environnement
+Demarrage complet :
 
 ```bash
 docker compose up -d --build
 ```
 
-## 3. Accéder au conteneur PHP
+Arret :
 
 ```bash
-docker exec -it symfony_php bash
+docker compose down
+```
+
+Logs utiles :
+
+```bash
+docker logs symfony_php
+docker logs symfony_nginx
+docker logs symfony_db
+docker logs discord_bot
 ```
 
 ---
 
-# 🌐 Accès à l'application
+## 3. Acces locaux
 
-Une fois les conteneurs démarrés :
+| Ressource | URL / acces |
+| --- | --- |
+| Site web | `http://localhost:8080` |
+| Login membre Discord | `/login` |
+| Login admin | `/login/admin` |
+| CGU | `/cgu` |
+| API Discord ping | `/api/discord/ping` |
 
-```text
-http://localhost:8080
-```
+La base MariaDB est exposee sur le port local `3306`.
 
----
+| Parametre | Valeur |
+| --- | --- |
+| Host Docker | `db` |
+| Port | `3306` |
+| Database | `symfony` |
+| User | `symfony` |
+| Password | `symfony` |
 
-# 🗄️ Base de données
-
-## Informations de connexion
-
-| Paramètre | Valeur  |
-| --------- | ------- |
-| Host      | db      |
-| Port      | 3306    |
-| Database  | symfony |
-| User      | symfony |
-| Password  | symfony |
-
-### Configuration Symfony
+`DATABASE_URL` attendu cote Symfony :
 
 ```env
 DATABASE_URL="mysql://symfony:symfony@db:3306/symfony"
@@ -127,162 +82,394 @@ DATABASE_URL="mysql://symfony:symfony@db:3306/symfony"
 
 ---
 
-# 🛠️ Commandes Docker utiles
+## 4. Installation backend
 
-## Démarrer les services
+Entrer dans le conteneur PHP :
 
 ```bash
-docker compose up -d
+docker exec -it symfony_php bash
 ```
 
-## Arrêter les services
+Installer les dependances et initialiser la base :
 
 ```bash
-docker compose down
+composer install
+php bin/console doctrine:database:create --if-not-exists
+php bin/console doctrine:migrations:migrate
 ```
 
-## Rebuild complet
+Charger les fixtures de test si vous voulez des donnees de demonstration :
 
 ```bash
-docker compose up -d --build
+php bin/console doctrine:fixtures:load --group=test
 ```
 
-## Afficher les logs
-
-### PHP
+Charger les fixtures de production minimale pour une base propre :
 
 ```bash
-docker logs symfony_php
+NXR_ADMIN_USERNAME=admin NXR_ADMIN_PASSWORD='mot-de-passe-fort' php bin/console doctrine:fixtures:load --group=prod
 ```
 
-### Nginx
+Cette fixture cree uniquement :
+
+* un compte admin ;
+* un roster technique ;
+* deux equipes de base.
+
+Elle ne cree pas de news, joueurs publics, planning, tournoi, match ou statistiques.
+
+---
+
+## 5. Installation frontend
+
+Entrer dans le conteneur Node :
 
 ```bash
-docker logs symfony_nginx
+docker exec -it symfony_node bash
 ```
 
-### MariaDB
+Installer les dependances :
 
 ```bash
-docker logs symfony_db
+npm install
+```
+
+Compiler en developpement :
+
+```bash
+npm run dev
+```
+
+Watcher les assets :
+
+```bash
+npm run watch
+```
+
+Compiler pour production :
+
+```bash
+npm run build
+```
+
+Les assets sources sont dans `app/assets/`. Les fichiers generes vont dans `app/public/build/` et ne doivent pas etre versionnes.
+
+---
+
+## 6. Variables d'environnement importantes
+
+### Symfony / Discord OAuth
+
+| Variable | Role |
+| --- | --- |
+| `DATABASE_URL` | Connexion MariaDB |
+| `OAUTH_DISCORD_CLIENT_ID` | Client ID OAuth Discord |
+| `OAUTH_DISCORD_CLIENT_SECRET` | Secret OAuth Discord |
+| `DISCORD_GUILD_ID` | Serveur Discord utilise pour les roles |
+| `DISCORD_ADMIN_ROLE_ID` | Role Discord donnant l'admin |
+| `DISCORD_BOT_TOKEN` ou `DISCORD_TOKEN` | Token bot utilise pour lire les roles |
+| `API_KEY` | Cle partagee entre le site et le bot |
+| `BOT_WEBHOOK_URL` | Webhook appele par le site quand un tournoi est modifie |
+
+### Fixture admin production
+
+| Variable | Defaut |
+| --- | --- |
+| `NXR_ADMIN_USERNAME` | `admin` |
+| `NXR_ADMIN_PASSWORD` | `adminNxr` |
+| `NXR_ADMIN_EMAIL` | `admin@nxr.local` |
+| `NXR_ADMIN_DISCORD_ID` | `admin-prod` |
+| `NXR_ADMIN_DISCORD_NAME` | `Admin NxR` |
+
+### Bot Discord
+
+| Variable | Role |
+| --- | --- |
+| `TOKEN` | Token du bot Discord |
+| `CLIENT_ID` | ID application Discord |
+| `GUILD_ID` / `DISCORD_GUILD_ID` | Serveur cible pour les slash commands |
+| `ROUTE_API` | Base URL de l'API site, ex: `http://nginx/api` |
+| `API_KEY` | Cle envoyee dans le header `x-api-key` |
+| `COMMAND_CHANNEL_ID` | Salon autorise pour les commandes |
+| `LOG_CHANNEL_ID` | Salon de logs |
+| `ROSTER_CHANNEL_ID` | Salon d'annonce roster |
+| `CAPITAINE_ROLE_ID` | Role Discord capitaine |
+
+---
+
+## 7. Routes principales
+
+### Public
+
+| Route | Description |
+| --- | --- |
+| `/` | Accueil |
+| `/news` | Actualites |
+| `/players` | Joueurs |
+| `/rosters` | Rosters |
+| `/schedule` | Planning |
+| `/matches` | Matchs |
+| `/cgu` | Conditions generales d'utilisation |
+
+### Compte
+
+| Route | Description |
+| --- | --- |
+| `/login` | Connexion Discord |
+| `/connect/discord` | Depart OAuth Discord |
+| `/auth/discord/callback` | Callback OAuth Discord |
+| `/ajax/profile` | Fragment profil |
+| `/ajax/profile/socials` | Mise a jour des liens reseaux |
+| `/ajax/profile/delete` | Suppression/anonymisation du profil |
+| `/logout` | Deconnexion |
+
+### Administration
+
+| Route | Description |
+| --- | --- |
+| `/login/admin` | Connexion admin par formulaire |
+| `/admin/content/modal/{modal}` | Chargement modal admin |
+| `/admin/content/news` | Creation news |
+| `/admin/content/player` | Creation joueur |
+| `/admin/content/roster` | Creation roster |
+| `/admin/content/event` | Creation event |
+| `/admin/content/match` | Creation match |
+| `/admin/content/edit/{type}/{id}` | Lecture / sauvegarde edition |
+| `/admin/content/match/{id}/result` | Mise a jour resultat |
+| `/admin/content/tournament/{id}/players` | Joueurs d'un tournoi |
+
+### API Discord
+
+Toutes les routes `/api/discord/*` protegent les actions sensibles avec le header `x-api-key`.
+
+| Route | Methode | Description |
+| --- | --- | --- |
+| `/api/discord/ping` | GET | Test API |
+| `/api/discord/register` | POST | Synchronise un compte Discord |
+| `/api/discord/add-event` | POST | Ajoute un event depuis le bot |
+| `/api/discord/add-tournois` | POST | Synchronise les tournois |
+| `/api/discord/tournoi-checkin` | POST | Synchronise une presence tournoi |
+
+---
+
+## 8. Bot Discord
+
+Entrer dans le conteneur :
+
+```bash
+docker exec -it discord_bot bash
+```
+
+Installer les dependances si besoin :
+
+```bash
+npm install
+```
+
+Deployer les slash commands :
+
+```bash
+docker exec discord_bot npm run deploy:commands
+```
+
+Redemarrer le bot :
+
+```bash
+docker compose restart discord_bot
+```
+
+Verifier la syntaxe des commandes :
+
+```bash
+docker exec discord_bot sh -c "for f in cmd/*.js; do node --check \"$f\"; done"
 ```
 
 ---
 
-# 🧰 Symfony CLI
+## 9. Structure du projet
 
-La Symfony CLI peut être utilisée pour du diagnostic uniquement.
-
-⚠️ L'application doit toujours être exécutée via Docker et Nginx.
-
-Exemple :
-
-```bash
-symfony check:requirements
+```text
+AppWebNxr/
+|-- app/
+|   |-- assets/                 # JS/CSS sources Encore
+|   |-- config/                 # Configuration Symfony
+|   |-- migrations/             # Migrations Doctrine
+|   |-- public/                 # Front controller et build assets
+|   |-- src/
+|   |   |-- Controller/         # Controllers web/admin
+|   |   |-- Controller/Api/     # API Discord
+|   |   |-- Entity/             # Entites Doctrine
+|   |   |-- Form/               # Formulaires admin
+|   |   |-- Service/            # Services metier
+|   |   `-- DataFixtures/       # Fixtures test/prod
+|   |-- templates/              # Templates Twig
+|   `-- tests/                  # Tests PHPUnit
+|-- bot/                        # Bot Discord actif
+|-- botMerge/                   # Variante/archive bot
+|-- botReav/                    # Variante/archive bot
+|-- docker/nginx/default.conf   # Configuration Nginx
+|-- Dockerfile                  # Image PHP FPM
+`-- docker-compose.yml          # Stack locale
 ```
 
 ---
 
-# 🌿 Workflow Git
+## 10. Conventions frontend
 
-## Branches
+* Les templates Twig doivent rester structurels.
+* Ne pas ajouter de `style="..."` dans les Twig.
+* Ne pas ajouter de blocs `<style>` dans les Twig.
+* Placer les styles dans `app/assets/styles/`.
+* Les styles de page vont dans `app/assets/styles/pages/<page>/<page>.css`.
+* Importer les nouveaux fichiers CSS dans `app/assets/styles/app.css`.
+* Les comportements JS globaux vont dans `app/assets/app.js`.
+* Les comportements par page vont dans `app/assets/js/pages/...`.
 
-| Branche   | Utilisation   |
-| --------- | ------------- |
-| main      | Production    |
-| feature/* | Développement |
+Exemples recents :
+
+* styles profil : `app/assets/styles/pages/profile/profile.css` ;
+* styles CGU : `app/assets/styles/pages/cgu/cgu.css` ;
+* styles admin : `app/assets/styles/pages/admin/admin.css`.
 
 ---
 
-## Créer une nouvelle fonctionnalité
+## 11. Donnees personnelles
+
+Le profil membre permet :
+
+* d'afficher les infos Discord utiles ;
+* de modifier les liens reseaux publics ;
+* de supprimer le profil.
+
+La suppression du profil :
+
+* supprime le compte web `User` ;
+* deconnecte la session ;
+* vide les liens reseaux du joueur lie ;
+* retire le `discordId` du joueur ;
+* anonymise les donnees personnelles restantes du joueur ;
+* retire les checkins et entrees roster d'evenements liees au Discord ID.
+
+Les donnees sportives anonymisees peuvent rester pour conserver l'historique des matchs et evenements.
+
+---
+
+## 12. Qualite et tests
+
+Dans le conteneur PHP :
+
+```bash
+docker exec -it symfony_php bash
+```
+
+Verifier le style PHP :
+
+```bash
+vendor/bin/php-cs-fixer fix --dry-run --diff
+```
+
+Analyse statique :
+
+```bash
+vendor/bin/phpstan analyse
+```
+
+Tests PHPUnit :
+
+```bash
+vendor/bin/phpunit --testdox
+```
+
+Compiler le front :
+
+```bash
+docker exec -it symfony_node bash
+npm run dev
+```
+
+---
+
+## 13. Fichiers a ne pas versionner
+
+Ces dossiers/fichiers sont generes localement et doivent rester ignores :
+
+```text
+app/vendor/
+app/var/
+app/node_modules/
+app/public/build/
+app/.phpunit.cache/
+.idea/
+.vscode/
+```
+
+Les caches `app/var/` et `app/.phpunit.cache/` peuvent etre supprimes sans risque : Symfony/PHPUnit les regenerent.
+
+---
+
+## 14. Workflow Git
+
+Branches conseillees :
+
+| Branche | Usage |
+| --- | --- |
+| `main` | Production |
+| `feature/*` | Nouvelle fonctionnalite |
+| `fix/*` | Correction |
+
+Commandes :
 
 ```bash
 git checkout main
 git pull origin main
-
 git checkout -b feature/nom-feature
 ```
 
----
+Avant commit :
 
-## Commit et Push
+```bash
+git status
+docker exec -it symfony_php vendor/bin/phpunit --testdox
+docker exec -it symfony_node npm run dev
+```
+
+Commit :
 
 ```bash
 git add .
-
-git commit -m "feat: description de la fonctionnalité"
-
-git push
+git commit -m "feat: description courte"
+git push --set-upstream origin feature/nom-feature
 ```
 
 ---
 
-## Fusion vers la branche principale
+## 15. Deploiement
 
-Les fusions vers `main` sont réalisées après validation de l'équipe de développement.
-
----
-
-# 🚀 Déploiement Production
-
-Le déploiement utilise exactement la même stack que l'environnement de développement.
+La stack de production reprend la meme base Docker :
 
 ```bash
 docker compose up -d --build
 ```
 
-Compatible :
+Apres deploiement :
 
-* Debian 13.5
-* Docker Engine
-* Docker Compose
-
----
-
-# 📌 Bonnes pratiques
-
-### Git
-
-* Toujours effectuer un `git pull` avant de commencer.
-* Ne jamais développer directement sur `main`.
-* Utiliser des messages de commit explicites.
-
-Exemples :
-
-```text
-feat: ajout du système de tournois
-fix: correction de l'authentification Discord
-chore: mise à jour des dépendances
+```bash
+docker exec -it symfony_php php bin/console doctrine:migrations:migrate --no-interaction
+docker exec -it symfony_php php bin/console cache:clear
+docker exec -it symfony_node npm run build
+docker compose restart discord_bot
 ```
 
-### Symfony
+Verifier ensuite :
 
-* Utiliser Composer uniquement dans le conteneur Docker.
-* Ne jamais lancer l'application avec `symfony serve`.
-
-### Versionnement
-
-Ne jamais versionner :
-
-```text
-/vendor
-/var
-/.idea
-/.vscode
-```
-
-Ajouter ces éléments dans le `.gitignore`.
+* `http://localhost:8080` ou l'URL publique ;
+* `/api/discord/ping` ;
+* connexion admin ;
+* connexion Discord ;
+* synchronisation bot/site.
 
 ---
 
-# 👥 Équipe
+## 16. Licence
 
-Projet développé et maintenu par l'équipe **AppWebNxr**.
-
----
-
-# 📄 Licence
-
-Projet privé.
-
-Tous droits réservés.
+Projet prive maintenu par la team Naxera eSport.

@@ -6,7 +6,7 @@
         <p class='hero-text'>"One Team. One Vision. NxR."</p>
         <div class="hero-actions">
             <a class="button button-primary" href="{{ path('app_players') }}">Rejoindre la team</a>
-            <a class="button button-ghost" href="{{ path('app_rosters') }}">Voir nos rosters</a>
+            <a class="button button-ghost" href="{{ path('app_matches') }}">Voir les matchs</a>
         </div>
     </div>
 </section>
@@ -28,7 +28,7 @@
         </div>
         <div class="card-grid three">
             {% for item in news|slice(0, 3) %}
-                <article class="image-card">
+                <article class="image-card js-news-card" data-news-id="{{ item.id }}" role="button" tabindex="0">
                     <img src="{{ item.image }}" alt="">
                     <div class="card-body">
                         <h3>{{ item.title }}</h3>
@@ -43,37 +43,64 @@
 
 <section class="section container">
     <div class="section-title">
-        <h2>Rosters actifs</h2>
+        <h2>Derniers matchs joues</h2>
+        <a href="{{ path('app_matches') }}">Voir tout -></a>
     </div>
-    <div class="card-grid two">
-        {% for roster in rosters %}
-            <article class="roster-card compact">
-                <div class="roster-banner">
-                    <img src="{{ roster.banner }}" alt="">
-                    <div>
-                        <h3>{{ roster.name }}</h3>
-                        <p>{{ roster.game }}</p>
-                    </div>
+
+    <div class="home-match-list">
+        {% for match in recentMatches %}
+            <article class="home-match-card js-match-card" data-match-id="{{ match.id }}" role="button" tabindex="0">
+                <div class="home-match-meta">
+                    <span>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'TBD' }}</span>
+                    <span>{{ match.game }}</span>
                 </div>
-                <div class="mini-stats">
-                    <span><strong>{{ roster.wins }}</strong> Victoires</span>
-                    <span><strong>{{ roster.losses }}</strong> Defaites</span>
-                    <span><strong>{{ roster.winrate }}</strong> Winrate</span>
-                </div>
-                <div class="player-list">
-                    {% for player in roster.players %}
-                        <span>{{ player.pseudo }}<em>{{ player.role }}</em></span>
-                    {% endfor %}
-                </div>
+
+                <h3>
+                    {{ match.teamA ? match.teamA.name : 'TBA' }}
+                    vs
+                    {{ match.teamB ? match.teamB.name : 'TBA' }}
+                </h3>
+
+                <p>{{ match.mapName ? match.mode ~ ' - ' ~ match.mapName : match.mode }}</p>
+
+                {% if match.result == 'Victory' %}
+                    <span class="result win">Victoire</span>
+                {% elseif match.result == 'Defeat' %}
+                    <span class="result loss">Defaite</span>
+                {% else %}
+                    <span class="result">A venir</span>
+                {% endif %}
             </article>
+        {% else %}
+            <p>Aucun match joue pour le moment.</p>
         {% endfor %}
     </div>
-    <div class="center-action"><a class="button button-ghost" href="{{ path('app_rosters') }}">Voir tous les rosters</a></div>
 </section>
 
-<section class="section section-alt partners">
+<section class="section section-alt partners" hidden aria-hidden="true">
     <div class="container">
         <h2>Nos partenaires</h2>
         <div class="partner-row"><span>HyperX</span><span>DISCORD</span><span>TWITCH</span></div>
     </div>
 </section>
+
+<div class="news-modal" id="newsModal" aria-hidden="true">
+    <div class="news-modal-overlay js-close-news-modal"></div>
+
+    <div class="news-modal-box">
+        <button type="button" class="news-modal-close js-close-news-modal">
+            x
+        </button>
+
+        <div id="newsModalContent"></div>
+    </div>
+</div>
+
+<div class="match-modal" id="matchModal" aria-hidden="true">
+    <div class="match-modal-overlay js-close-match-modal"></div>
+
+    <div class="match-modal-box">
+        <button type="button" class="match-modal-close js-close-match-modal">x</button>
+        <div id="matchModalContent"></div>
+    </div>
+</div>

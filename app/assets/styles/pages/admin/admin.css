@@ -1,6 +1,152 @@
 @import '../../_variables.css';
 @import '../../common.css';
 
+.admin-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    border-top: 2px solid #7c3aed;
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    font-family: 'Inter', sans-serif;
+}
+
+.admin-bar-content {
+    display: flex;
+    max-width: 1400px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding: 12px 20px;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.admin-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    background-color: #7c3aed;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.admin-user {
+    color: #d1d5db;
+    font-size: 14px;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.admin-bar .admin-add-btn {
+    background-color: #7c3aed;
+    color: white;
+}
+
+.admin-bar .admin-add-btn:hover {
+    background-color: #6d28d9;
+    transform: translateY(-2px);
+}
+
+.admin-logout-btn {
+    border: 1px solid #4b5563;
+    background-color: transparent;
+    color: #d1d5db;
+}
+
+.admin-logout-btn:hover {
+    background-color: rgba(255, 255, 255, .1);
+    color: white;
+}
+
+.admin-panel {
+    padding: 20px;
+    border-top: 1px solid #374151;
+    background: #0f172a;
+    animation: slideUp .3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-panel-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-panel-content h3 {
+    margin: 0 0 15px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.admin-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.admin-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    background-color: #1f2937;
+    color: white;
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.admin-action-card:hover {
+    border-color: #7c3aed;
+    background-color: #374151;
+    transform: translateY(-2px);
+}
+
+.admin-action-card .icon {
+    font-size: 24px;
+}
+
+.admin-action-card .label {
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+}
+
 .admin-locked {
     position: relative;
     display: grid;
@@ -56,6 +202,106 @@
     color: var(--muted);
     line-height: 1.7;
     font-weight: 700;
+}
+
+.admin-login-page {
+    display: grid;
+    min-height: calc(100vh - 80px);
+    place-items: center;
+    padding: 48px 16px;
+}
+
+.admin-login-card {
+    width: min(100%, 400px);
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+}
+
+.admin-login-card h1 {
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+}
+
+.admin-login-card .form-group {
+    margin-bottom: 20px;
+}
+
+.admin-login-card .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+.admin-login-card .form-group input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.admin-login-card .form-group input:focus {
+    border-color: #7c3aed;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, .1);
+}
+
+.admin-login-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #7c3aed;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color .3s;
+}
+
+.admin-login-btn:hover {
+    background-color: #6d28d9;
+}
+
+.admin-login-card .alert {
+    margin-bottom: 20px;
+    padding: 12px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.admin-login-card .alert-danger {
+    border: 1px solid #fcc;
+    background-color: #fee;
+    color: #c33;
+}
+
+.admin-login-card .back-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.admin-login-card .back-link a {
+    color: #7c3aed;
+    text-decoration: none;
+}
+
+.admin-login-card .back-link a:hover {
+    text-decoration: underline;
+}
+
+.admin-login-card .hero-logo {
+    margin-bottom: 20px;
+    color: #7c3aed;
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
 }
 
 .admin-dropdown {
@@ -289,9 +535,18 @@
 }
 
 .event-players-fields {
+    display: none;
     flex-direction: column;
     gap: 14px;
     margin-top: 12px;
+}
+
+.event-players-fields.is-visible {
+    display: flex;
+}
+
+.is-hidden {
+    display: none !important;
 }
 
 .admin-form-group {
@@ -304,6 +559,16 @@
     color: #fff;
     font-weight: 700;
     font-size: .9rem;
+}
+
+.admin-social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.admin-social-grid input {
+    min-width: 0;
 }
 
 .admin-form select.ts-hidden-accessible {
@@ -407,5 +672,30 @@
     .admin-locked h1,
     .admin-modal-box h2 {
         font-size: 2rem;
+    }
+
+    .admin-social-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-bar-content {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .admin-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .admin-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    .admin-quick-actions {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

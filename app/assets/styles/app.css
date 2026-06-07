@@ -3,8 +3,9 @@
 @import './pages/login/login.css';
 @import './pages/news/news.css';
 @import './pages/players/players.css';
+@import './pages/profile/profile.css';
 @import './pages/rosters/rosters.css';
 @import './pages/matches/matches.css';
 @import './pages/schedule/schedule.css';
 @import './pages/admin/admin.css';
-
+@import './pages/cgu/cgu.css';

@@ -223,6 +223,14 @@ img {
     color: #7c3aed;
 }
 
+.profile-btn--wide {
+    width: 150%;
+}
+
+.profile-btn-username {
+    color: #7b2eff;
+}
+
 .user-avatar {
     width: 32px;
     height: 32px;
@@ -399,6 +407,12 @@ p {
 .roster-card:hover,
 .stat-card:hover {
     transform: translateY(-2px);
+}
+
+.card-grid.two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
 }
 
 .stat-card,
@@ -653,6 +667,10 @@ p {
 
     .section {
         padding: 48px 0;
+    }
+
+    .card-grid.two {
+        grid-template-columns: 1fr;
     }
 }
 .admin-edit-btn,

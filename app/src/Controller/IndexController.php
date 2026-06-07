@@ -6,7 +6,6 @@ use App\Repository\EventRepository;
 use App\Repository\GameMatchRepository;
 use App\Repository\NewsRepository;
 use App\Repository\PlayerRepository;
-use App\Repository\RosterRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +23,6 @@ class IndexController extends AbstractController
         PlayerRepository $playerRepository,
         GameMatchRepository $gameMatchRepository,
         NewsRepository $newsRepository,
-        RosterRepository $rosterRepository,
         TeamRepository $teamRepository,
         EventRepository $eventRepository,
         UserRepository $userRepository,
@@ -44,6 +42,14 @@ class IndexController extends AbstractController
             ? number_format(($victories / $matchesPlayed) * 100, 1).'%'
             : '0%';
 
+        $recentMatches = $gameMatchRepository->createQueryBuilder('m')
+            ->andWhere('m.playedAt <= :now')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('m.playedAt', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
         return $this->renderPage($request, 'index', 'Naxera eSport', [
             'nbMembre' => count($players),
             'matchesPlayed' => $matchesPlayed,
@@ -51,7 +57,7 @@ class IndexController extends AbstractController
             'winrate' => $winrate,
 
             'news' => $newsRepository->findBy([], ['date' => 'DESC'], 3),
-            'rosters' => $rosterRepository->findAll(),
+            'recentMatches' => $recentMatches,
 
             'players' => $players,
             'users' => $users,

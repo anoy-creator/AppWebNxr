@@ -23,7 +23,6 @@
         '/': 'Accueil',
         '/news': 'Actualites',
         '/players': 'Joueurs',
-        '/rosters': 'Rosters',
         '/schedule': 'Planning',
         '/matches': 'Matchs'
     } %}
@@ -48,7 +47,6 @@
                         <div class="admin-dropdown-menu" id="adminMenu">
                             <button class="dropdown-item" data-modal="add-news">Actualite</button>
                             <button class="dropdown-item" data-modal="add-player">Joueur</button>
-                            <button class="dropdown-item" data-modal="add-roster">Roster</button>
                             <button class="dropdown-item" data-modal="add-event">Event</button>
                             <button class="dropdown-item" data-modal="add-match">Match</button>
                         </div>
@@ -57,18 +55,18 @@
 
                 {% if app.user %}
                     <div class="user-menu">
-                        <button class="profile-btn" id="profileMenuBtn">
+                        <button class="profile-btn profile-btn--wide" id="profileMenuBtn">
                             {% if app.user.avatar %}
                                 <img src="{{ app.user.avatar }}" alt="Profil" class="user-avatar">
                             {% else %}
                                 <span class="user-avatar-fallback">{{ app.user.username|first|upper }}</span>
                             {% endif %}
-                            <span>{{ app.user.username }}</span>
+                            <span class="profile-btn-username">{{ app.user.username|capitalize }}</span>
                         </button>
                         <div class="user-dropdown-menu" id="profileMenu">
                             <a href="#" class="dropdown-item" data-load-profile="true">Profil</a>
                             <hr>
-                            <a href="{{ path('app_logout') }}" class="dropdown-item logout-item">Deconnexion</a>
+                            <a href="{{ path('app_logout') }}" class="dropdown-item logout-item" data-no-ajax="true" data-logout-link="true">Deconnexion</a>
                         </div>
                     </div>
                 {% else %}
@@ -108,11 +106,12 @@
                         <li><a href="{{ path('app_index') }}">Accueil</a></li>
                         <li><a href="{{ path('app_news') }}">Actualites</a></li>
                         <li><a href="{{ path('app_players') }}">Joueurs</a></li>
-                        <li><a href="{{ path('app_rosters') }}">Rosters</a></li>
+                        <li><a href="{{ path('app_matches') }}">Matchs</a></li>
+                        <li><a href="{{ path('app_cgu') }}">CGU</a></li>
                     </ul>
                 </div>
 
-                <div>
+                <div hidden aria-hidden="true">
                     <h3>Partenaires</h3>
                     <ul class="footer-list">
                         <li>HyperX</li>

@@ -35,9 +35,22 @@ docker exec -it symfony_php bash
 composer install
 
 php bin/console doctrine:database:create --if-not-exists
-php bin/console doctrine:schema:update --force
-php bin/console doctrine:fixtures:load
+php bin/console doctrine:migrations:migrate
 ```
+
+Pour initialiser une base de test avec des donnees de demonstration :
+
+```bash
+php bin/console doctrine:fixtures:load --group=test
+```
+
+Pour initialiser une base de production sans contenu public de demo :
+
+```bash
+NXR_ADMIN_USERNAME=admin NXR_ADMIN_PASSWORD='mot-de-passe-fort' php bin/console doctrine:fixtures:load --group=prod
+```
+
+Cette fixture cree uniquement le compte admin, un roster technique et deux equipes de base. Elle ne cree aucune actualite, joueur, planning, tournoi, match ou stat.
 
 ---
 
@@ -46,8 +59,7 @@ php bin/console doctrine:fixtures:load
 ```bash
 docker exec -it symfony_node bash
 
-yarn install
-npm install tom-select
+npm install
 ```
 
 ---
@@ -58,7 +70,7 @@ npm install tom-select
 
 ```bash
 docker exec -it symfony_node bash
-yarn watch
+npm run watch
 ```
 
 ### Back

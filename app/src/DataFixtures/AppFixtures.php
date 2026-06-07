@@ -11,13 +11,22 @@ use App\Entity\Roster;
 use App\Entity\Team;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-final class AppFixtures extends Fixture
+final class AppFixtures extends Fixture implements FixtureGroupInterface
 {
     public function __construct(private UserPasswordHasherInterface $passwordHasher)
     {
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getGroups(): array
+    {
+        return ['test'];
     }
 
     public function load(ObjectManager $manager): void
@@ -84,10 +93,9 @@ final class AppFixtures extends Fixture
             ->setGame('All Games')
             ->setRoster($rosters['NxR Warzone'])
             ->setSocials([
-                'twitter' => 'admin_nxr',
-                'twitch' => 'admin_nxr',
-                'youtube' => 'nxr_official',
-                'discord' => 'admin-fixture',
+                'twitter' => 'https://twitter.com/admin_nxr',
+                'youtube' => 'https://youtube.com/@nxr_official',
+                'insta' => 'https://instagram.com/nxr_official',
             ]);
 
         $admin->setPlayer($adminPlayer);
@@ -104,8 +112,8 @@ final class AppFixtures extends Fixture
                 'game' => 'Call of Duty',
                 'roster' => 'NxR Warzone',
                 'socials' => [
-                    'twitter' => 'shadowx',
-                    'twitch' => 'shadowx_nxr',
+                    'twitter' => 'https://twitter.com/shadowx',
+                    'insta' => 'https://instagram.com/shadowx',
                 ],
             ],
             [
@@ -116,8 +124,8 @@ final class AppFixtures extends Fixture
                 'game' => 'Warzone',
                 'roster' => 'NxR Warzone',
                 'socials' => [
-                    'twitch' => 'neonknight',
-                    'youtube' => 'neonknight',
+                    'youtube' => 'https://youtube.com/@neonknight',
+                    'tiktok' => 'https://tiktok.com/@neonknight',
                 ],
             ],
             [
@@ -128,9 +136,8 @@ final class AppFixtures extends Fixture
                 'game' => 'Multi-Gaming',
                 'roster' => 'NxR Warzone',
                 'socials' => [
-                    'twitter' => 'vortexpro',
-                    'twitch' => 'vortexpro',
-                    'youtube' => 'vortex',
+                    'twitter' => 'https://twitter.com/vortexpro',
+                    'youtube' => 'https://youtube.com/@vortexpro',
                 ],
             ],
             [
@@ -141,7 +148,7 @@ final class AppFixtures extends Fixture
                 'game' => 'Call of Duty',
                 'roster' => 'NxR CDL',
                 'socials' => [
-                    'twitter' => 'quantumace',
+                    'twitter' => 'https://twitter.com/quantumace',
                 ],
             ],
             [
@@ -152,7 +159,7 @@ final class AppFixtures extends Fixture
                 'game' => 'All Games',
                 'roster' => 'NxR CDL',
                 'socials' => [
-                    'twitter' => 'blazefury',
+                    'twitter' => 'https://twitter.com/blazefury',
                 ],
             ],
             [
@@ -163,8 +170,8 @@ final class AppFixtures extends Fixture
                 'game' => 'Content',
                 'roster' => 'NxR CDL',
                 'socials' => [
-                    'twitter' => 'cyberstorm',
-                    'youtube' => 'cyberstorm',
+                    'twitter' => 'https://twitter.com/cyberstorm',
+                    'youtube' => 'https://youtube.com/@cyberstorm',
                 ],
             ],
         ];
@@ -210,7 +217,7 @@ final class AppFixtures extends Fixture
                 'date' => '2026-05-28',
                 'teamA' => 'NxR Esport',
                 'teamB' => 'Team Horizon',
-                'mode' => 'Battle Royale',
+                'mode' => GameMatch::ModeDomination,
                 'result' => 'Victory',
                 'score' => '3-1',
                 'game' => 'Warzone',
@@ -220,7 +227,7 @@ final class AppFixtures extends Fixture
                 'date' => '2026-05-25',
                 'teamA' => 'NxR Esport',
                 'teamB' => 'Elite Squad',
-                'mode' => 'Hardpoint',
+                'mode' => GameMatch::ModeHardpoint,
                 'result' => 'Victory',
                 'score' => '250-187',
                 'game' => 'CDL',
@@ -230,7 +237,7 @@ final class AppFixtures extends Fixture
                 'date' => '2026-05-22',
                 'teamA' => 'NxR Esport',
                 'teamB' => 'Phantom Gaming',
-                'mode' => 'Search & Destroy',
+                'mode' => GameMatch::ModeSearchAndDestroy,
                 'result' => 'Defeat',
                 'score' => '4-6',
                 'game' => 'CDL',
@@ -240,7 +247,7 @@ final class AppFixtures extends Fixture
                 'date' => '2026-05-20',
                 'teamA' => 'NxR Esport',
                 'teamB' => 'Thunder Esports',
-                'mode' => 'Resurgence',
+                'mode' => GameMatch::ModeTdm,
                 'result' => 'Victory',
                 'score' => '5-0',
                 'game' => 'Warzone',
@@ -250,7 +257,7 @@ final class AppFixtures extends Fixture
                 'date' => '2026-05-18',
                 'teamA' => 'NxR Esport',
                 'teamB' => 'Apex Legends',
-                'mode' => 'Tournament Finals',
+                'mode' => GameMatch::ModeControl,
                 'result' => 'Victory',
                 'score' => '3-2',
                 'game' => 'Tournament',
@@ -260,10 +267,10 @@ final class AppFixtures extends Fixture
                 'date' => '2026-05-16',
                 'teamA' => 'NxR Esport',
                 'teamB' => 'Team Vitality',
-                'mode' => 'Control',
+                'mode' => GameMatch::ModeTdm,
                 'result' => 'Defeat',
                 'score' => '2-3',
-                'game' => 'CDL',
+                'game' => 'Hardcore',
                 'roster' => 'NxR CDL',
             ],
         ];
@@ -411,6 +418,10 @@ final class AppFixtures extends Fixture
                 ->setDescription($data['description']);
 
             $manager->persist($event);
+
+            if ('Tournoi Summer Cup' === $data['title']) {
+                $matches[4]->setTournament($event);
+            }
         }
 
         $manager->flush();

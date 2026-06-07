@@ -15,8 +15,10 @@ class DiscordAccountLinker
      */
     private array $playersByDiscordId = [];
 
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private PlayerSocialLinks $playerSocialLinks,
+    ) {
     }
 
     /**
@@ -97,11 +99,10 @@ class DiscordAccountLinker
                 ->setRole('Joueur')
                 ->setGrade('Membre')
                 ->setGame('Call of Duty')
-                ->setSocials(['discord' => $discordId]);
+                ->setSocials([]);
         }
 
-        $socials = $player->getSocials();
-        $socials['discord'] = $discordId;
+        $socials = $this->playerSocialLinks->normalize($player->getSocials(), false);
 
         if (!$isNewPlayer && $this->shouldRefreshPseudoFromDiscord($player, $discordId, $pseudo)) {
             $player->setPseudo($pseudo);

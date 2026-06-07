@@ -34,7 +34,8 @@ class ScheduleController extends AbstractController
             $events = $eventRepository->createQueryBuilder('e')
                 ->andWhere('e.type IN (:types)')
                 ->setParameter('types', $eventTypes)
-                ->orderBy('e.date', 'ASC')
+                ->orderBy('e.date', 'DESC')
+                ->addOrderBy('e.time', 'DESC')
                 ->getQuery()
                 ->getResult();
         }
@@ -43,9 +44,32 @@ class ScheduleController extends AbstractController
 
         if (in_array(Event::MatchOfficiel, $types, true)) {
             $matches = $gameMatchRepository->findBy([], [
-                'playedAt' => 'ASC',
+                'playedAt' => 'DESC',
             ]);
         }
+
+        $scheduleItems = [];
+
+        foreach ($events as $event) {
+            $scheduleItems[] = [
+                'kind' => 'event',
+                'event' => $event,
+                'sortAt' => $this->createEventSortDate($event),
+            ];
+        }
+
+        foreach ($matches as $match) {
+            $scheduleItems[] = [
+                'kind' => 'match',
+                'match' => $match,
+                'sortAt' => $match->getPlayedAt() ?? new \DateTimeImmutable('@0'),
+            ];
+        }
+
+        usort(
+            $scheduleItems,
+            static fn (array $left, array $right): int => $right['sortAt'] <=> $left['sortAt']
+        );
 
         $scheduleFilters = array_map(
             static fn (string $type) => [
@@ -59,6 +83,7 @@ class ScheduleController extends AbstractController
         return $this->renderPage($request, 'schedule', 'Planning - Naxera', [
             'events' => $events,
             'matches' => $matches,
+            'scheduleItems' => $scheduleItems,
             'activeTypes' => $types,
             'scheduleFilters' => $scheduleFilters,
         ]);
@@ -85,5 +110,13 @@ class ScheduleController extends AbstractController
             'match' => $match,
             'stats' => $stats,
         ]);
+    }
+
+    private function createEventSortDate(Event $event): \DateTimeImmutable
+    {
+        $date = $event->getDate()?->format('Y-m-d') ?? '1970-01-01';
+        $time = $event->getTime() ?: '00:00';
+
+        return new \DateTimeImmutable($date.' '.$time);
     }
 }

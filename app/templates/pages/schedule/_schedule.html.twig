@@ -23,70 +23,72 @@
     </div>
 
     <div id="schedule-list" class="stack">
-        {% if events|length == 0 and matches|length == 0 %}
+        {% if scheduleItems|default([])|length == 0 %}
             <p>Aucun evenement programme.</p>
         {% else %}
-            {% for event in events %}
-                <article
-                    class="event-card js-schedule-item {{ event.type }}"
-                    data-detail-url="{{ path('app_schedule_event_details', { id: event.id }) }}"
-                    data-item-id="event-{{ event.id }}"
-                >
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <button type="button" class="admin-edit-btn" data-admin-edit="event" data-admin-edit-id="{{ event.id }}">Modifier</button>
-                    {% endif %}
-
-                    <div class="event-card-meta">
-                        <span>{{ event.title }}</span>
-                        <span>
-                            {{ event.date ? event.date|date('d/m/Y') : 'TBD' }}
-                            {% if event.time %}
-                                - {{ event.time }}
-                            {% endif %}
-                        </span>
-                    </div>
-
-                    <h3>{{ event.title }}</h3>
-                    <p>{{ event.publicDescription }}</p>
-                </article>
-
-                <div class="schedule-detail-row" id="schedule-detail-event-{{ event.id }}">
-                    <div class="schedule-detail-content"></div>
-                </div>
-            {% endfor %}
-
-            {% for match in matches %}
-                <article
-                    class="event-card js-schedule-item match"
-                    data-detail-url="{{ path('app_schedule_match_details', { id: match.id }) }}"
-                    data-item-id="match-{{ match.id }}"
-                >
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <button type="button" class="admin-edit-btn" data-admin-edit="match" data-admin-edit-id="{{ match.id }}">Modifier</button>
-                    {% endif %}
-
-                    <div class="event-card-meta">
-                        <span>Match officiel</span>
-                        <span>{{ match.playedAt ? match.playedAt|date('d/m/Y') : 'TBD' }}</span>
-                    </div>
-
-                    <h3>
-                        {{ match.teamA ? match.teamA.name : 'TBA' }}
-                        vs
-                        {{ match.teamB ? match.teamB.name : 'TBA' }}
-                    </h3>
-
-                    <p>
-                        {{ match.game }}
-                        {% if match.mode %}
-                            - {{ match.mode }}
+            {% for item in scheduleItems %}
+                {% if item.kind == 'event' %}
+                    {% set event = item.event %}
+                    <article
+                        class="event-card js-schedule-item {{ event.type }}"
+                        data-detail-url="{{ path('app_schedule_event_details', { id: event.id }) }}"
+                        data-item-id="event-{{ event.id }}"
+                    >
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <button type="button" class="admin-edit-btn" data-admin-edit="event" data-admin-edit-id="{{ event.id }}">Modifier</button>
                         {% endif %}
-                    </p>
-                </article>
 
-                <div class="schedule-detail-row" id="schedule-detail-match-{{ match.id }}">
-                    <div class="schedule-detail-content"></div>
-                </div>
+                        <div class="event-card-meta">
+                            <span>{{ event.title }}</span>
+                            <span>
+                                {{ event.date ? event.date|date('d/m/Y') : 'TBD' }}
+                                {% if event.time %}
+                                    - {{ event.time }}
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <h3>{{ event.title }}</h3>
+                        <p>{{ event.publicDescription }}</p>
+                    </article>
+
+                    <div class="schedule-detail-row" id="schedule-detail-event-{{ event.id }}">
+                        <div class="schedule-detail-content"></div>
+                    </div>
+                {% else %}
+                    {% set match = item.match %}
+                    <article
+                        class="event-card js-schedule-item match"
+                        data-detail-url="{{ path('app_schedule_match_details', { id: match.id }) }}"
+                        data-item-id="match-{{ match.id }}"
+                    >
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <button type="button" class="admin-edit-btn" data-admin-edit="match" data-admin-edit-id="{{ match.id }}">Modifier</button>
+                        {% endif %}
+
+                        <div class="event-card-meta">
+                            <span>Match officiel</span>
+                            <span>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'TBD' }}</span>
+                        </div>
+
+                        <h3>
+                            {{ match.teamA ? match.teamA.name : 'TBA' }}
+                            vs
+                            {{ match.teamB ? match.teamB.name : 'TBA' }}
+                        </h3>
+
+                        <p>
+                            {{ match.game }}
+                            {% if match.mode %}
+                                - {{ match.mode }}
+                            {% endif %}
+                        </p>
+                    </article>
+
+                    <div class="schedule-detail-row" id="schedule-detail-match-{{ match.id }}">
+                        <div class="schedule-detail-content"></div>
+                    </div>
+                {% endif %}
             {% endfor %}
         {% endif %}
     </div>

@@ -1,6 +1,15 @@
 <div class="profile-container">
-    <h1>Mon Profil</h1>
+    <h1>Mon profil</h1>
     {% set discordRoles = discordRoles|default([]) %}
+    {% set socialNetworks = socialNetworks|default(['tiktok', 'youtube', 'discord', 'insta', 'twitter']) %}
+    {% set socialLabels = socialLabels|default({
+        tiktok: 'TikTok',
+        youtube: 'YouTube',
+        discord: 'Discord',
+        insta: 'Instagram',
+        twitter: 'Twitter'
+    }) %}
+    {% set player = user.player %}
 
     <div class="profile-card">
         {% if user.avatar %}
@@ -28,77 +37,56 @@
             {% endif %}
         </div>
     </div>
+
+    <div class="profile-social-card">
+        <div class="profile-social-heading">
+            <h2>Liens reseaux</h2>
+            {% if player %}
+                {% include 'components/_social_links.html.twig' with {
+                    socials: player.socials,
+                    class_name: 'profile-social-preview'
+                } only %}
+            {% endif %}
+        </div>
+
+        {% if player %}
+            <form class="profile-social-form" data-profile-socials-form>
+                <div class="profile-social-grid">
+                    {% for network in socialNetworks %}
+                        {% set rawUrl = player.socials[network]|default('') %}
+                        {% set currentUrl = rawUrl is iterable ? '' : rawUrl|trim %}
+                        <label>
+                            <span>{{ socialLabels[network]|default(network|capitalize) }}</span>
+                            <input
+                                name="socials[{{ network }}]"
+                                type="url"
+                                inputmode="url"
+                                placeholder="https://..."
+                                value="{{ currentUrl matches '~^https?://~i' ? currentUrl : '' }}"
+                            >
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="profile-social-actions">
+                    <button type="submit">Enregistrer</button>
+                    <span class="profile-social-feedback" data-profile-socials-feedback aria-live="polite"></span>
+                </div>
+            </form>
+        {% else %}
+            <p class="profile-muted">Aucun joueur n'est lie a ce profil.</p>
+        {% endif %}
+    </div>
+
+    <div class="profile-danger-card">
+        <div>
+            <h2>Zone sensible</h2>
+            <p>La suppression efface le compte web et anonymise les donnees personnelles liees au joueur.</p>
+        </div>
+
+        <form class="profile-delete-form" data-profile-delete-form data-token="{{ csrf_token('delete_profile') }}">
+            <button type="submit">Supprimer mon profil</button>
+            <span class="profile-social-feedback" data-profile-delete-feedback aria-live="polite"></span>
+        </form>
+    </div>
 </div>
-
-<style>
-.profile-container {
-    padding: 20px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.profile-card {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.profile-avatar-large {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.profile-avatar-large.no-avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-size: 48px;
-    font-weight: bold;
-    color: white;
-}
-
-.profile-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.profile-info h2 {
-    margin: 0 0 10px 0;
-    color: white;
-}
-
-.profile-info p {
-    margin: 8px 0;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.profile-roles {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.badge {
-    display: inline-block;
-    background: rgba(102, 126, 234, 0.2);
-    color: #667eea;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-}
-
-.profile-muted {
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 13px;
-}
-</style>

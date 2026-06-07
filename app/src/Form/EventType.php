@@ -31,7 +31,7 @@ class EventType extends AbstractType
             ->add('tournamentFormat', ChoiceType::class, [
                 'choices' => array_combine(Event::TournamentFormats, Event::TournamentFormats),
                 'required' => false,
-                'placeholder' => 'Format du tournoi',
+                'placeholder' => 'Format',
             ])
             ->add('captain', EntityType::class, [
                 'class' => Player::class,

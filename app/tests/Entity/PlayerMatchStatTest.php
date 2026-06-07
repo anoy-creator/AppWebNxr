@@ -37,8 +37,8 @@ class PlayerMatchStatTest extends TestCase
             ->setTeamA($teamA)
             ->setTeamB($teamB)
             ->setRoster($roster)
-            ->setGame('Warzone')
-            ->setMode('Battle Royale')
+            ->setGame(GameMatch::GameWarzone)
+            ->setMode(GameMatch::ModeDomination)
             ->setResult('Victory')
             ->setScore('3-1');
 

@@ -28,11 +28,10 @@ $(document).on(`change${eventNamespace}`, '.schedule-filter input', function () 
         return;
     }
 
-    const selectedTypes = $('.schedule-filter input:checked')
-        .map(function () {
-            return $(this).val();
-        })
-        .get();
+    const selectedType = $(this).val();
+
+    $('.schedule-filter input').prop('checked', false);
+    $(this).prop('checked', true);
 
     closeScheduleDetail();
 
@@ -43,7 +42,7 @@ $(document).on(`change${eventNamespace}`, '.schedule-filter input', function () 
         url: '/schedule',
         method: 'GET',
         data: {
-            types: selectedTypes.length ? selectedTypes : ['__none__']
+            types: [selectedType]
         },
         headers: {
             'X-Naxera-Ajax': '1',
@@ -95,9 +94,7 @@ $(document).on(`click${eventNamespace}`, '.js-schedule-item', function (event) {
     openedItemId = itemId;
     isDetailLoading = true;
 
-    $item
-        .find('.event-card-meta')
-        .append('<span class="schedule-inline-loader" aria-hidden="true"></span>');
+    $item.append('<span class="schedule-inline-loader" aria-hidden="true"></span>');
 
     $.ajax({
         url: detailUrl,

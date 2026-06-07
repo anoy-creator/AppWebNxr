@@ -18,11 +18,7 @@ class AdminLoginController extends AbstractController
         return $this->render('pages/admin/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
+            'hide_footer' => true,
         ]);
-    }
-
-    #[Route('/logout', name: 'app_logout')]
-    public function logout(): void
-    {
     }
 }

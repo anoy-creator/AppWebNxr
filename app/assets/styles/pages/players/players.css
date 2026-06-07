@@ -146,20 +146,73 @@
     font-weight: 700;
 }
 
-.social-links {
-    display: grid;
-    gap: 8px;
-    padding: 8px 24px 24px;
+.social-icon-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.social-links span {
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .045);
-    padding: 10px 12px;
-    color: #d8d9e2;
-    font-size: .85rem;
-    font-weight: 700;
+.social-links {
+    padding: 10px 24px 24px;
+}
+
+.social-icon-link {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+    text-decoration: none;
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.social-icon-link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(123, 46, 255, .55);
+    background: rgba(123, 46, 255, .24);
+    color: #fff;
+}
+
+.social-icon-link svg {
+    width: 21px;
+    height: 21px;
+    fill: currentColor;
+}
+
+.social-icon-cutout {
+    fill: #15101f;
+}
+
+.social-icon-stroke {
+    fill: none;
+    stroke: #15101f;
+    stroke-width: 2;
+}
+
+.social-icon-link--youtube {
+    color: #ff5a5a;
+}
+
+.social-icon-link--discord {
+    color: #8ea1ff;
+}
+
+.social-icon-link--insta {
+    color: #ff7ac8;
+}
+
+.social-icon-link--tiktok {
+    color: #7df6ff;
+}
+
+.social-icon-link--twitter {
+    color: #f7f7fb;
 }
 
 /* =========================
@@ -282,20 +335,8 @@
     font-weight: 900;
 }
 
-.player-modal-socials p {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    margin: 0 0 10px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .06);
-    color: #fff;
-    font-weight: 800;
-}
-
-.player-modal-socials span {
-    color: #aeb3c4;
+.player-modal-social-links {
+    gap: 12px;
 }
 
 /* =========================

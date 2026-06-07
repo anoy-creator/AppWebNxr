@@ -15,21 +15,59 @@ class MatchesController extends AbstractController
     use PageRenderTrait;
 
     #[Route('/matches', name: 'app_matches')]
-    public function index(Request $request, GameMatchRepository $gameMatchRepository): Response
-    {
-        $game = $request->query->get('game');
+    public function index(
+        Request $request,
+        GameMatchRepository $gameMatchRepository,
+    ): Response {
+        $game = (string) $request->query->get('game', 'Tous');
+        $matchFilters = array_merge(['Tous'], GameMatch::Games);
 
-        $criteria = [];
-
-        if ($game && 'Tous' !== $game) {
-            $criteria['game'] = $game;
+        if (!in_array($game, $matchFilters, true)) {
+            $game = 'Tous';
         }
 
-        $games = $gameMatchRepository->findBy($criteria, ['playedAt' => 'DESC']);
+        $criteria = [];
+        $tournamentGroups = [];
+
+        if (GameMatch::GameTournament === $game) {
+            $games = $gameMatchRepository->createQueryBuilder('m')
+                ->leftJoin('m.tournament', 't')
+                ->addSelect('t')
+                ->andWhere('m.tournament IS NOT NULL')
+                ->orderBy('m.playedAt', 'DESC')
+                ->getQuery()
+                ->getResult();
+
+            foreach ($games as $match) {
+                $tournament = $match->getTournament();
+
+                if (null === $tournament || null === $tournament->getId()) {
+                    continue;
+                }
+
+                $tournamentId = $tournament->getId();
+                $tournamentGroups[$tournamentId] ??= [
+                    'tournament' => $tournament,
+                    'matches' => [],
+                ];
+                $tournamentGroups[$tournamentId]['matches'][] = $match;
+            }
+        } else {
+            if ('Tous' !== $game) {
+                $criteria['game'] = $game;
+            }
+
+            $games = $gameMatchRepository->findBy($criteria, ['playedAt' => 'DESC']);
+        }
+
+        $tournamentGroups = array_values($tournamentGroups);
 
         return $this->renderPage($request, 'matches', 'Matchs - Naxera', [
             'games' => $games,
-            'activeFilter' => $game ?: 'Tous',
+            'activeFilter' => $game,
+            'isTournamentView' => GameMatch::GameTournament === $game,
+            'matchFilters' => $matchFilters,
+            'tournamentGroups' => $tournamentGroups,
         ]);
     }
 

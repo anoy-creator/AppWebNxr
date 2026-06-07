@@ -59,6 +59,13 @@ $(document).on(`click${eventNamespace}`, '.js-news-card', function (event) {
     });
 });
 
+$(document).on(`keydown${eventNamespace}`, '.js-news-card', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        $(this).trigger('click');
+    }
+});
+
 $(document).on(`click${eventNamespace}`, '.js-close-news-modal', function () {
     closeNewsModal();
 });

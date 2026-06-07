@@ -212,5 +212,25 @@
     "reminder24hSent": false,
     "reminder2hSent": false,
     "siteEventId": "26"
+  },
+  {
+    "id": "1780784661601",
+    "status": "active",
+    "createdBy": "374571291539144727",
+    "captain": "374571291539144727",
+    "date": "01/06/2026",
+    "heure": "21:00",
+    "format": "2v2",
+    "timestamp": 1780347600000,
+    "players": [
+      "1511388576347193474"
+    ],
+    "substitutes": [],
+    "checkins": {
+      "374571291539144727": "available"
+    },
+    "reminder24hSent": false,
+    "reminder2hSent": false,
+    "siteEventId": "35"
   }
 ]

@@ -10,6 +10,30 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: GameMatchRepository::class)]
 class GameMatch
 {
+    public const GameCdl = 'CDL';
+    public const GameWarzone = 'Warzone';
+    public const GameTournament = 'Tournament';
+    public const GameHardcore = 'Hardcore';
+    public const Games = [
+        self::GameCdl,
+        self::GameWarzone,
+        self::GameTournament,
+        self::GameHardcore,
+    ];
+
+    public const ModeTdm = 'Match à mort par équipe (TDM)';
+    public const ModeDomination = 'Domination';
+    public const ModeHardpoint = 'Point stratégique (Hardpoint)';
+    public const ModeSearchAndDestroy = 'Recherche et destruction (Search & Destroy)';
+    public const ModeControl = 'Contrôle (Control)';
+    public const Modes = [
+        self::ModeTdm,
+        self::ModeDomination,
+        self::ModeHardpoint,
+        self::ModeSearchAndDestroy,
+        self::ModeControl,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -244,6 +268,10 @@ class GameMatch
 
     public function setMode(string $mode): self
     {
+        if (!in_array($mode, self::Modes, true)) {
+            throw new \InvalidArgumentException(sprintf('Mode de match invalide: %s', $mode));
+        }
+
         $this->mode = $mode;
 
         return $this;

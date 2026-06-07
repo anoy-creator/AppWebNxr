@@ -31,8 +31,8 @@ class GameMatchTest extends TestCase
             ->setTeamA($teamA)
             ->setTeamB($teamB)
             ->setRoster($roster)
-            ->setGame('Warzone')
-            ->setMode('Battle Royale')
+            ->setGame(GameMatch::GameHardcore)
+            ->setMode(GameMatch::ModeHardpoint)
             ->setResult('Victory')
             ->setScore('3-1');
 
@@ -41,9 +41,16 @@ class GameMatchTest extends TestCase
         $this->assertSame($teamA, $match->getTeamA());
         $this->assertSame($teamB, $match->getTeamB());
         $this->assertSame($roster, $match->getRoster());
-        $this->assertSame('Warzone', $match->getGame());
-        $this->assertSame('Battle Royale', $match->getMode());
+        $this->assertSame(GameMatch::GameHardcore, $match->getGame());
+        $this->assertSame(GameMatch::ModeHardpoint, $match->getMode());
         $this->assertSame('Victory', $match->getResult());
         $this->assertSame('3-1', $match->getScore());
+    }
+
+    public function testModeMustBeInClosedList(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        (new GameMatch())->setMode('Battle Royale');
     }
 }

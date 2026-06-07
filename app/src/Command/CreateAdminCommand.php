@@ -79,7 +79,7 @@ class CreateAdminCommand extends Command
             ->setRole('Staff')
             ->setGrade('Admin')
             ->setGame('All Games')
-            ->setSocials(['discord' => $discordId]);
+            ->setSocials([]);
 
         $user->setPlayer($player);
 
