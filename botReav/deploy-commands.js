@@ -231,6 +231,8 @@ const commands = [
         )
 ].map(cmd => cmd.toJSON());
 
+console.log(JSON.stringify(commands, null, 2));
+
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
 (async () => {
@@ -249,4 +251,3 @@ const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
     }
 })();
 
-console.log(JSON.stringify(commands, null, 2));
