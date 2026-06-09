@@ -30,6 +30,38 @@ const commands = [
 
         .addSubcommand(sub =>
             sub
+                .setName("annuler-proposition")
+                .setDescription("Annuler une proposition de tournoi")
+                .addStringOption(opt =>
+                    opt.setName("id")
+                        .setDescription("ID de la proposition")
+                        .setRequired(true)
+                )
+                .addStringOption(opt =>
+                    opt.setName("raison")
+                        .setDescription("Raison de l’annulation")
+                        .setRequired(false)
+                )
+        )
+
+        .addSubcommand(sub =>
+            sub
+                .setName("valider-proposition")
+                .setDescription("Créer un tournoi depuis une proposition")
+                .addStringOption(opt =>
+                    opt.setName("id")
+                        .setDescription("ID de la proposition")
+                        .setRequired(true)
+                )
+                .addUserOption(opt =>
+                    opt.setName("capitaine")
+                        .setDescription("Capitaine du tournoi")
+                        .setRequired(true)
+                )
+        )
+
+        .addSubcommand(sub =>
+            sub
                 .setName("ajouter")
                 .setDescription("Ajouter un tournoi")
                 .addStringOption(opt =>
@@ -115,6 +147,7 @@ const commands = [
                         .setRequired(false)
                 )
         )
+
         .addSubcommand(sub =>
             sub
                 .setName("terminer")
@@ -125,6 +158,7 @@ const commands = [
                         .setRequired(true)
                 )
         )
+
         .addSubcommand(sub =>
             sub
                 .setName("modifier")

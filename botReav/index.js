@@ -15,7 +15,9 @@ const {
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
   ],
   partials: [Partials.Channel]
 });
@@ -113,6 +115,11 @@ function validateDateHeure(date, heure) {
   if (heure && !regexHeure.test(heure)) return "❌ Format d'heure invalide. Utilise : **21:00**";
 
   return null;
+}
+
+function getTournamentSlots(format) {
+  const match = String(format || "").match(/(\d+)\s*v\s*\d+/i);
+  return match ? Number(match[1]) : 5;
 }
 
 function getUserIdsFromOptions(interaction, prefix, max) {
@@ -235,11 +242,7 @@ async function sendLog(message) {
 
 function buildRosterEmbed(tournois) {
   const activeTournois = tournois
-      .filter(
-          t =>
-              t.status !== "cancelled" &&
-              t.status !== "finished"
-      )
+      .filter(t => t.status !== "cancelled" && t.status !== "finished")
       .sort((a, b) => a.timestamp - b.timestamp);
 
   let description =
@@ -328,11 +331,19 @@ function buildProposalEmbed(proposal) {
     else pending.push(`<@${userId}>`);
   }
 
+  const statusText =
+      proposal.status === "cancelled"
+          ? "❌ Proposition annulée"
+          : proposal.status === "converted"
+              ? `✅ Transformée en tournoi : \`${proposal.linkedTournamentId}\``
+              : "⏳ En attente des réponses";
+
   return new EmbedBuilder()
-      .setColor(0x7b2cff)
+      .setColor(proposal.status === "cancelled" ? 0xff0000 : 0x7b2cff)
       .setTitle("📢 Proposition tournoi NxR")
       .setDescription(
           `🎮 **Nouveau tournoi proposé**\n\n` +
+          `📌 Statut : **${statusText}**\n` +
           `📅 Date : **${formatDateFR(proposal.timestamp)}**\n` +
           `🎯 Format : **${proposal.format}**\n` +
           `👤 Proposé par : <@${proposal.createdBy}>\n\n` +
@@ -371,6 +382,32 @@ client.once("clientReady", () => {
   console.log(`Bot NxR connecté : ${client.user.tag}`);
 });
 
+client.on("messageCreate", async message => {
+  if (message.author.bot) return;
+  if (!message.mentions.has(client.user)) return;
+
+  const clashs = [
+    "💀 Tu m’as mentionné pour ça ? Même ton micro fait plus de dégâts que toi.",
+    "💀 J’espère que tu joues mieux que tu écris, sinon le roster est en danger.",
+    "💀 Ton niveau est tellement suspect que même Wazuh veut te scanner.",
+    "💀 Calme-toi soldat, t’as plus de messages Discord que de kills confirmés.",
+    "💀 Même en remplaçant, je te mettrais remplaçant du remplaçant.",
+    "💀 Tu veux parler stratégie ? Commence déjà par survivre au premier round.",
+    "💀 Ton aim, c’est comme une promesse de tournoi : beaucoup d’annonce, peu de résultat.",
+    "💀 Le bot répond, mais ton ratio ne mérite pas autant d’attention.",
+    "💀 J’ai vu ton gameplay. Même le point B essaye de t’éviter.",
+    "💀 NxR représente. Toi, tu fais surtout acte de présence.",
+    "💀 On t’a mis titulaire ou c’était une erreur de copier-coller ?",
+    "💀 Tu veux un conseil ? Confirme ta présence avant de confirmer ton ego.",
+    "💀 Même mon fichier JSON est plus stable que ton mental en ranked.",
+    "💀 Tu fais peur, mais surtout à ton équipe.",
+    "💀 Le seul cashprize que tu vas gagner, c’est en remboursement de coaching."
+  ];
+
+  const reponse = clashs[Math.floor(Math.random() * clashs.length)];
+  await message.reply(reponse);
+});
+
 client.on("interactionCreate", async interaction => {
   try {
     if (interaction.isButton()) {
@@ -383,6 +420,20 @@ client.on("interactionCreate", async interaction => {
         if (!proposal) {
           return interaction.reply({
             content: "❌ Proposition introuvable.",
+            ephemeral: true
+          });
+        }
+
+        if (proposal.status === "cancelled") {
+          return interaction.reply({
+            content: "❌ Cette proposition a été annulée.",
+            ephemeral: true
+          });
+        }
+
+        if (proposal.status === "converted") {
+          return interaction.reply({
+            content: "✅ Cette proposition a déjà été transformée en tournoi.",
             ephemeral: true
           });
         }
@@ -429,6 +480,13 @@ client.on("interactionCreate", async interaction => {
       if (tournoi.status === "cancelled") {
         return interaction.reply({
           content: "❌ Ce tournoi est annulé.",
+          ephemeral: true
+        });
+      }
+
+      if (tournoi.status === "finished") {
+        return interaction.reply({
+          content: "🏆 Ce tournoi est déjà terminé.",
           ephemeral: true
         });
       }
@@ -524,6 +582,7 @@ client.on("interactionCreate", async interaction => {
 
       const proposal = {
         id: Date.now().toString(),
+        status: "active",
         createdBy: interaction.user.id,
         date,
         heure,
@@ -573,6 +632,162 @@ client.on("interactionCreate", async interaction => {
             `🎯 Format : **${proposal.format}**\n` +
             `👥 Membres contactés : **${members.length}**\n\n` +
             `📩 MP : ${dmResults.join(", ")}`
+      });
+    }
+
+    if (subcommand === "annuler-proposition") {
+      const id = interaction.options.getString("id");
+      const raison = interaction.options.getString("raison") || "Aucune raison précisée";
+
+      const proposals = loadPropositions();
+      const proposal = proposals.find(p => p.id === id);
+
+      if (!proposal) return interaction.editReply({ content: "❌ Proposition introuvable." });
+      if (proposal.status === "cancelled") return interaction.editReply({ content: "❌ Cette proposition est déjà annulée." });
+      if (proposal.status === "converted") return interaction.editReply({ content: "❌ Cette proposition a déjà été transformée en tournoi." });
+
+      proposal.status = "cancelled";
+      proposal.cancelledBy = interaction.user.id;
+      proposal.cancelReason = raison;
+      proposal.cancelledAt = Date.now();
+
+      savePropositions(proposals);
+      await updateProposalEmbed(proposal);
+
+      await sendLog(
+          `❌ **Proposition tournoi annulée**\n` +
+          `🆔 ID : \`${proposal.id}\`\n` +
+          `👤 Annulée par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(proposal.timestamp)}**\n` +
+          `🎯 Format : **${proposal.format}**\n` +
+          `📝 Raison : ${raison}`
+      );
+
+      return interaction.editReply({
+        content:
+            `❌ **Proposition annulée**\n\n` +
+            `🆔 ID : \`${proposal.id}\`\n` +
+            `📅 Date : **${formatDateFR(proposal.timestamp)}**\n` +
+            `🎯 Format : **${proposal.format}**`
+      });
+    }
+
+    if (subcommand === "valider-proposition") {
+      const id = interaction.options.getString("id");
+      const capitaine = interaction.options.getUser("capitaine");
+
+      const proposals = loadPropositions();
+      const proposal = proposals.find(p => p.id === id);
+
+      if (!proposal) return interaction.editReply({ content: "❌ Proposition introuvable." });
+      if (proposal.status === "cancelled") return interaction.editReply({ content: "❌ Impossible de créer un tournoi depuis une proposition annulée." });
+      if (proposal.status === "converted") {
+        return interaction.editReply({
+          content: `❌ Cette proposition a déjà été transformée en tournoi : \`${proposal.linkedTournamentId}\``
+        });
+      }
+
+      const yes = [];
+      const subs = [];
+
+      for (const userId of proposal.members || []) {
+        const response = proposal.responses?.[userId];
+        if (response === "yes") yes.push(userId);
+        if (response === "sub") subs.push(userId);
+      }
+
+      const playerSlots = Math.max(getTournamentSlots(proposal.format) - 1, 1);
+      const availableWithoutCaptain = yes.filter(userId => userId !== capitaine.id);
+
+      const playerIds = availableWithoutCaptain.slice(0, playerSlots);
+      const substituteIds = [
+        ...new Set([
+          ...subs.filter(userId => userId !== capitaine.id),
+          ...availableWithoutCaptain.slice(playerSlots)
+        ])
+      ];
+
+      if (playerIds.length === 0) {
+        return interaction.editReply({
+          content: "❌ Aucun joueur disponible pour créer le tournoi."
+        });
+      }
+
+      const tournoi = {
+        id: Date.now().toString(),
+        status: "active",
+        createdBy: interaction.user.id,
+        createdFromProposal: proposal.id,
+        captain: capitaine.id,
+        date: proposal.date,
+        heure: proposal.heure,
+        format: proposal.format,
+        timestamp: proposal.timestamp,
+        players: playerIds,
+        substitutes: substituteIds,
+        checkins: {},
+        reminder24hSent: false,
+        reminder2hSent: false
+      };
+
+      tournoi.checkins[capitaine.id] = "available";
+      for (const userId of playerIds) tournoi.checkins[userId] = "available";
+      for (const userId of substituteIds) tournoi.checkins[userId] = "available";
+
+      tournois.push(tournoi);
+
+      proposal.status = "converted";
+      proposal.linkedTournamentId = tournoi.id;
+      proposal.convertedBy = interaction.user.id;
+      proposal.convertedAt = Date.now();
+
+      saveTournois(tournois);
+      savePropositions(proposals);
+
+      await updateRosterBoard(tournois);
+      await updateProposalEmbed(proposal);
+
+      const dmResults = [];
+
+      for (const userId of getAllTournamentUsers(tournoi)) {
+        const rosterStatus = getStatusForUser(tournoi, userId);
+
+        const success = await sendDm(
+            userId,
+            `🎮 **Tournoi NxR**\n\n` +
+            `Tu as été sélectionné pour le tournoi du **${formatDateFR(tournoi.timestamp)}**.\n\n` +
+            `🎯 Format : **${tournoi.format}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `📌 Statut : **${rosterStatus}**\n\n` +
+            `Ta réponse à la proposition a été prise en compte.\n\n` +
+            `Ceci est un message automatique du Colonel Moutarde.`,
+            [buildCheckinButtons(tournoi.id)]
+        );
+
+        dmResults.push(`${success ? "✅" : "❌"} <@${userId}>`);
+      }
+
+      await sendLog(
+          `✅ **Tournoi créé depuis une proposition**\n` +
+          `🆔 Proposition : \`${proposal.id}\`\n` +
+          `🆔 Tournoi : \`${tournoi.id}\`\n` +
+          `👤 Créé par : <@${interaction.user.id}>\n` +
+          `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+          `🎯 Format : **${tournoi.format}**\n` +
+          `🧢 Capitaine : <@${tournoi.captain}>`
+      );
+
+      return interaction.editReply({
+        content:
+            `✅ **Tournoi créé depuis la proposition**\n\n` +
+            `🆔 Proposition : \`${proposal.id}\`\n` +
+            `🆔 Tournoi : \`${tournoi.id}\`\n` +
+            `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
+            `🎯 Format : **${tournoi.format}**\n` +
+            `🧢 Capitaine : <@${tournoi.captain}>\n` +
+            `👥 Joueurs : ${playerIds.map(userId => `<@${userId}>`).join(", ")}\n` +
+            `🔁 Remplaçants : ${substituteIds.length ? substituteIds.map(userId => `<@${userId}>`).join(", ") : "Aucun"}\n\n` +
+            `📩 MP envoyés : ${dmResults.join(", ")}`
       });
     }
 
@@ -658,15 +873,15 @@ client.on("interactionCreate", async interaction => {
             `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
             `🎯 Format : **${tournoi.format}**\n` +
             `🧢 Capitaine : <@${tournoi.captain}>\n` +
-            `👥 Joueurs : ${playerIds.map(id => `<@${id}>`).join(", ")}\n` +
-            `🔁 Remplaçants : ${substituteIds.length ? substituteIds.map(id => `<@${id}>`).join(", ") : "Aucun"}\n\n` +
+            `👥 Joueurs : ${playerIds.map(userId => `<@${userId}>`).join(", ")}\n` +
+            `🔁 Remplaçants : ${substituteIds.length ? substituteIds.map(userId => `<@${userId}>`).join(", ") : "Aucun"}\n\n` +
             `📩 MP envoyés : ${dmResults.join(", ")}`
       });
     }
 
     if (subcommand === "liste") {
       const activeTournois = tournois
-          .filter(t => t.status !== "cancelled")
+          .filter(t => t.status !== "cancelled" && t.status !== "finished")
           .sort((a, b) => a.timestamp - b.timestamp);
 
       if (activeTournois.length === 0) {
@@ -681,30 +896,19 @@ client.on("interactionCreate", async interaction => {
             ).join("\n")
       });
     }
+
     if (subcommand === "terminer") {
-
       const id = interaction.options.getString("id");
-
       const tournoi = tournois.find(t => t.id === id);
 
-      if (!tournoi) {
-        return interaction.editReply({
-          content: "❌ Tournoi introuvable."
-        });
-      }
-
-      if (tournoi.status === "finished") {
-        return interaction.editReply({
-          content: "❌ Ce tournoi est déjà terminé."
-        });
-      }
+      if (!tournoi) return interaction.editReply({ content: "❌ Tournoi introuvable." });
+      if (tournoi.status === "finished") return interaction.editReply({ content: "❌ Ce tournoi est déjà terminé." });
 
       tournoi.status = "finished";
       tournoi.finishedBy = interaction.user.id;
       tournoi.finishedAt = Date.now();
 
       saveTournois(tournois);
-
       await updateRosterBoard(tournois);
 
       await sendLog(
@@ -725,6 +929,7 @@ client.on("interactionCreate", async interaction => {
             `Le tournoi a été retiré du roster.`
       });
     }
+
     if (subcommand === "annuler") {
       const id = interaction.options.getString("id");
       const raison = interaction.options.getString("raison") || "Aucune raison précisée";
@@ -782,6 +987,7 @@ client.on("interactionCreate", async interaction => {
 
       if (!tournoi) return interaction.editReply({ content: "❌ Tournoi introuvable." });
       if (tournoi.status === "cancelled") return interaction.editReply({ content: "❌ Impossible de modifier un tournoi annulé." });
+      if (tournoi.status === "finished") return interaction.editReply({ content: "❌ Impossible de modifier un tournoi terminé." });
 
       const newDate = interaction.options.getString("date");
       const newHeure = interaction.options.getString("heure");
@@ -807,13 +1013,8 @@ client.on("interactionCreate", async interaction => {
       const newPlayers = getUserIdsFromOptions(interaction, "joueur", 5);
       const newSubstitutes = getUserIdsFromOptions(interaction, "remplacant", 3);
 
-      if (newPlayers.length > 0) {
-        tournoi.players = newPlayers;
-      }
-
-      if (newSubstitutes.length > 0) {
-        tournoi.substitutes = newSubstitutes;
-      }
+      if (newPlayers.length > 0) tournoi.players = newPlayers;
+      if (newSubstitutes.length > 0) tournoi.substitutes = newSubstitutes;
 
       tournoi.checkins = tournoi.checkins || {};
       tournoi.reminder24hSent = false;
@@ -861,8 +1062,8 @@ client.on("interactionCreate", async interaction => {
             `📅 Date : **${formatDateFR(tournoi.timestamp)}**\n` +
             `🎯 Format : **${tournoi.format || "Non précisé"}**\n` +
             `🧢 Capitaine : <@${tournoi.captain}>\n` +
-            `👥 Joueurs : ${tournoi.players.map(id => `<@${id}>`).join(", ")}\n` +
-            `🔁 Remplaçants : ${tournoi.substitutes.length ? tournoi.substitutes.map(id => `<@${id}>`).join(", ") : "Aucun"}\n\n` +
+            `👥 Joueurs : ${tournoi.players.map(userId => `<@${userId}>`).join(", ")}\n` +
+            `🔁 Remplaçants : ${tournoi.substitutes.length ? tournoi.substitutes.map(userId => `<@${userId}>`).join(", ") : "Aucun"}\n\n` +
             `📩 MP envoyés : ${dmResults.join(", ")}`
       });
     }
@@ -887,7 +1088,7 @@ cron.schedule("* * * * *", async () => {
   let updated = false;
 
   for (const tournoi of tournois) {
-    if (tournoi.status === "cancelled") continue;
+    if (tournoi.status === "cancelled" || tournoi.status === "finished") continue;
 
     const timeLeft = tournoi.timestamp - now;
 
