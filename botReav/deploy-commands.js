@@ -248,3 +248,5 @@ const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
         console.error("Erreur déploiement commandes :", error);
     }
 })();
+
+console.log(JSON.stringify(commands, null, 2));
